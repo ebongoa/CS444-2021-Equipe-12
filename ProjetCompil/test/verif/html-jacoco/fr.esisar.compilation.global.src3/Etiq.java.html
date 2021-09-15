@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Etiq.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">JaCoCo Coverage Report</a> &gt; <a href="index.source.html" class="el_package">fr.esisar.compilation.global.src3</a> &gt; <span class="el_source">Etiq.java</span></div><h1>Etiq.java</h1><pre class="source lang-java linenums">package fr.esisar.compilation.global.src3;
+
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * Classe des étiquettes de la machine abstraite.
+ */
+
+public class Etiq {
+
+   private String chaine; // Le texte de l'étiquette
+
+<span class="nc" id="L14">   private static Map&lt;String,Etiq&gt; listeEtiq = </span>
+      new HashMap&lt;String,Etiq&gt;(); // Le catalogue des étiquettes existantes
+
+<span class="nc" id="L17">   private static int compteur = 0; </span>
+                        // Compteur pour fabriquer des nouvelles étiquettes.
+
+   /**
+    * Constructeur.
+    * Construit une nouvelle étiquette à partir de la chaîne spécifiée.
+    */
+<span class="nc" id="L24">   private Etiq(String chaine) {</span>
+<span class="nc" id="L25">      this.chaine = chaine;</span>
+<span class="nc" id="L26">   }</span>
+
+   /**
+    * Renvoie l'étiquette de chaîne spécifiée, si celle-ci a déjà été créée, 
+    * sinon crée cette étiquette et la renvoie.
+    */
+   public static Etiq lEtiq(String chaine) {
+<span class="nc" id="L33">      String chaineMin = chaine.toLowerCase();</span>
+<span class="nc bnc" id="L34" title="All 2 branches missed.">      if (listeEtiq.containsKey(chaineMin)) {</span>
+<span class="nc" id="L35">         return listeEtiq.get(chaineMin);</span>
+      } else {
+<span class="nc" id="L37">         Etiq etiq = new Etiq(chaineMin);</span>
+<span class="nc" id="L38">         listeEtiq.put(chaineMin, etiq);</span>
+<span class="nc" id="L39">         return etiq;</span>
+      }
+   }
+
+   /**
+    * Renvoie l'étiquette ayant la chaîne (chaine + &quot;.&quot; + n), si celle-ci 
+    * a déjà été créée, sinon crée cette étiquette et la renvoie.
+    */
+   private static Etiq lEtiqNum(String chaine, int n) {
+<span class="nc" id="L48">      return lEtiq(chaine + &quot;.&quot; + n);</span>
+   }
+
+   /**
+    * Renvoie une étiquette ayant la chaîne (chaine + &quot;.&quot; + n) où n est 
+    * incrémenté à chaque appel de cette méthode.
+    */
+   public static Etiq nouvelle(String chaine) {
+<span class="nc" id="L56">      compteur++;</span>
+<span class="nc" id="L57">      return lEtiqNum(chaine, compteur);</span>
+   }
+      
+
+   /**
+    * La chaîne de caractères qui correspond à cette étiquette.
+    */
+   public String toString() {
+<span class="nc" id="L65">      return chaine;</span>
+   }
+
+}
+
+
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

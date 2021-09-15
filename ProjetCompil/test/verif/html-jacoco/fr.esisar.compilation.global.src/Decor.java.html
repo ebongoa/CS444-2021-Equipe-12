@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Decor.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">JaCoCo Coverage Report</a> &gt; <a href="index.source.html" class="el_package">fr.esisar.compilation.global.src</a> &gt; <span class="el_source">Decor.java</span></div><h1>Decor.java</h1><pre class="source lang-java linenums">package fr.esisar.compilation.global.src;
+
+/**
+ * Classe des décors.
+ * Un décor est un triplet (Defn defn, Type type, int infoCode).
+ * Le champ infoCode est initialisé par défaut à -1.
+ */
+
+public class Decor {
+
+   private Defn defn;    // La defn de ce décor
+   private Type type;    // Le type de ce décor
+   private int infoCode; // Le champ infoCode de ce décor
+
+   private boolean premierSaut; // Pour l'affichage d'un décor
+
+   /**
+    * Constructeur de décor.
+    * La defn et le type sont initialisées à null.
+    * Le champ infoCode est initialisé à -1.
+    */
+<span class="nc" id="L22">   public Decor() { </span>
+<span class="nc" id="L23">      infoCode = -1;</span>
+<span class="nc" id="L24">   }</span>
+
+   /**
+    * Constructeur de décor avec la defn spécifiée.
+    * Le type est initialisée à null.
+    * Le champ infoCode est initialisé à -1.
+    */
+<span class="nc" id="L31">   public Decor(Defn defn) {</span>
+<span class="nc" id="L32">      this.defn = defn;</span>
+<span class="nc" id="L33">      infoCode = -1;</span>
+<span class="nc" id="L34">   }</span>
+
+   /**
+    * Constructeur de décor avec le type spécifiée.
+    * La defn est initialisée à null;
+    * Le champ infoCode est initialisé à -1.
+    */
+<span class="nc" id="L41">   public Decor(Type type) {</span>
+<span class="nc" id="L42">      this.type = type;</span>
+<span class="nc" id="L43">      infoCode = -1;</span>
+<span class="nc" id="L44">   }</span>
+
+   /**
+    * Constructeur de décor avec la defn et le type spécifiées.
+    * Le champ infoCode est initialisé à -1.
+    */
+<span class="nc" id="L50">   public Decor(Defn defn, Type type) {</span>
+<span class="nc" id="L51">      this.defn = defn;</span>
+<span class="nc" id="L52">      this.type = type;</span>
+<span class="nc" id="L53">      infoCode = -1;</span>
+<span class="nc" id="L54">   }</span>
+
+   /**
+    * La defn de ce décor.
+    */
+   public Defn getDefn() {
+<span class="nc" id="L60">      return defn;</span>
+   }
+
+   /**
+    * Le type de ce décor.
+    */
+   public Type getType() {
+<span class="nc" id="L67">      return type;</span>
+   }
+
+   /**
+    * L'infoCode de ce décor.
+    */
+   public int getInfoCode() {
+<span class="nc" id="L74">      return infoCode;</span>
+   }
+
+   /**
+    * Modifie la defn de ce décor avec la defn spécifiée.
+    */
+   public void setDefn(Defn defn) {
+<span class="nc" id="L81">      this.defn = defn;</span>
+<span class="nc" id="L82">   }</span>
+
+   /**
+    * Modifie le type de ce décor avec le type spécifiée.
+    */
+   public void setType(Type type) {
+<span class="nc" id="L88">      this.type = type;</span>
+<span class="nc" id="L89">   }</span>
+
+   /**
+    * Modifie l'infoCode de ce décor avec l'entier spécifié.
+    */
+   public void setInfoCode(int infoCode) {
+<span class="nc" id="L95">      this.infoCode = infoCode;</span>
+<span class="nc" id="L96">   }</span>
+
+   /**
+    * Affiche un retour à la ligne si c'est la première ligne affichée
+    * et si le numéro de colonne est différent de 1.
+    */
+   private void premiereLigne() {
+<span class="nc bnc" id="L103" title="All 2 branches missed.">      if (premierSaut) {</span>
+<span class="nc bnc" id="L104" title="All 2 branches missed.">         if (Affichage.getCol() != 1) {</span>
+<span class="nc" id="L105">            Affichage.ecrire(&quot;\n&quot;);</span>
+         }
+<span class="nc" id="L107">         premierSaut = false; </span>
+      }
+<span class="nc" id="L109">   }</span>
+
+   /**
+    * Affiche ce décor avec le niveau de détails spécifié.
+    * &lt;ul&gt;
+    *  &lt;li&gt; niveau = 0 : pas de décor affiché &lt;/li&gt;
+    *  &lt;li&gt; niveau = 1 : décors relatifs à la passe 2 &lt;/li&gt;
+    *  &lt;li&gt; niveau = 2 : décors relatifs aux passes 2 et 3 &lt;/li&gt;
+    * &lt;/ul&gt;
+    */
+   public void afficher(int niveau) {
+<span class="nc" id="L120">      premierSaut = true;</span>
+<span class="nc" id="L121">      int c = Affichage.getCol();</span>
+<span class="nc bnc" id="L122" title="All 2 branches missed.">      if (defn != null) {</span>
+<span class="nc bnc" id="L123" title="All 2 branches missed.">         if (niveau &gt;= 1) {</span>
+<span class="nc" id="L124">            premiereLigne();</span>
+<span class="nc" id="L125">            Affichage.commencer();</span>
+<span class="nc" id="L126">            Affichage.ecrire(&quot;defn :\n&quot;);</span>
+<span class="nc" id="L127">            Affichage.empiler(3, &quot;&quot;);</span>
+<span class="nc" id="L128">            defn.afficher(niveau);</span>
+<span class="nc" id="L129">            Affichage.depiler();</span>
+<span class="nc" id="L130">            Affichage.ecrire(&quot;\n&quot;);</span>
+         }
+      }
+
+<span class="nc bnc" id="L134" title="All 2 branches missed.">      if (type != null) {</span>
+<span class="nc bnc" id="L135" title="All 2 branches missed.">         if (niveau &gt;= 1) {</span>
+<span class="nc" id="L136">            premiereLigne();</span>
+<span class="nc" id="L137">            Affichage.commencer();</span>
+<span class="nc" id="L138">            Affichage.ecrire(&quot;type :\n&quot;);</span>
+<span class="nc" id="L139">            Affichage.empiler(3, &quot;&quot;);</span>
+<span class="nc" id="L140">            type.afficher(niveau);</span>
+<span class="nc" id="L141">            Affichage.depiler();</span>
+<span class="nc" id="L142">            Affichage.ecrire(&quot;\n&quot;);</span>
+         }
+      }
+
+<span class="nc bnc" id="L146" title="All 2 branches missed.">      if (infoCode != -1) {</span>
+<span class="nc bnc" id="L147" title="All 2 branches missed.">         if (niveau &gt;= 2) {</span>
+<span class="nc" id="L148">            premiereLigne();</span>
+<span class="nc" id="L149">            Affichage.commencer();</span>
+<span class="nc" id="L150">            Affichage.ecrire(&quot;infoCode : &quot; + infoCode + &quot;\n&quot;);</span>
+         }
+      }
+
+<span class="nc bnc" id="L154" title="All 2 branches missed.">      if (!premierSaut) {</span>
+<span class="nc" id="L155">         Affichage.setCol(c);</span>
+      }
+
+<span class="nc" id="L158">   }</span>
+}
+
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

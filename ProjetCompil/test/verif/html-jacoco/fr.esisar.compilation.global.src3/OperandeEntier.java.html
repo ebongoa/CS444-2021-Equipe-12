@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>OperandeEntier.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">JaCoCo Coverage Report</a> &gt; <a href="index.source.html" class="el_package">fr.esisar.compilation.global.src3</a> &gt; <span class="el_source">OperandeEntier.java</span></div><h1>OperandeEntier.java</h1><pre class="source lang-java linenums">package fr.esisar.compilation.global.src3;
+
+/**
+ * Classe des opérandes entiers (de nature OpEntier).
+ */
+
+class OperandeEntier extends Operande { 
+
+   private int valEntier; // L'entier qui correspond à cet opérande entier
+
+   /**
+    * Constructeur.
+    */
+   OperandeEntier(int valEntier) {
+<span class="nc" id="L15">      super(NatureOperande.OpEntier);</span>
+<span class="nc" id="L16">      this.valEntier = valEntier;</span>
+<span class="nc" id="L17">   }</span>
+
+   /**
+    * L'entier qui correspond à cet opérande entier.
+    */
+   public int getEntier() {
+<span class="nc" id="L23">      return valEntier;</span>
+   }
+
+   /**
+    * Modifie l'entier qui correspond à cet opérande entier.
+    */
+   public void setEntier(int valEntier) {
+<span class="nc" id="L30">      this.valEntier = valEntier;</span>
+<span class="nc" id="L31">   }</span>
+
+   /**
+    * La chaîne de caractères qui correspond à cet opérande. 
+    */
+   public String toString() {
+<span class="nc" id="L37">      return &quot;#&quot; + valEntier;</span>
+   }
+
+
+}
+
+
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>TestSynt.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">JaCoCo Coverage Report</a> &gt; <a href="index.source.html" class="el_package">fr.esisar.compilation.syntaxe</a> &gt; <span class="el_source">TestSynt.java</span></div><h1>TestSynt.java</h1><pre class="source lang-java linenums">// ----------------------------------------------------------------------------
+// Testeur pour l'analyseur syntaxique
+// ----------------------------------------------------------------------------
+
+package fr.esisar.compilation.syntaxe;
+
+import fr.esisar.compilation.global.src.Arbre;
+
+/** 
+ * Classe qui permet de tester l'analyse syntaxique.
+ */
+<span class="nc" id="L12">public class TestSynt {</span>
+
+   /** 
+    * Méthode principale qui permet de tester l'analyse syntaxique et 
+    * la construction de l'arbre abstrait.
+    */
+
+   public static void main(String args[]) throws Exception {
+
+      try {
+         // Appel de l'analyseur syntaxique et construction de l'arbre abstrait
+<span class="nc" id="L23">         Arbre arbre = parser.analyseSyntaxique(args); </span>
+         // Affichage de l'arbre
+<span class="nc" id="L25">         arbre.afficher(0);</span>
+         // Décompilation de l'arbre
+<span class="nc" id="L27">         arbre.decompiler(0);</span>
+<span class="nc" id="L28">      } catch (ErreurLexicale e) {</span>
+         // Recuperation de l'exception ErreurLexicale
+         // On ne fait rien
+<span class="nc" id="L31">      } catch (ErreurSyntaxe e) {</span>
+         // Recuperation de l'exception ErreurSyntaxe
+         // On ne fait rien
+<span class="nc" id="L34">      }</span>
+<span class="nc" id="L35">   }</span>
+
+}
+
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

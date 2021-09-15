@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ArgsFichier.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">JaCoCo Coverage Report</a> &gt; <a href="index.source.html" class="el_package">fr.esisar.compilation.global.src</a> &gt; <span class="el_source">ArgsFichier.java</span></div><h1>ArgsFichier.java</h1><pre class="source lang-java linenums">package fr.esisar.compilation.global.src;
+
+import java.io.File;
+import java.io.InputStream;
+import java.io.FileInputStream;
+
+/** 
+ * La classe ArgsFichier permet de récupérer, à l'aide de la fonction
+ * ouvrir(args), soit le flot System.in, soit le flot correspondant 
+ * au fichier args[0].
+ */
+
+public class ArgsFichier {
+
+   /**
+    * Constructeur privé, car la classe n'est pas destinée à être 
+    * instanciée.
+    */
+   private ArgsFichier() { }
+
+   /**
+    * ouvrir(args) retourne : 
+    * &lt;ul&gt;
+    * &lt;li&gt; le flot System.in, si le tableau args est de taille 0,
+    * &lt;/li&gt;
+    * &lt;li&gt; le flot correspondant au fichier args[0], si args est de taille 1.
+    * &lt;/li&gt;
+    * &lt;/ul&gt;
+    * Si args est de taille supérieure ou égale à 2, ou si le fichier arg[0]  
+    * ne peut pas être ouvert, un message d'erreur est affiché et 
+    * le programme s'arrête.
+    */
+   public static InputStream ouvrir(String args[]){
+<span class="fc" id="L34">      InputStream fichier = null;</span>
+
+<span class="pc bpc" id="L36" title="1 of 2 branches missed.">      if (args.length == 0) {</span>
+         // On va lire sur l'entrée standard
+<span class="nc" id="L38">         fichier = System.in;</span>
+<span class="pc bpc" id="L39" title="1 of 2 branches missed.">      } else if (args.length == 1) {</span>
+         // On va lire le fichier args[0]
+         try {
+<span class="fc" id="L42">            fichier = new FileInputStream(args[0]);</span>
+<span class="nc" id="L43">         } catch (java.io.FileNotFoundException e) {</span>
+            // Exception levée si le fichier n'est pas trouvé
+<span class="nc" id="L45">            System.err.println(&quot;Erreur : le fichier '&quot; + args[0] +</span>
+                               &quot;' n'existe pas ou est impossible a ouvrir&quot;);
+<span class="nc" id="L47">            System.exit(1);</span>
+<span class="pc" id="L48">         }</span>
+      } else {
+<span class="nc" id="L50">         System.err.println(&quot;Zero ou un argument attendu dans la commande&quot;);</span>
+<span class="nc" id="L51">         System.exit(1);</span>
+      }
+      
+<span class="fc" id="L54">      return fichier;</span>
+   }
+   
+   
+   /** 
+    * Renvoie le nom du fichier de sortie en fonction des paramètres d'entrée
+    * sortie(args) retourne null si le tableau args n'est pas de longueur 1 ou si le nom
+    * du fichier dans args[0] n'existe pas ;
+    * sinon elle retourne le nom du fichier correspondant à args[Ø], remplacant 
+    * l'extension cas par ass si elle est présente, ou ajoutant &quot;.ass&quot; par défaut
+    */
+   public static String sortie(String args[]) {
+
+<span class="nc" id="L67">	   File f=null;</span>
+<span class="nc bnc" id="L68" title="All 2 branches missed.">	   if (args.length == 0) {</span>
+
+<span class="nc" id="L70">		   return null;</span>
+<span class="nc bnc" id="L71" title="All 2 branches missed.">	   } else if (args.length == 1) {</span>
+		   // On va lire le fichier args[0]
+
+<span class="nc" id="L74">		   f=new File(args[0]);</span>
+<span class="nc bnc" id="L75" title="All 2 branches missed.">		   if (!f.exists()) </span>
+<span class="nc" id="L76">			   return null;</span>
+		   else
+		   {
+			   
+<span class="nc" id="L80">			   String name=f.getName();</span>
+<span class="nc bnc" id="L81" title="All 2 branches missed.">			   if (name.endsWith(&quot;.cas&quot;)) </span>
+<span class="nc" id="L82">				   name=name.substring(0,name.length()-3)+&quot;ass&quot;;</span>
+			   
+			   else
+<span class="nc" id="L85">				   name=name+&quot;ass&quot;;</span>
+<span class="nc" id="L86">			   return name;</span>
+				   
+		   }
+
+
+
+
+	   }
+	   else
+<span class="nc" id="L95">		   return null;</span>
+   } 
+}
+
+
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

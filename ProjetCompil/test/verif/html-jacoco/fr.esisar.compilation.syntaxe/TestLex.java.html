@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>TestLex.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">JaCoCo Coverage Report</a> &gt; <a href="index.source.html" class="el_package">fr.esisar.compilation.syntaxe</a> &gt; <span class="el_source">TestLex.java</span></div><h1>TestLex.java</h1><pre class="source lang-java linenums">// ----------------------------------------------------------------------------
+// Testeur pour l'analyseur lexical
+// ----------------------------------------------------------------------------
+
+package fr.esisar.compilation.syntaxe;
+
+import java.io.InputStream;
+
+import java_cup.runtime.Symbol;
+import fr.esisar.compilation.global.src.ArgsFichier;
+
+/**
+ * La classe TestLex permet de tester l'analyseur lexical défini
+ * dans la classe Lexical. 
+ */
+<span class="nc" id="L16">public class TestLex {</span>
+
+   /** 
+    * Fonction principale de la classe TestLex, qui permet de lire 
+    * des unités lexicales sur l'entrée standard. 
+    * L'exception java.io.IOException est levée en cas d'erreur 
+    * d'entrées/sorties.
+    * L'exception ErreurLexicale est levée en cas d'erreur lexicale.
+    * Ces deux exception sont levées par la fonction next_token 
+    * de la classe Lexical (fonction principale permettant de lire des
+    * unites lexicales).
+    */
+
+   public static void main(String args[]) throws java.io.IOException {
+
+      try {
+
+         // L'entrée de TestLex
+<span class="nc" id="L34">         InputStream fichierCas = ArgsFichier.ouvrir(args);</span>
+      
+         // Création d'un analyseur lexical 
+<span class="nc" id="L37">         Lexical analyseur = new Lexical(fichierCas);</span>
+
+         // Un token
+         Symbol t ; 
+
+         // Lecture de la premiere unite lexicale
+<span class="nc" id="L43">         t = analyseur.next_token() ; </span>
+
+         // Boucle principale 
+         // En fin de fichier, la fonction next_token() renvoie un Symbol
+         // dont la &quot;valeur&quot; est sym.EOF
+      
+<span class="nc bnc" id="L49" title="All 2 branches missed.">         while (t.sym != sym.EOF) {</span>
+<span class="nc" id="L50">            System.out.println(Lexical.toString(t));</span>
+<span class="nc" id="L51">            t = analyseur.next_token() ;</span>
+         }
+
+<span class="nc" id="L54">         System.out.println() ;</span>
+   
+<span class="nc" id="L56">      } catch (ErreurLexicale e) {</span>
+          // Recuperation de l'exception ErreurLexicale
+          // On ne fait rien
+<span class="nc" id="L59">      }</span>
+<span class="nc" id="L60">   }</span>
+
+}
+
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

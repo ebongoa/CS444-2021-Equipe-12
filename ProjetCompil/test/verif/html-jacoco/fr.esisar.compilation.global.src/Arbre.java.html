@@ -1,0 +1,1044 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Arbre.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">JaCoCo Coverage Report</a> &gt; <a href="index.source.html" class="el_package">fr.esisar.compilation.global.src</a> &gt; <span class="el_source">Arbre.java</span></div><h1>Arbre.java</h1><pre class="source lang-java linenums">package fr.esisar.compilation.global.src;
+
+/**
+ * Classe pour représenter les arbres abstraits du programme.
+ */
+
+public class Arbre {
+
+   private Noeud noeudArbre; // Le noeud de l'arbre
+   private int numLigne;     // Le numéro de ligne
+   private Decor decor;      // Le décor de l'arbre
+
+   // ------------------------------------------------------------------------
+   // CONSTRUCTEURS
+   // ------------------------------------------------------------------------
+
+   /**
+    * Constructeur d'arbre de noeud Noeud.Entier.
+    */
+
+   public static Arbre creationEntier(int valEntier, int numLigne) {
+<span class="nc" id="L22">      return new ArbreEntier(valEntier, numLigne);</span>
+   }
+
+   /**
+    * Constructeur d'arbre de noeud Noeud.Reel.
+    */
+
+   public static Arbre creationReel(float valReel, int numLigne) {
+<span class="nc" id="L30">      return new ArbreReel(valReel, numLigne);</span>
+   }
+
+   /**
+    * Constructeur d'arbre de noeud Noeud.Chaine.
+    */
+   
+   public static Arbre creationChaine(String valChaine, int numLigne) {
+<span class="nc" id="L38">      return new ArbreChaine(Noeud.Chaine, valChaine, numLigne);</span>
+   }
+
+   /**
+    * Constructeur d'arbre de noeud Noeud.Ident.
+    */
+ 
+   public static Arbre creationIdent(String valIdent, int numLigne) {
+<span class="nc" id="L46">      return new ArbreChaine(Noeud.Ident, valIdent, numLigne);</span>
+   }
+
+   /**
+    * Constructeur de noeud et d'arité spécifiés.
+    */
+<span class="nc" id="L52">   Arbre(Noeud noeud, int numLigne, int arite) {</span>
+<span class="nc bnc" id="L53" title="All 2 branches missed.">      if (noeud.arite != arite) {</span>
+<span class="nc" id="L54">         throw new ErreurArbre(&quot;Noeud d'arite &quot; + arite + &quot; attendu&quot;);</span>
+      }
+<span class="nc" id="L56">      this.noeudArbre = noeud;</span>
+<span class="nc" id="L57">      this.numLigne = numLigne;</span>
+<span class="nc" id="L58">   }</span>
+      
+   /**
+    * Constructeur d'arbre d'arité 0.
+    * Précondition : noeud.arite == 0.
+    */
+<span class="nc" id="L64">   Arbre(Noeud noeud, int numLigne) {</span>
+<span class="nc bnc" id="L65" title="All 2 branches missed.">      if (noeud.arite != 0) {</span>
+<span class="nc" id="L66">         throw new ErreurArbre(&quot;Noeud d'arite 0 attendu&quot;);</span>
+      }
+<span class="nc" id="L68">      this.noeudArbre = noeud;</span>
+<span class="nc" id="L69">      this.numLigne = numLigne;</span>
+<span class="nc" id="L70">   } </span>
+
+   /**
+    * Constructeur d'arbre d'arité 0.
+    * Précondition : noeud.arite == 0.
+    */
+   public static Arbre creation0(Noeud noeud, int numLigne) {
+<span class="nc" id="L77">      return new Arbre(noeud, numLigne);</span>
+   }
+
+   /**
+    * Constructeur d'arbre d'arité 1.
+    * Précondition : noeud.arite == 1.
+    */
+   public static Arbre creation1(Noeud noeud, Arbre fils1, int numLigne) {
+<span class="nc" id="L85">      return new ArbreFils(noeud, fils1, numLigne);</span>
+   }
+
+   /**
+    * Constructeur d'arbre d'arité 2.
+    * Précondition : noeud.arite == 2.
+    */
+   public static Arbre creation2(Noeud noeud, 
+         Arbre fils1, Arbre fils2, int numLigne) {
+<span class="nc" id="L94">      return new ArbreFils(noeud, fils1, fils2, numLigne);</span>
+   }
+
+   /**
+    * Constructeur d'arbre d'arité 3.
+    * Précondition : noeud.arite == 3.
+    */
+   public static Arbre creation3(Noeud noeud, 
+         Arbre fils1, Arbre fils2, Arbre fils3, int numLigne) {
+<span class="nc" id="L103">      return new ArbreFils(noeud, fils1, fils2, fils3, numLigne);</span>
+   }
+
+   // ------------------------------------------------------------------------
+   // Sélecteurs
+   // ------------------------------------------------------------------------
+
+   /**
+    * Le noeud de l'arbre.
+    */
+   public Noeud getNoeud() {
+<span class="nc" id="L114">      return noeudArbre;</span>
+   }
+
+   /**
+    * Le numéro de ligne de l'arbre.
+    */
+   public int getNumLigne() {
+<span class="nc" id="L121">      return numLigne;</span>
+   }
+
+   /**
+    * L'arité de l'arbre.
+    */
+   public int getArite() {
+<span class="nc" id="L128">      return noeudArbre.arite;</span>
+   }
+
+   /**
+    * La chaîne associée à l'arbre.
+    * Précondition : 
+    *    this.getNoeud() == Noeud.Chaine ou this.getNoeud() == Noeud.Ident
+    */
+   public String getChaine() {
+<span class="nc" id="L137">      throw new ErreurArbre(&quot;getChaine() impossible sur &quot; + noeudArbre);</span>
+   }
+
+   /**
+    * L'entier associé à un Noeud.Entier.
+    * Précondition : 
+    *    this.getNoeud() == Noeud.Entier
+    */
+   public int getEntier() {
+<span class="nc" id="L146">      throw new ErreurArbre(&quot;getEntier() impossible sur &quot; + noeudArbre);</span>
+   }
+
+   /**
+    * Le réel associé à un Noeud.Reel.
+    * Précondition :
+    *    this.getNoeud() == Noeud.Reel
+    */
+   public float getReel() {
+<span class="nc" id="L155">      throw new ErreurArbre(&quot;getReel() impossible sur &quot; + noeudArbre);</span>
+   }
+
+   /**
+    * Le premier fils de cet arbre.
+    * Précondition : l'arbre a au moins un fils.
+    */
+   public Arbre getFils1() {
+<span class="nc" id="L163">      return getFils(1);</span>
+   }
+
+   /**
+    * Le deuxième fils de cet arbre.
+    * Précondition : l'arbre a au moins deux fils.
+    */
+   public Arbre getFils2() {
+<span class="nc" id="L171">      return getFils(2);</span>
+   }
+
+   /**
+    * Le troisième fils de cet arbre.
+    * Précondition : l'arbre a au moins trois fils.
+    */
+   public Arbre getFils3() {
+<span class="nc" id="L179">      return getFils(3);</span>
+   }
+
+   /**
+    * Le n-ième fils de cet arbre.
+    * Précondition : le fils existe.
+    */
+   public Arbre getFils(int n) {
+<span class="nc bnc" id="L187" title="All 4 branches missed.">      if (n &lt;= 0 || n &gt; 3) {</span>
+<span class="nc" id="L188">         throw new ErreurArbre(</span>
+            &quot;Accès au fils no &quot; + n + &quot; impossible&quot;);
+      } else { 
+<span class="nc" id="L191">         throw new ErreurArbre(</span>
+            &quot;Accès au fils no &quot; + n + &quot; impossible sur &quot; + noeudArbre +
+            &quot; (l'arbre n'a pas de fils)&quot;);
+      }
+   }
+
+   /**
+    * Le décor de cet arbre.
+    */
+   public Decor getDecor() {
+<span class="nc" id="L201">      return decor;</span>
+   }
+
+   // ------------------------------------------------------------------------
+   // Mutateurs
+   // ------------------------------------------------------------------------
+
+   /**
+    * Modifie le numéro de ligne associé à cet arbre.
+    */
+   public void setNumLigne(int numLigne) {
+<span class="nc" id="L212">      this.numLigne = numLigne;</span>
+<span class="nc" id="L213">   }</span>
+
+   /**
+    * Modifie la chaîne associée à cet arbre.
+    * Précondition :
+    *    this.getNoeud() == Noeud.Chaine ou this.getNoeud() == Noeud.Ident
+    */
+   public void setChaine(String valChaine) {
+<span class="nc" id="L221">      throw new ErreurArbre(&quot;setChaine() impossible sur &quot; + noeudArbre);</span>
+   }
+
+   /**
+    * Modifie l'entier associé à cet arbre.
+    * Précondition :
+    *    this.getNoeud() == Noeud.Entier
+    */
+   public void setEntier(int valEntier) {
+<span class="nc" id="L230">      throw new ErreurArbre(&quot;setEntier() impossible sur &quot; + noeudArbre);</span>
+   }
+
+   /**
+    * Modifie le réel associé à cet arbre.
+    * Précondition :
+    *    this.getNoeud() == Noeud.Reel
+    */
+   public void setReel(float valReel) {
+<span class="nc" id="L239">      throw new ErreurArbre(&quot;setReel() impossible sur &quot; + noeudArbre);</span>
+   }
+
+   /**
+    * Modifie le premier fils de cet arbre.
+    * Précondition : l'arbre a au moins un fils.
+    */
+   public void setFils1(Arbre fils1) {
+<span class="nc" id="L247">      setFils(1, fils1);</span>
+<span class="nc" id="L248">   }</span>
+
+   /**
+    * Modifie le deuxième fils de cet arbre.
+    * Précondition : l'arbre a au moins deux fils.
+    */
+   public void setFils2(Arbre fils2) {
+<span class="nc" id="L255">      setFils(2, fils2);</span>
+<span class="nc" id="L256">   }</span>
+
+   /**
+    * Modifie le troisième fils de cet arbre.
+    * Précondition : l'arbre a au moins trois fils.
+    */
+   public void setFils3(Arbre fils3) {
+<span class="nc" id="L263">      setFils(3, fils3);</span>
+<span class="nc" id="L264">   }</span>
+
+   /**
+    * Modifie le n-ième fils de cet arbre.
+    * Précondition : le fils existe.
+    */
+   public void setFils(int n, Arbre fils) {
+<span class="nc bnc" id="L271" title="All 4 branches missed.">      if (n &lt;= 0 || n &gt; 3) {</span>
+<span class="nc" id="L272">         throw new ErreurArbre(</span>
+            &quot;Modification du fils no &quot; + n + &quot; impossible&quot;);
+      } else {
+<span class="nc" id="L275">         throw new ErreurArbre(</span>
+            &quot;Modification du fils no &quot; + n + &quot; impossible sur &quot; + noeudArbre +
+            &quot; (l'arbre n'a pas de fils)&quot;);
+      }
+   }
+
+
+   /**
+    * Modifie le décor associé à cet arbre.
+    */
+   public void setDecor(Decor decor) {
+<span class="nc" id="L286">      this.decor = decor;</span>
+<span class="nc" id="L287">   }</span>
+
+   // ------------------------------------------------------------------------
+   // Affichages d'arbres
+   // ------------------------------------------------------------------------
+
+   /**
+    * Affiche cet arbre, avec un niveau de détails spécifié.
+    * &lt;ul&gt;
+    *  &lt;li&gt; niveau = 0 : pas de détail (passe 1) &lt;/li&gt;
+    *  &lt;li&gt; niveau = 1 : décors relatifs à la passe 2 &lt;/li&gt;
+    *  &lt;li&gt; niveau = 2 : décors relatifs aux passes 2 et 3 &lt;/li&gt;
+    * &lt;/ul&gt;
+    */
+   public void afficher(int niveau) {
+<span class="nc" id="L302">      afficher1(0, niveau);</span>
+<span class="nc" id="L303">   }</span>
+
+   private void afficher1(int indent, int niveau) {
+<span class="nc" id="L306">      final int colNumLignes = 60;</span>
+<span class="nc" id="L307">      Affichage.commencer();</span>
+<span class="nc" id="L308">      Affichage.ecrire(noeudArbre + &quot; &quot;);</span>
+<span class="nc bnc" id="L309" title="All 4 branches missed.">      switch (noeudArbre) {</span>
+         case Ident:
+         case Chaine:
+<span class="nc" id="L312">            Affichage.ecrire(&quot;\&quot;&quot; + getChaine() + &quot;\&quot;&quot;);</span>
+<span class="nc" id="L313">            break;</span>
+         case Entier:
+<span class="nc" id="L315">            Affichage.ecrire(Integer.toString(getEntier()));</span>
+<span class="nc" id="L316">            break;</span>
+         case Reel:
+<span class="nc" id="L318">            Affichage.ecrire(Float.toString(getReel()));</span>
+      }
+<span class="nc bnc" id="L320" title="All 2 branches missed.">      if (Affichage.getCol() &lt; colNumLignes) {</span>
+<span class="nc" id="L321">         Affichage.setCol(colNumLignes);</span>
+      }
+<span class="nc" id="L323">      Affichage.ecrire(&quot;  -- ligne : &quot; + getNumLigne() + &quot;\n&quot;);</span>
+<span class="nc" id="L324">      Affichage.empiler(0, &quot;-- &quot;);</span>
+<span class="nc bnc" id="L325" title="All 2 branches missed.">      if (decor != null) {</span>
+<span class="nc" id="L326">         decor.afficher(niveau);</span>
+      }
+<span class="nc" id="L328">      Affichage.depiler();</span>
+<span class="nc bnc" id="L329" title="All 2 branches missed.">      if (getArite() != 0) {</span>
+<span class="nc" id="L330">         Affichage.empiler(0, &quot;. &quot;);</span>
+<span class="nc bnc" id="L331" title="All 2 branches missed.">         for (int i = 1; i &lt;= getArite(); i++) {</span>
+<span class="nc" id="L332">            getFils(i).afficher1(indent + 1, niveau);</span>
+         }
+<span class="nc" id="L334">         Affichage.depiler();</span>
+      }
+<span class="nc" id="L336">   }</span>
+      
+   // ------------------------------------------------------------------------
+   // Décompilation de cet arbre
+   // ------------------------------------------------------------------------
+
+   /**
+    * Augmenter l'indentation de 3 espaces.
+    */
+   private static void augmenterIndentation() {
+<span class="nc" id="L346">      Affichage.empiler(3, &quot;&quot;);</span>
+<span class="nc" id="L347">   }</span>
+
+   /**
+    * Diminuer l'indentation de 3 espaces.
+    */
+
+   private static void diminuerIndentation() {
+<span class="nc" id="L354">      Affichage.depiler();</span>
+<span class="nc" id="L355">   }</span>
+
+   /**
+    * Méthode appelée si l'arbre ou le programme est incorrect
+    * Affiche un message d'erreur et lève l'exception ErreurArbre.
+    */
+   
+   private void arbreOuProgrammeIncorrect(String s) {
+<span class="nc" id="L363">      System.out.println(s);</span>
+<span class="nc" id="L364">      System.out.println(&quot;Noeud trouve : &quot; + getNoeud() + </span>
+<span class="nc" id="L365">                         &quot; -- ligne &quot; + getNumLigne());</span>
+<span class="nc bnc" id="L366" title="All 2 branches missed.">      while (!Affichage.pileVide()) {</span>
+<span class="nc" id="L367">         Affichage.depiler();</span>
+      }
+<span class="nc" id="L369">      throw new ErreurArbre(s);</span>
+   }
+
+   private void arbreIncorrect(String s) {
+<span class="nc" id="L373">      System.out.println();</span>
+<span class="nc" id="L374">      System.out.print(&quot;Arbre incorrect : &quot;);</span>
+<span class="nc" id="L375">      arbreOuProgrammeIncorrect(s);</span>
+<span class="nc" id="L376">   }</span>
+
+   private void programmeIncorrect(String s) {
+<span class="nc" id="L379">      System.out.println();</span>
+<span class="nc" id="L380">      System.out.print(&quot;Programme incorrect : &quot;);</span>
+<span class="nc" id="L381">      arbreOuProgrammeIncorrect(s);</span>
+<span class="nc" id="L382">   }</span>
+
+   private void testerNoeudArbre(Noeud n) {
+<span class="nc bnc" id="L385" title="All 2 branches missed.">      if (getNoeud() != n) {</span>
+<span class="nc" id="L386">         arbreIncorrect(n.toString() + &quot; attendu&quot;);</span>
+      }
+<span class="nc" id="L388">   }</span>
+
+   /**
+    * Indente, puis affiche la chaîne s.
+    */
+   private void indenter(String s) {
+<span class="nc" id="L394">      Affichage.commencer();</span>
+<span class="nc" id="L395">      Affichage.ecrire(s);</span>
+<span class="nc" id="L396">   }</span>
+
+   /**
+    * Indente, affiche la chaîne s puis passe à la ligne.
+    */
+   private void indenterLigne(String s) {
+<span class="nc" id="L402">      Affichage.commencer();</span>
+<span class="nc" id="L403">      Affichage.ecrire(s + &quot;\n&quot;);</span>
+<span class="nc" id="L404">   }</span>
+
+   /**
+    * Affiche la String S sous forme JCas.
+    */
+   private static void decompilerString(String s) {
+<span class="nc" id="L410">      Affichage.ecrire('&quot;');</span>
+<span class="nc bnc" id="L411" title="All 2 branches missed.">      for (int i = 0; i &lt; s.length(); i++) {</span>
+<span class="nc" id="L412">         char c = s.charAt(i);</span>
+<span class="nc bnc" id="L413" title="All 2 branches missed.">         if (c == '&quot;') {</span>
+<span class="nc" id="L414">            Affichage.ecrire('&quot;');</span>
+         }
+<span class="nc" id="L416">         Affichage.ecrire(c);</span>
+      }
+<span class="nc" id="L418">      Affichage.ecrire('&quot;');</span>
+<span class="nc" id="L419">   }</span>
+
+   private void afficherNoeud(int niveau) {
+<span class="nc bnc" id="L422" title="All 25 branches missed.">      switch (getNoeud()) {</span>
+         case Affect:
+<span class="nc" id="L424">            Affichage.ecrire(&quot; := &quot;) ;</span>
+<span class="nc" id="L425">            break;</span>
+         case Chaine:
+<span class="nc" id="L427">            decompilerString(getChaine());</span>
+<span class="nc" id="L428">            break;</span>
+         case Conversion:
+<span class="nc bnc" id="L430" title="All 2 branches missed.">            if (niveau != 0) {</span>
+<span class="nc" id="L431">               Affichage.ecrire(&quot;-- Noeud.Conversion &quot;);</span>
+            }
+            break;
+         case DivReel:
+<span class="nc" id="L435">            Affichage.ecrire(&quot; / &quot;);</span>
+<span class="nc" id="L436">            break;</span>
+         case Egal:
+<span class="nc" id="L438">            Affichage.ecrire(&quot; = &quot;);</span>
+<span class="nc" id="L439">            break;</span>
+         case Entier:
+<span class="nc" id="L441">            Affichage.ecrire(Integer.toString(getEntier()));</span>
+<span class="nc" id="L442">            break;</span>
+         case Et:
+<span class="nc" id="L444">            Affichage.ecrire(&quot; and &quot;);</span>
+<span class="nc" id="L445">            break;</span>
+         case Ident:
+<span class="nc" id="L447">            Affichage.ecrire(getChaine());</span>
+<span class="nc" id="L448">            break;</span>
+         case Index:
+<span class="nc" id="L450">            break;</span>
+         case Inf:
+<span class="nc" id="L452">            Affichage.ecrire(&quot; &lt; &quot;);</span>
+<span class="nc" id="L453">            break;</span>
+         case InfEgal:
+<span class="nc" id="L455">            Affichage.ecrire(&quot; &lt;= &quot;);</span>
+<span class="nc" id="L456">            break;</span>
+         case Moins:
+<span class="nc" id="L458">            Affichage.ecrire(&quot; - &quot;);</span>
+<span class="nc" id="L459">            break;</span>
+         case MoinsUnaire:
+<span class="nc" id="L461">            Affichage.ecrire(&quot;-&quot;);</span>
+<span class="nc" id="L462">            break;</span>
+         case Mult:
+<span class="nc" id="L464">            Affichage.ecrire(&quot; * &quot;);</span>
+<span class="nc" id="L465">            break;</span>
+         case Non:
+<span class="nc" id="L467">            Affichage.ecrire(&quot;not &quot;);</span>
+<span class="nc" id="L468">            break;</span>
+         case NonEgal:
+<span class="nc" id="L470">            Affichage.ecrire(&quot; /= &quot;);</span>
+<span class="nc" id="L471">            break;</span>
+         case Ou:
+<span class="nc" id="L473">            Affichage.ecrire(&quot; or &quot;);</span>
+<span class="nc" id="L474">            break;</span>
+         case Plus:
+<span class="nc" id="L476">            Affichage.ecrire(&quot; + &quot;);</span>
+<span class="nc" id="L477">            break;</span>
+         case PlusUnaire:
+<span class="nc" id="L479">            Affichage.ecrire(&quot;+&quot;);</span>
+<span class="nc" id="L480">            break;</span>
+         case Quotient:
+<span class="nc" id="L482">            Affichage.ecrire(&quot; div &quot;);</span>
+<span class="nc" id="L483">            break;</span>
+         case Reel:
+<span class="nc" id="L485">            Affichage.ecrire(Float.toString(getReel()));</span>
+<span class="nc" id="L486">            break;</span>
+         case Reste:
+<span class="nc" id="L488">            Affichage.ecrire(&quot; mod &quot;);</span>
+<span class="nc" id="L489">            break;</span>
+         case Sup:
+<span class="nc" id="L491">            Affichage.ecrire(&quot; &gt; &quot;);</span>
+<span class="nc" id="L492">            break;</span>
+         case SupEgal:
+<span class="nc" id="L494">            Affichage.ecrire(&quot; &gt;= &quot;);</span>
+<span class="nc" id="L495">            break;</span>
+         default:
+<span class="nc" id="L497">            arbreIncorrect(&quot;Noeud incorrect&quot;);</span>
+      }
+<span class="nc" id="L499">   }</span>
+
+   private void afficherNoeudPuisDecor(int niveau) {
+<span class="nc" id="L502">      Affichage.empiler(</span>
+<span class="nc" id="L503">         Affichage.getCol() - Affichage.longueur() + getNoeud().nbEspaces - 1, </span>
+         &quot;-- &quot;);
+<span class="nc" id="L505">      afficherNoeud(niveau);</span>
+<span class="nc bnc" id="L506" title="All 2 branches missed.">      if (decor != null) {</span>
+<span class="nc" id="L507">         decor.afficher(niveau);</span>
+      }
+<span class="nc" id="L509">      Affichage.depiler();</span>
+/*
+      Affichage.empiler(0, &quot;-- &quot;);
+      afficherNoeud(niveau);
+      if (decor != null) {
+         decor.afficher(niveau);
+      }
+      Affichage.depiler();
+*/
+<span class="nc" id="L518">   }</span>
+
+   // ------------------------------------------------------------------------
+   // Méthodes principales de décompilation, en fonction des non terminaux
+   // de la grammaire d'arbre.
+   // ------------------------------------------------------------------------
+
+   /**
+    * Décompiler les arbres qui dérivent de PROGRAMME.
+    */
+   private void decompiler_PROGRAMME(int niveau) {
+<span class="nc" id="L529">      testerNoeudArbre(Noeud.Programme);</span>
+<span class="nc" id="L530">      indenterLigne(&quot;program&quot;);</span>
+<span class="nc" id="L531">      getFils1().decompiler_LISTE_DECL(niveau);</span>
+<span class="nc" id="L532">      indenterLigne(&quot;begin&quot;);</span>
+<span class="nc" id="L533">      getFils2().decompiler_LISTE_INST(niveau);</span>
+<span class="nc" id="L534">      indenterLigne(&quot;end.&quot;);</span>
+<span class="nc" id="L535">   }</span>
+
+   /**
+    * Décompiler les arbres qui dérivent de LISTE_DECL.
+    */
+   private void decompiler_LISTE_DECL(int niveau) {
+<span class="nc" id="L541">      augmenterIndentation();</span>
+<span class="nc" id="L542">      decompiler_LISTE_DECL_Aux(niveau);</span>
+<span class="nc" id="L543">      diminuerIndentation();</span>
+<span class="nc" id="L544">   }</span>
+
+   private void decompiler_LISTE_DECL_Aux(int niveau) {
+<span class="nc bnc" id="L547" title="All 3 branches missed.">      switch (getNoeud()) {</span>
+         case Vide:
+<span class="nc" id="L549">            break;</span>
+         case ListeDecl:
+<span class="nc" id="L551">            getFils1().decompiler_LISTE_DECL_Aux(niveau);</span>
+<span class="nc" id="L552">            getFils2().decompiler_DECL(niveau);</span>
+<span class="nc" id="L553">            break;</span>
+         default:
+<span class="nc" id="L555">            arbreIncorrect(&quot;Noeud.Vide ou Noeud.ListeDecl attendu&quot;);</span>
+      }
+<span class="nc" id="L557">   }</span>
+
+   /**
+    * Décompiler les arbres qui dérivent de DECL.
+    */
+   private void decompiler_DECL(int niveau) {
+<span class="nc" id="L563">      testerNoeudArbre(Noeud.Decl);</span>
+<span class="nc" id="L564">      Affichage.commencer();</span>
+<span class="nc" id="L565">      Arbre listeIdent = getFils1();</span>
+<span class="nc" id="L566">      Arbre typ = getFils2();</span>
+<span class="nc" id="L567">      listeIdent.testerNoeudArbre(Noeud.ListeIdent);</span>
+<span class="nc" id="L568">      listeIdent.decompiler_LISTE_IDENT(niveau);</span>
+<span class="nc" id="L569">      Affichage.ecrire(&quot; : &quot;);</span>
+<span class="nc" id="L570">      typ.decompiler_TYPE(niveau);</span>
+<span class="nc" id="L571">      Affichage.ecrire(&quot;; \n&quot;);</span>
+<span class="nc" id="L572">   }</span>
+
+   /**
+    * Décompiler les arbres qui dérivent de LISTE_IDENT.
+    */
+   private void decompiler_LISTE_IDENT(int niveau) {
+<span class="nc bnc" id="L578" title="All 3 branches missed.">      switch (getNoeud()) {</span>
+         case Vide:
+<span class="nc" id="L580">            break;</span>
+         case ListeIdent:
+<span class="nc" id="L582">            decompiler_LISTE_IDENT_NonVide(niveau);</span>
+<span class="nc" id="L583">            break;</span>
+         default:
+<span class="nc" id="L585">            arbreIncorrect(&quot;Noeud.Vide ou Noeud.ListeIdent attendu&quot;);</span>
+      }
+<span class="nc" id="L587">   }</span>
+
+   private void decompiler_LISTE_IDENT_NonVide(int niveau) {
+<span class="nc" id="L590">      testerNoeudArbre(Noeud.ListeIdent);</span>
+<span class="nc" id="L591">      Arbre lIdent = getFils1();</span>
+<span class="nc" id="L592">      Arbre ident = getFils2(); </span>
+<span class="nc bnc" id="L593" title="All 3 branches missed.">      switch (lIdent.getNoeud()) {</span>
+         case Vide:
+<span class="nc" id="L595">            break;</span>
+         case ListeIdent:
+<span class="nc" id="L597">            lIdent.decompiler_LISTE_IDENT_NonVide(niveau);</span>
+<span class="nc" id="L598">            Affichage.ecrire(&quot;, &quot;);</span>
+<span class="nc" id="L599">            break;</span>
+         default:
+<span class="nc" id="L601">            arbreIncorrect(&quot;Noeud.Vide ou Noeud.ListeIdent attendu&quot;);</span>
+      }
+<span class="nc" id="L603">      ident.decompiler_IDENT(niveau);</span>
+<span class="nc" id="L604">   }</span>
+
+   /**
+    * Décompiler les arbres qui dérivent de TYPE.
+    */
+   private void decompiler_TYPE(int niveau) {
+<span class="nc bnc" id="L610" title="All 4 branches missed.">      switch (getNoeud()) {</span>
+         case Intervalle:
+<span class="nc" id="L612">            getFils1().decompiler_EXP_CONST(niveau);</span>
+<span class="nc" id="L613">            Affichage.ecrire(&quot; .. &quot;);</span>
+<span class="nc" id="L614">            getFils2().decompiler_EXP_CONST(niveau);</span>
+<span class="nc" id="L615">            break;</span>
+         case Tableau:
+<span class="nc" id="L617">            Affichage.ecrire(&quot;array [&quot;);</span>
+<span class="nc" id="L618">            getFils1().decompiler_TYPE(niveau);</span>
+<span class="nc" id="L619">            Affichage.ecrire(&quot;] of &quot;);</span>
+<span class="nc" id="L620">            getFils2().decompiler_TYPE(niveau);</span>
+<span class="nc" id="L621">            break;</span>
+         case Ident:
+<span class="nc" id="L623">            decompiler_IDENT(niveau);</span>
+<span class="nc" id="L624">            break;</span>
+         default:
+<span class="nc" id="L626">            arbreIncorrect(</span>
+               &quot;Noeud.Intervalle, Noeud.Tableau ou Noeud.Ident attendu&quot;);
+      }
+<span class="nc" id="L629">   }</span>
+
+   /**
+    * Décompiler les arbres qui dérivent de EXP_CONST.
+    */
+   private void decompiler_EXP_CONST(int niveau) {
+<span class="nc bnc" id="L635" title="All 4 branches missed.">      switch (getNoeud()) {</span>
+         case Entier:
+<span class="nc" id="L637">            afficherNoeudPuisDecor(niveau);</span>
+<span class="nc" id="L638">            break;</span>
+         case Ident:
+<span class="nc" id="L640">            decompiler_IDENT(niveau);</span>
+<span class="nc" id="L641">            break;</span>
+         case PlusUnaire:
+         case MoinsUnaire:
+<span class="nc" id="L644">            afficherNoeudPuisDecor(niveau);</span>
+<span class="nc" id="L645">            getFils1().decompiler_EXP_CONST(niveau);</span>
+<span class="nc" id="L646">            break;</span>
+         default:
+<span class="nc" id="L648">            arbreIncorrect(</span>
+               &quot;Noeud.Entier, Noeud.Ident, Noeud.PlusUnaire ou &quot; +
+               &quot;Noeud.MoinsUnaire attendu&quot;);
+      }
+<span class="nc" id="L652">   }</span>
+
+   /**
+    * Décompiler les arbres qui dérivent de LISTE_INST.
+    */
+   private void decompiler_LISTE_INST(int niveau) {
+<span class="nc bnc" id="L658" title="All 3 branches missed.">      switch (getNoeud()) {</span>
+         case Vide:
+<span class="nc" id="L660">            programmeIncorrect(&quot;Noeud.ListeInst attendu&quot;);</span>
+<span class="nc" id="L661">            break;</span>
+         case ListeInst:
+<span class="nc" id="L663">            augmenterIndentation();</span>
+<span class="nc" id="L664">            decompiler_LISTE_INST_2(niveau);</span>
+<span class="nc" id="L665">            diminuerIndentation();</span>
+<span class="nc" id="L666">            break;</span>
+         default:
+<span class="nc" id="L668">            arbreIncorrect(&quot;Noeud.ListeInst attendu&quot;);</span>
+      }
+<span class="nc" id="L670">   }</span>
+
+   private void decompiler_LISTE_INST_2(int niveau) {
+<span class="nc bnc" id="L673" title="All 3 branches missed.">      switch (getNoeud()) {</span>
+         case Vide:
+<span class="nc" id="L675">            break;</span>
+         case ListeInst:
+<span class="nc" id="L677">            getFils1().decompiler_LISTE_INST_2(niveau);</span>
+<span class="nc" id="L678">            getFils2().decompiler_INST(niveau);</span>
+<span class="nc" id="L679">            break;</span>
+         default:
+<span class="nc" id="L681">            arbreIncorrect(&quot;Noeud.Vide ou Noeud.ListeInst attendu&quot;);</span>
+      }
+<span class="nc" id="L683">   }</span>
+
+   /**
+    * Décompiler les arbres qui dérivent de INST.
+    */
+   private void decompiler_INST(int niveau) {
+<span class="nc" id="L689">      Affichage.commencer();</span>
+<span class="nc bnc" id="L690" title="All 9 branches missed.">      switch (getNoeud()) {</span>
+         case Nop:
+<span class="nc" id="L692">            Affichage.ecrire(&quot;null&quot;);</span>
+<span class="nc" id="L693">            break;</span>
+         case Affect:
+<span class="nc" id="L695">            decompiler_INST_Affect(niveau);</span>
+<span class="nc" id="L696">            break;</span>
+         case Si:
+<span class="nc" id="L698">            decompiler_INST_Si(niveau);</span>
+<span class="nc" id="L699">            break;</span>
+         case TantQue:
+<span class="nc" id="L701">            decompiler_INST_TantQue(niveau);</span>
+<span class="nc" id="L702">            break;</span>
+         case Pour:
+<span class="nc" id="L704">            decompiler_INST_Pour(niveau);</span>
+<span class="nc" id="L705">            break;</span>
+         case Lecture:
+<span class="nc" id="L707">            decompiler_INST_Lecture(niveau);</span>
+<span class="nc" id="L708">            break;</span>
+         case Ecriture:
+<span class="nc" id="L710">            decompiler_INST_Ecriture(niveau);</span>
+<span class="nc" id="L711">            break;</span>
+         case Ligne:
+<span class="nc" id="L713">            Affichage.ecrire(&quot;new_line&quot;);</span>
+<span class="nc" id="L714">            break;</span>
+         default:
+<span class="nc" id="L716">            arbreIncorrect(</span>
+               &quot;Noeud.Nop, Noeud.Affect, Noeud.Si, Noeud.TantQue, &quot; +
+               &quot;Noeud.Pour, Noeud.Lecture, Noeud.Ecriture ou Noeud.Ligne &quot; +
+               &quot;attendu&quot;);
+      }
+<span class="nc" id="L721">      Affichage.ecrire(&quot;;\n&quot;);</span>
+<span class="nc" id="L722">   }</span>
+
+   private void decompiler_INST_Affect(int niveau) {
+<span class="nc" id="L725">      getFils1().decompiler_PLACE(niveau);</span>
+<span class="nc" id="L726">      afficherNoeudPuisDecor(niveau);</span>
+<span class="nc" id="L727">      getFils2().decompiler_EXP(niveau);</span>
+<span class="nc" id="L728">   }</span>
+
+   private void decompiler_INST_Si(int niveau) {
+<span class="nc" id="L731">      Affichage.ecrire(&quot;if &quot;);</span>
+<span class="nc" id="L732">      getFils1().decompiler_EXP(niveau);</span>
+<span class="nc" id="L733">      Affichage.ecrire(&quot; then \n&quot;);</span>
+<span class="nc" id="L734">      getFils2().decompiler_LISTE_INST(niveau);</span>
+<span class="nc" id="L735">      Arbre sinon = getFils3();</span>
+<span class="nc bnc" id="L736" title="All 2 branches missed.">      if (sinon.getNoeud() != Noeud.Vide) {</span>
+         // Il y a une partie else
+<span class="nc" id="L738">         indenterLigne(&quot;else&quot;);</span>
+<span class="nc" id="L739">         sinon.decompiler_LISTE_INST(niveau);</span>
+      }
+<span class="nc" id="L741">      indenter(&quot;end&quot;);</span>
+<span class="nc" id="L742">   }</span>
+
+   private void decompiler_INST_TantQue(int niveau) {
+<span class="nc" id="L745">      Affichage.ecrire(&quot;while &quot;);</span>
+<span class="nc" id="L746">      getFils1().decompiler_EXP(niveau);</span>
+<span class="nc" id="L747">      Affichage.ecrire(&quot; do\n&quot;);</span>
+<span class="nc" id="L748">      getFils2().decompiler_LISTE_INST(niveau);</span>
+<span class="nc" id="L749">      Affichage.commencer();</span>
+<span class="nc" id="L750">      Affichage.ecrire(&quot;end&quot;);</span>
+<span class="nc" id="L751">   }</span>
+
+   private void decompiler_INST_Pour(int niveau) {
+<span class="nc" id="L754">      Arbre pas = getFils1();</span>
+<span class="nc" id="L755">      Arbre insts = getFils2();</span>
+<span class="nc" id="L756">      Affichage.ecrire(&quot;for &quot;);</span>
+<span class="nc" id="L757">      pas.getFils1().decompiler_IDENT(niveau);</span>
+<span class="nc" id="L758">      Affichage.ecrire(&quot; := &quot;);</span>
+<span class="nc" id="L759">      pas.getFils2().decompiler_EXP(niveau);</span>
+<span class="nc bnc" id="L760" title="All 3 branches missed.">      switch (pas.getNoeud()) {</span>
+         case Increment:
+<span class="nc" id="L762">            Affichage.ecrire(&quot; to &quot;);</span>
+<span class="nc" id="L763">            break;</span>
+         case Decrement:
+<span class="nc" id="L765">            Affichage.ecrire(&quot; downto &quot;);</span>
+<span class="nc" id="L766">            break;</span>
+         default:
+<span class="nc" id="L768">            pas.arbreIncorrect(&quot;Noeud.Increment ou Noeud.Decrement attendu&quot;);</span>
+      }
+<span class="nc" id="L770">      pas.getFils3().decompiler_EXP(niveau);</span>
+<span class="nc" id="L771">      Affichage.ecrire(&quot; do \n&quot;);</span>
+<span class="nc" id="L772">      insts.decompiler_LISTE_INST(niveau);</span>
+<span class="nc" id="L773">      indenter(&quot;end&quot;);</span>
+<span class="nc" id="L774">   }</span>
+
+   private void decompiler_INST_Lecture(int niveau) {
+<span class="nc" id="L777">      Affichage.ecrire(&quot;read(&quot;);</span>
+<span class="nc" id="L778">      getFils1().decompiler_PLACE(niveau);</span>
+<span class="nc" id="L779">      Affichage.ecrire(&quot;)&quot;);</span>
+<span class="nc" id="L780">   }</span>
+
+   private void decompiler_INST_Ecriture(int niveau) {
+<span class="nc" id="L783">      Affichage.ecrire(&quot;write&quot;);</span>
+<span class="nc" id="L784">      Arbre listeExp = getFils1();</span>
+<span class="nc bnc" id="L785" title="All 3 branches missed.">      switch (listeExp.getNoeud()) {</span>
+         case Vide:
+<span class="nc" id="L787">            listeExp.programmeIncorrect(&quot;Noeud.Liste attendu&quot;);</span>
+<span class="nc" id="L788">            break;</span>
+         case ListeExp:
+<span class="nc" id="L790">            Affichage.ecrire(&quot;(&quot;);</span>
+<span class="nc" id="L791">            listeExp.decompiler_LISTE_EXP(niveau);</span>
+<span class="nc" id="L792">            Affichage.ecrire(&quot;)&quot;);</span>
+<span class="nc" id="L793">            break;</span>
+         default:
+<span class="nc" id="L795">            listeExp.arbreIncorrect(&quot;Noeud.Liste attendu&quot;);</span>
+      }
+<span class="nc" id="L797">   }</span>
+
+   /**
+    * Décompiler un arbre qui dérive de IDENT.
+    */
+   private void decompiler_IDENT(int niveau) {
+<span class="nc" id="L803">      testerNoeudArbre(Noeud.Ident);</span>
+<span class="nc" id="L804">      afficherNoeudPuisDecor(niveau);</span>
+<span class="nc" id="L805">   }</span>
+
+   /**
+    * Décompiler un arbre qui dérive de PLACE.
+    */
+   private void decompiler_PLACE(int niveau) {
+<span class="nc bnc" id="L811" title="All 3 branches missed.">      switch (getNoeud()) {</span>
+         case Index:
+<span class="nc" id="L813">            getFils1().decompiler_PLACE(niveau);</span>
+<span class="nc" id="L814">            Affichage.ecrire(&quot;[&quot;);</span>
+<span class="nc" id="L815">            getFils2().decompiler_EXP(niveau);</span>
+<span class="nc" id="L816">            Affichage.ecrire(&quot;]&quot;);</span>
+<span class="nc" id="L817">            afficherNoeudPuisDecor(niveau);</span>
+<span class="nc" id="L818">            break;</span>
+         case Ident:
+<span class="nc" id="L820">            decompiler_IDENT(niveau);</span>
+<span class="nc" id="L821">            break;</span>
+         default:
+<span class="nc" id="L823">            arbreIncorrect(&quot;Noeud.Index ou Noeud.Ident attendu&quot;);</span>
+      }
+<span class="nc" id="L825">   }</span>
+
+   /**
+    * Décompiler un arbre non vide qui dérive de LISTE_EXP.
+    */
+   private void decompiler_LISTE_EXP(int niveau) {
+<span class="nc" id="L831">      testerNoeudArbre(Noeud.ListeExp);</span>
+<span class="nc" id="L832">      Arbre listeExp = getFils1();</span>
+<span class="nc" id="L833">      Arbre exp = getFils2();</span>
+<span class="nc bnc" id="L834" title="All 3 branches missed.">      switch (listeExp.getNoeud()) {</span>
+         case Vide:
+<span class="nc" id="L836">            exp.decompiler_EXP(niveau);</span>
+<span class="nc" id="L837">            break;</span>
+         case ListeExp:
+<span class="nc" id="L839">            listeExp.decompiler_LISTE_EXP(niveau);</span>
+<span class="nc" id="L840">            Affichage.ecrire(&quot;, &quot;);</span>
+<span class="nc" id="L841">            exp.decompiler_EXP(niveau);</span>
+<span class="nc" id="L842">            break;</span>
+         default:
+<span class="nc" id="L844">            listeExp.arbreIncorrect(&quot;Noeud.Vide ou Noeud.ListeExp attendu&quot;);</span>
+      }
+<span class="nc" id="L846">   }</span>
+        
+   /**
+    * Décompiler un arbre qui dérive de EXP.
+    */
+   private void decompiler_EXP(int niveau) {
+<span class="nc" id="L852">      decompiler_EXP_NoeudSup(Noeud.Vide, true, niveau);</span>
+<span class="nc" id="L853">   }</span>
+
+   /**
+    * Décompiler un arbre qui dérive de EXP. N_Sup est le noeud supérieur, 
+    * Branche_Gauche = true ssi on est dans une branche gauche pour 
+    * les noeud binaires.
+    */
+   private void decompiler_EXP_NoeudSup
+         (Noeud noeudSup, boolean brancheGauche, int niveau) {
+      boolean par;
+<span class="nc" id="L863">      Noeud noeudInf = getNoeud(); // Le noeud courant</span>
+<span class="nc bnc" id="L864" title="All 7 branches missed.">      switch (noeudInf) {</span>
+         case Ident:
+<span class="nc" id="L866">            decompiler_IDENT(niveau);</span>
+<span class="nc" id="L867">            break;</span>
+         case Index:
+<span class="nc" id="L869">            decompiler_PLACE(niveau);</span>
+<span class="nc" id="L870">            break;</span>
+         case Entier:
+         case Reel:
+         case Chaine:
+<span class="nc" id="L874">            afficherNoeudPuisDecor(niveau);</span>
+<span class="nc" id="L875">            break;</span>
+         case Conversion:
+            // noeud &quot;transparent&quot;
+<span class="nc" id="L878">            afficherNoeudPuisDecor(niveau);</span>
+<span class="nc" id="L879">            getFils1().decompiler_EXP_NoeudSup(noeudSup, brancheGauche, niveau);</span>
+<span class="nc" id="L880">            break;</span>
+         case PlusUnaire:
+         case MoinsUnaire:
+         case Non:
+            // noeud unaire
+<span class="nc" id="L885">            par = parenthese(noeudSup, noeudInf, brancheGauche);</span>
+<span class="nc bnc" id="L886" title="All 2 branches missed.">            if (par) {</span>
+<span class="nc" id="L887">               Affichage.ecrire(&quot;(&quot;);</span>
+            }
+<span class="nc" id="L889">            afficherNoeudPuisDecor(niveau);</span>
+<span class="nc" id="L890">            getFils1().decompiler_EXP_NoeudSup(noeudInf, true, niveau);</span>
+<span class="nc bnc" id="L891" title="All 2 branches missed.">            if (par) {</span>
+<span class="nc" id="L892">               Affichage.ecrire(&quot;)&quot;);</span>
+            }
+            break;
+         case Et:
+         case Ou:
+         case Egal:
+         case InfEgal:
+         case SupEgal:
+         case NonEgal:
+         case Inf:
+         case Sup:
+         case Plus:
+         case Moins:
+         case Mult:
+         case DivReel:
+         case Quotient:
+         case Reste:
+            // noeud binaire
+<span class="nc" id="L910">            par = parenthese(noeudSup, noeudInf, brancheGauche);</span>
+<span class="nc bnc" id="L911" title="All 2 branches missed.">            if (par) {</span>
+<span class="nc" id="L912">               Affichage.ecrire(&quot;(&quot;);</span>
+            }
+<span class="nc" id="L914">            getFils1().decompiler_EXP_NoeudSup(noeudInf, true, niveau);</span>
+<span class="nc" id="L915">            afficherNoeudPuisDecor(niveau);</span>
+<span class="nc" id="L916">            getFils2().decompiler_EXP_NoeudSup(noeudInf, false, niveau);</span>
+<span class="nc bnc" id="L917" title="All 2 branches missed.">            if (par) {</span>
+<span class="nc" id="L918">               Affichage.ecrire(&quot;)&quot;);</span>
+            }
+            break;
+         default:
+<span class="nc" id="L922">            arbreIncorrect(&quot;Noeud derivant de EXP attendu&quot;);</span>
+      }
+<span class="nc" id="L924">   }</span>
+
+   /**
+    * Retourne true s'il faut parentheser.
+    * Il faut parenthéser si la priorité de l'opérateur supérieur
+    * est strictement supérieure à la priorité de l'opérateur inférieur
+    * Si les priorités de l'opérateur supérieur et de 
+    * l'opérateur inférieur sont égales, il faut parentheser si
+    * &lt;ul&gt; 
+    *    &lt;li&gt; on est dans une branche gauche et l'opérateur supérieur 
+    *         n'est pas associatif à gauche ;  &lt;/li&gt;
+    *    &lt;li&gt; on est dans une branche droite et l'opérateur supérieur
+    *         n'est pas associatif à droite.   &lt;/li&gt;
+    * &lt;/ul&gt;
+    */
+
+   private static boolean parenthese(
+         Noeud noeudSup, Noeud noeudInf, boolean brancheGauche) {
+<span class="nc" id="L942">      int prioNoeudSup = priorite(noeudSup);</span>
+<span class="nc" id="L943">      int prioNoeudInf = priorite(noeudInf);</span>
+<span class="nc bnc" id="L944" title="All 2 branches missed.">      if (brancheGauche) {</span>
+<span class="nc bnc" id="L945" title="All 4 branches missed.">         return (prioNoeudSup &gt; prioNoeudInf) ||</span>
+<span class="nc bnc" id="L946" title="All 2 branches missed.">            ((prioNoeudSup == prioNoeudInf) &amp;&amp; (!associatifGauche(noeudSup)));</span>
+      } else {
+<span class="nc bnc" id="L948" title="All 4 branches missed.">         return (prioNoeudSup &gt; prioNoeudInf) ||</span>
+<span class="nc bnc" id="L949" title="All 2 branches missed.">            ((prioNoeudSup == prioNoeudInf) &amp;&amp; (!associatifDroite(noeudSup)));</span>
+      }
+   }
+
+   /**
+    * priorite(noeud) est un entier indiquant la priorité de 
+    * l'opérateur correspondant au noeud.
+    * Plus priorite(noeud) est grand, plus l'opérateur est prioritaire.
+    * Le Noeud.Vide signifie qu'il s'agit de la racine.
+    * On lui met la priorité minimum, pour que les expressions 
+    * ne soient pas parenthésées au plus au niveau.
+    */
+   private static int priorite(Noeud noeud) {
+<span class="nc bnc" id="L962" title="All 6 branches missed.">      switch(noeud) {</span>
+         case Non:
+         case PlusUnaire:
+         case MoinsUnaire:
+<span class="nc" id="L966">            return 4;</span>
+         case DivReel:
+         case Reste:
+         case Quotient:
+         case Mult:
+         case Et:
+<span class="nc" id="L972">            return 3;</span>
+         case Plus:
+         case Moins:
+         case Ou:
+<span class="nc" id="L976">            return 2;</span>
+         case Egal:
+         case InfEgal:
+         case SupEgal:
+         case NonEgal:
+         case Inf:
+         case Sup:
+<span class="nc" id="L983">            return 1;</span>
+         case Vide:
+<span class="nc" id="L985">            return 0;</span>
+         default:
+<span class="nc" id="L987">            throw new ErreurArbre(&quot;Erreur interne dans priorite&quot;);</span>
+      }
+   }
+
+   /**
+    * associatifGauche(noeud) = true ssi 
+    * l'opérateur correspondant au noeud est associatif à gauche.
+    */
+   private static boolean associatifGauche(Noeud noeud) {
+<span class="nc bnc" id="L996" title="All 2 branches missed.">      switch (noeud) {</span>
+         case Plus:
+         case Moins:
+         case Ou:
+         case Reste:
+         case DivReel:
+         case Quotient:
+         case Mult:
+         case Et:
+<span class="nc" id="L1005">            return true;</span>
+         default:
+<span class="nc" id="L1007">            return false;</span>
+      }
+   }
+
+   /**
+    * associatifDroite(noeud) = true ssi 
+    * l'opérateur correspondant au noeud est associatif à droite.
+    */
+   private static boolean associatifDroite(Noeud noeud) {
+<span class="nc bnc" id="L1016" title="All 2 branches missed.">      switch(noeud) {</span>
+         case Plus:
+         case Ou:
+         case Mult:
+         case Et:
+<span class="nc" id="L1021">            return true;</span>
+         default:
+<span class="nc" id="L1023">            return false;</span>
+      }
+
+   }
+
+
+   /**
+    * Décompile cet arbre, avec un niveau de détails spécifié. 
+    * &lt;ul&gt;
+    *  &lt;li&gt; niveau = 0 : pas de détail (passe 1) &lt;/li&gt;
+    *  &lt;li&gt; niveau = 1 : décors relatifs à la passe 2 &lt;/li&gt;
+    *  &lt;li&gt; niveau = 2 : décors relatifs aux passes 2 et 3 &lt;/li&gt;
+    * &lt;/ul&gt;
+    */
+   public void decompiler(int niveau) {
+<span class="nc" id="L1038">      decompiler_PROGRAMME(niveau);</span>
+<span class="nc" id="L1039">   }</span>
+   
+}
+
+
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

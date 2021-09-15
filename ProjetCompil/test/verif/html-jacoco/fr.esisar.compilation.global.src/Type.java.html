@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Type.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">JaCoCo Coverage Report</a> &gt; <a href="index.source.html" class="el_package">fr.esisar.compilation.global.src</a> &gt; <span class="el_source">Type.java</span></div><h1>Type.java</h1><pre class="source lang-java linenums">package fr.esisar.compilation.global.src;
+
+/**
+ * Classe des types.
+ *
+ * Un objet de la classe Type représente un type du langage JCas. 
+ *
+ * La nature d'un type est définie par un attribut de type {@link fr.esisar.compilation.global.src.NatureType NatureType}.
+ * Les différentes natures d'un type sont les suivantes : 
+ * &lt;code&gt;NatureType.String&lt;/code&gt;, &lt;code&gt;NatureType.Boolean&lt;/code&gt;, 
+ * &lt;code&gt;NatureType.Real&lt;/code&gt;, &lt;code&gt;NatureType.Interval&lt;/code&gt;, 
+ * &lt;code&gt;NatureType.Array&lt;/code&gt;.
+ * &lt;br&gt;&lt;br&gt;
+ * Tous les types ont un attribut &lt;code&gt;taille&lt;/code&gt; de type &lt;code&gt;int&lt;/code&gt;,
+ * initialisé à la valeur -1 lors de leur création. 
+ * Cet attribut sert à stocker la taille mémoire occupée par une valeur du 
+ * type en passe 3.
+ * &lt;br&gt;&lt;br&gt;
+ * Les types &lt;code&gt;Type.Interval&lt;/code&gt; possèdent deux attributs de type 
+ * &lt;code&gt;int&lt;/code&gt; : 
+ * la borne inférieure &lt;code&gt;borneInf&lt;/code&gt; et la borne supérieure 
+ * &lt;code&gt;borneSup&lt;/code&gt; de l'intervalle.
+ * &lt;br&gt;&lt;br&gt;
+ * Les types {@link fr.esisar.compilation.global.src.Type#String Type.String}, 
+ * {@link fr.esisar.compilation.global.src.Type#Boolean Type.Boolean}, 
+ * {@link fr.esisar.compilation.global.src.Type#Real Type.Real} n'existent qu'en un 
+ * seul exemplaire.
+ * &lt;br&gt;&lt;br&gt;
+ * Le type 'Type.Integer' est prédéfini comme un Type.Interval, avec les 
+ * attributs : 
+ * &lt;PRE&gt;
+   borneInf = -java.lang.Integer.MAX_VALUE 
+   borneSup = java.lang.Integer.MAX_VALUE 
+ * &lt;/PRE&gt;
+ */
+
+public class Type { 
+
+   private NatureType nature; // La nature de ce type
+   int taille;                // La taille de ce type
+
+   /**
+    * Le type string.
+    */
+<span class="nc" id="L45">   public static final Type String = new Type(NatureType.String);</span>
+
+   /**
+    * Le type boolean.
+    */
+<span class="nc" id="L50">   public static final Type Boolean = new Type(NatureType.Boolean);</span>
+
+   /**
+    * Le type real.
+    */
+<span class="nc" id="L55">   public static final Type Real = new Type(NatureType.Real);</span>
+
+   /**
+    * Le type integer.
+    */
+<span class="nc" id="L60">   public static final Type Integer = </span>
+<span class="nc" id="L61">      creationInterval(-java.lang.Integer.MAX_VALUE, </span>
+                        java.lang.Integer.MAX_VALUE); 
+
+   // ------------------------------------------------------------------------
+   // Constructeurs
+   // ------------------------------------------------------------------------
+
+   /**
+    * Constructeur de type de nature spécifiée.
+    * La taille du type est initialisée à -1.
+    */
+<span class="nc" id="L72">   Type(NatureType nature) {</span>
+<span class="nc" id="L73">      this.nature = nature;</span>
+<span class="nc" id="L74">      this.taille = -1;</span>
+<span class="nc" id="L75">   }</span>
+
+   /**
+    * Constructeur de type intervalle de bornes inférieure et supérieure
+    * spécifiées.
+    */
+   public static Type creationInterval(int borneInf, int borneSup) {
+<span class="nc" id="L82">      return new TypeInterval(borneInf, borneSup);</span>
+   }
+
+   /**
+    * Constructeur de type tableau. 
+    * Précondition : la nature de typeIndice est NatureType.Interval.
+    */
+   public static Type creationArray(Type typeIndice, Type typeElement) {
+<span class="nc bnc" id="L90" title="All 2 branches missed.">      if (typeIndice.getNature() != NatureType.Interval) {</span>
+<span class="nc" id="L91">         throw new ErreurType(</span>
+            &quot;La nature de typeIndice doit etre NatureType.Interval&quot;) ; 
+      }
+<span class="nc" id="L94">      return new TypeArray(typeIndice, typeElement);</span>
+   }
+
+   // ------------------------------------------------------------------------
+   // Sélecteurs
+   // ------------------------------------------------------------------------
+
+   /**
+    * La nature de ce type.
+    */
+   public NatureType getNature() {
+<span class="nc" id="L105">      return nature;</span>
+   }
+
+   /**
+    * La taille de ce type.
+    */
+   public int getTaille() {
+<span class="nc" id="L112">      return taille;</span>
+   }
+ 
+   /**
+    * Le type des indices pour un type tableau.
+    * Précondition : la nature de ce type doit être NatureType.Array.
+    */
+
+   public Type getIndice() {
+<span class="nc" id="L121">      throw new ErreurType(&quot;Type tableau attendu.&quot;);</span>
+   }
+
+   /**
+    * Le type des éléments pour un type tableau.
+    * Précondition : la nature de ce type doit être NatureType.Array.
+    */
+
+   public Type getElement() {
+<span class="nc" id="L130">      throw new ErreurType(&quot;Type tableau attendu.&quot;);</span>
+   }
+
+   /**
+    * La borne inférieure d'un type intervalle.
+    * Précondition : la nature de ce type doit être NatureType.Interval.
+    */
+
+   public int getBorneInf() {
+<span class="nc" id="L139">      throw new ErreurType(&quot;Type intervalle attendu.&quot;);</span>
+   }
+
+   /**
+    * La borne supérieure d'un type intervalle.
+    * Précondition : la nature de ce type doit être NatureType.Interval.
+    */
+
+   public int getBorneSup() {
+<span class="nc" id="L148">      throw new ErreurType(&quot;Type intervalle attendu.&quot;);</span>
+   }
+
+
+   // ------------------------------------------------------------------------
+   // Mutateurs
+   // ------------------------------------------------------------------------
+
+   /**
+    * Modifie la taille de ce type.
+    */
+   public void setTaille(int taille) {
+<span class="nc" id="L160">      this.taille = taille;</span>
+<span class="nc" id="L161">   }</span>
+
+   /**
+    * Modifie le type des indices pour un type tableau.
+    * Précondition : la nature de ce type doit être NatureType.Array.
+    */
+
+   public void setIndice(Type typeIndice) {
+<span class="nc" id="L169">      throw new ErreurType(&quot;Type tableau attendu.&quot;);</span>
+   }
+
+   /**
+    * Modifie le type des éléments pour un type tableau.
+    * Précondition : la nature de ce type doit être NatureType.Array.
+    */
+
+   public void setElement(Type typeElement) {
+<span class="nc" id="L178">      throw new ErreurType(&quot;Type tableau attendu.&quot;);</span>
+   }
+
+   /**
+    * Modifie la borne inférieure d'un type intervalle.
+    * Précondition : la nature de ce type doit être NatureType.Interval.
+    */
+
+   public void setBorneInf(int borneInf) {
+<span class="nc" id="L187">      throw new ErreurType(&quot;Type intervalle attendu.&quot;);</span>
+   }
+
+   /**
+    * Modifie la borne supérieure d'un type intervalle.
+    * Précondition : la nature de ce type doit être NatureType.Interval.
+    */
+
+   public void setBorneSup(int borneSup) {
+<span class="nc" id="L196">      throw new ErreurType(&quot;Type intervalle attendu.&quot;);</span>
+   }
+
+
+   // ------------------------------------------------------------------------
+   // Divers
+   // ------------------------------------------------------------------------
+
+   String natureToString() {
+      String s;
+<span class="nc bnc" id="L206" title="All 2 branches missed.">      switch (nature) {</span>
+         case Interval:
+<span class="nc bnc" id="L208" title="All 2 branches missed.">            if (this == Type.Integer) {</span>
+<span class="nc" id="L209">               s = &quot;Type.Integer&quot;;</span>
+            } else {
+<span class="nc" id="L211">               s = &quot;NatureType.Interval&quot;;</span>
+            }
+<span class="nc" id="L213">            break;</span>
+         default:
+<span class="nc" id="L215">            s = nature.toString();</span>
+      }
+<span class="nc" id="L217">      return s;</span>
+   }
+
+   /**
+    * Chaîne de carcatères qui correspond à ce type.
+    */
+   public String toString() {
+      String s;
+<span class="nc" id="L225">      s = natureToString();</span>
+<span class="nc bnc" id="L226" title="All 3 branches missed.">      switch (nature) {</span>
+         case Interval:
+<span class="nc bnc" id="L228" title="All 2 branches missed.">            if (this != Type.Integer) {</span>
+<span class="nc" id="L229">               s = s + &quot;(&quot; + getBorneInf() + &quot;, &quot; + getBorneSup() + &quot;)&quot;;</span>
+            }
+            break;
+         case Array:
+<span class="nc" id="L233">            s = s + &quot;(&quot; + getIndice() + &quot;, &quot; + getElement() + &quot;)&quot;;</span>
+         break;
+      }
+<span class="nc" id="L236">      return s;</span>
+   }
+
+   /**
+    * Affiche ce type avec le niveau de détails spécifié.
+    */
+
+   public void afficher(int niveau) {
+      int c1, c2;
+<span class="nc" id="L245">      c1 = Affichage.getCol();</span>
+<span class="nc bnc" id="L246" title="All 2 branches missed.">      if (c1 == 1) {</span>
+<span class="nc" id="L247">         Affichage.commencer();</span>
+      }
+<span class="nc bnc" id="L249" title="All 2 branches missed.">      switch (nature) {</span>
+         case Array:
+<span class="nc" id="L251">            Affichage.ecrire(natureToString());</span>
+<span class="nc" id="L252">            Affichage.ecrire(&quot;(&quot;);</span>
+<span class="nc" id="L253">            getIndice().afficher(niveau);</span>
+<span class="nc" id="L254">            Affichage.ecrire(&quot;, &quot;);</span>
+<span class="nc" id="L255">            getElement().afficher(niveau);</span>
+<span class="nc" id="L256">            Affichage.ecrire(&quot;)&quot;);</span>
+<span class="nc" id="L257">            break;</span>
+         default:
+<span class="nc" id="L259">            Affichage.ecrire(this.toString());</span>
+      }
+<span class="nc bnc" id="L261" title="All 2 branches missed.">      if (niveau &gt;= 2) {</span>
+<span class="nc" id="L262">         c2 = Affichage.getCol();</span>
+<span class="nc" id="L263">         Affichage.ecrire(&quot;\n&quot;);</span>
+<span class="nc" id="L264">         Affichage.commencer();</span>
+<span class="nc" id="L265">         Affichage.setCol(c1);</span>
+<span class="nc" id="L266">         Affichage.ecrire(&quot;... taille = &quot; + getTaille() + &quot;\n&quot;);</span>
+<span class="nc" id="L267">         Affichage.commencer();</span>
+<span class="nc" id="L268">         Affichage.setCol(c2);</span>
+      }
+<span class="nc" id="L270">   }</span>
+     
+}
+
+
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

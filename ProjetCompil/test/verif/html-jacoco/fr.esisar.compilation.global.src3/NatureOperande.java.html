@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>NatureOperande.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">JaCoCo Coverage Report</a> &gt; <a href="index.source.html" class="el_package">fr.esisar.compilation.global.src3</a> &gt; <span class="el_source">NatureOperande.java</span></div><h1>NatureOperande.java</h1><pre class="source lang-java linenums">package fr.esisar.compilation.global.src3;
+
+/**
+ * Le type des différentes natures d'opérande de la machine abstraite.
+ */
+
+<span class="nc" id="L7">public enum NatureOperande {</span>
+
+   /** Opérande direct : pour l'adressage direct par registre. */
+<span class="nc" id="L10">   OpDirect,   </span>
+
+   /** Opérande indirect : pour l'adressage indirect avec déplacement. */
+<span class="nc" id="L13">   OpIndirect, </span>
+
+   /** Opérande indexé : pour l'adressage indirect indexé avec déplacement. */
+<span class="nc" id="L16">   OpIndexe,   </span>
+
+   /** Opérande entier : pour l'adressage immédiat entier. */ 
+<span class="nc" id="L19">   OpEntier,   </span>
+
+   /** Opérande réel : pour l'adressage immédiat réel. */ 
+<span class="nc" id="L22">   OpReel,     </span>
+
+   /** Opérande chaîne. */
+<span class="nc" id="L25">   OpChaine,   </span>
+
+   /** Opérande étiquette. */
+<span class="nc" id="L28">   OpEtiq;     </span>
+}
+
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

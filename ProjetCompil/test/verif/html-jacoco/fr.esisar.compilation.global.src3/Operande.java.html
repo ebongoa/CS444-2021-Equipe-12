@@ -1,0 +1,393 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Operande.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">JaCoCo Coverage Report</a> &gt; <a href="index.source.html" class="el_package">fr.esisar.compilation.global.src3</a> &gt; <span class="el_source">Operande.java</span></div><h1>Operande.java</h1><pre class="source lang-java linenums">package fr.esisar.compilation.global.src3;
+
+/**
+ * Classe des opérandes des instructions de la machine abstraite.
+ */
+
+public abstract class Operande {
+
+   /** La nature de cet opérande. */
+   private NatureOperande nature; // La nature de cet opérande
+
+   /**
+    * Tableau permettant de créer une fois pour toutes les opérandes
+    * qui correspondent aux différents registres de la machine abstraite.
+    */
+<span class="nc" id="L16">   private static Operande[] tableauOpDirect = initialiserTableauOpDirect(); </span>
+
+   /**
+    * Initialisation de tableauOpDirect.
+    */
+   private static Operande[] initialiserTableauOpDirect() {
+<span class="nc" id="L22">      Registre[] tabRegistre = Registre.values(); </span>
+<span class="nc" id="L23">      int nbReg = tabRegistre.length; </span>
+<span class="nc" id="L24">      Operande[] tabRes = new Operande[nbReg]; </span>
+<span class="nc bnc" id="L25" title="All 2 branches missed.">      for (int i = 0; i &lt; nbReg; i++) {</span>
+<span class="nc" id="L26">         tabRes[i] = Operande.creationOpDirect(tabRegistre[i]); </span>
+      }
+<span class="nc" id="L28">      return tabRes; </span>
+   }
+         
+
+   /**
+    * Opérande correspondant au registre Registre.R0.
+    */
+<span class="nc" id="L35">   public final static Operande R0 = Operande.opDirect(Registre.R0); </span>
+
+   /**
+    * Opérande correspondant au registre Registre.R1.
+    */
+<span class="nc" id="L40">   public final static Operande R1 = Operande.opDirect(Registre.R1);</span>
+
+   /**
+    * Opérande correspondant au registre Registre.R2.
+    */
+<span class="nc" id="L45">   public final static Operande R2 = Operande.opDirect(Registre.R2);</span>
+
+   /**
+    * Opérande correspondant au registre Registre.R3.
+    */
+<span class="nc" id="L50">   public final static Operande R3 = Operande.opDirect(Registre.R3);</span>
+
+   /**
+    * Opérande correspondant au registre Registre.R4.
+    */
+<span class="nc" id="L55">   public final static Operande R4 = Operande.opDirect(Registre.R4);</span>
+
+   /**
+    * Opérande correspondant au registre Registre.R5.
+    */
+<span class="nc" id="L60">   public final static Operande R5 = Operande.opDirect(Registre.R5);</span>
+
+   /**
+    * Opérande correspondant au registre Registre.R6.
+    */
+<span class="nc" id="L65">   public final static Operande R6 = Operande.opDirect(Registre.R6);</span>
+
+   /**
+    * Opérande correspondant au registre Registre.R7.
+    */
+<span class="nc" id="L70">   public final static Operande R7 = Operande.opDirect(Registre.R7);</span>
+
+   /**
+    * Opérande correspondant au registre Registre.R8.
+    */
+<span class="nc" id="L75">   public final static Operande R8 = Operande.opDirect(Registre.R8);</span>
+
+   /**
+    * Opérande correspondant au registre Registre.R9.
+    */
+<span class="nc" id="L80">   public final static Operande R9 = Operande.opDirect(Registre.R9);</span>
+
+   /**
+    * Opérande correspondant au registre Registre.R10.
+    */
+<span class="nc" id="L85">   public final static Operande R10 = Operande.opDirect(Registre.R10);</span>
+
+   /**
+    * Opérande correspondant au registre Registre.R11.
+    */
+<span class="nc" id="L90">   public final static Operande R11 = Operande.opDirect(Registre.R11);</span>
+
+   /**
+    * Opérande correspondant au registre Registre.R12.
+    */
+<span class="nc" id="L95">   public final static Operande R12 = Operande.opDirect(Registre.R12);</span>
+
+   /**
+    * Opérande correspondant au registre Registre.R13.
+    */
+<span class="nc" id="L100">   public final static Operande R13 = Operande.opDirect(Registre.R13);</span>
+
+   /**
+    * Opérande correspondant au registre Registre.R14.
+    */
+<span class="nc" id="L105">   public final static Operande R14 = Operande.opDirect(Registre.R14);</span>
+
+   /**
+    * Opérande correspondant au registre Registre.R15.
+    */
+<span class="nc" id="L110">   public final static Operande R15 = Operande.opDirect(Registre.R15);</span>
+
+   /**
+    * Opérande correspondant au registre Registre.GB.
+    */
+<span class="nc" id="L115">   public final static Operande GB = Operande.opDirect(Registre.GB);</span>
+
+   /**
+    * Opérande correspondant au registre Registre.LB.
+    */
+<span class="nc" id="L120">   public final static Operande LB = Operande.opDirect(Registre.LB);</span>
+
+   // ------------------------------------------------------------------------
+   // CONSTRUCTEURS
+   // ------------------------------------------------------------------------
+
+   /**
+    * Constructeur d'opérande registre (de nature OpDirect). 
+    * Permet l'adressage direct par registre.
+    * Ce constructeur est privé car il est préférable d'utiliser la 
+    * méthode opDirect qui ne re-crée
+    * pas un nouvel opérande à chaque appel.
+    */
+   private static Operande creationOpDirect(Registre reg) {
+<span class="nc" id="L134">      return new OperandeDirect(reg);</span>
+   }
+
+   /**
+    * L'opérande qui correspond au registre reg.
+    * Cet opérande est crée une seule fois.
+    */
+   public static Operande opDirect(Registre reg) {
+<span class="nc" id="L142">      return tableauOpDirect[reg.ordinal()]; </span>
+   }
+
+   /**
+    * Constructeur d'opérande indirect (de nature OpIndirect).
+    * Permet l'adressage indirect avec déplacement.
+    */
+
+   public static Operande creationOpIndirect(int deplacement, Registre reg) {
+<span class="nc" id="L151">      return new OperandeIndirect(deplacement, reg);</span>
+   }
+
+   /**
+    * Constructeur d'opérande indexé (de nature OpIndexe). 
+    * Permet l'adressage indirect indexé avec déplacement.
+    */
+
+   public static Operande creationOpIndexe
+      (int deplacement, Registre regBase, Registre regIndex) {
+<span class="nc" id="L161">      return new OperandeIndexe(deplacement, regBase, regIndex);</span>
+   }
+
+   /**
+    * Constructeur d'opérande entier (de nature OpEntier).
+    * Permet l'adressage immédiat entier.
+    */
+
+   public static Operande creationOpEntier(int valEntier) {
+<span class="nc" id="L170">      return new OperandeEntier(valEntier);</span>
+   }
+
+   /**
+    * Constructeur d'opérande réel (de nature OpReel).
+    * Permet l'adressage immédiat réel.
+    */
+
+   public static Operande creationOpReel(float valReel) {
+<span class="nc" id="L179">      return new OperandeReel(valReel);</span>
+   }
+
+   /**
+    * Constructeur d'opérande chaîne (de nature OpChaine). 
+    */
+
+   public static Operande creationOpChaine(String valChaine) {
+<span class="nc" id="L187">      return new OperandeChaine(valChaine);</span>
+   }
+
+   /**
+    * Constructeur d'opérande étiquette (de nature OpEtiq). 
+    */
+
+   public static Operande creationOpEtiq(Etiq etiquette) {
+<span class="nc" id="L195">      return new OperandeEtiq(etiquette);</span>
+   }
+
+   /**
+    * Constructeur d'opérande de nature spécifiée.
+    */
+<span class="nc" id="L201">   Operande(NatureOperande nature) {</span>
+<span class="nc" id="L202">      this.nature = nature;</span>
+<span class="nc" id="L203">   }</span>
+
+   // ------------------------------------------------------------------------
+   // Sélecteurs
+   // ------------------------------------------------------------------------
+
+   /**
+    * La nature de cet opérande.
+    */
+   public NatureOperande getNature() {
+<span class="nc" id="L213">      return nature;</span>
+   }
+
+   /**
+    * Le registre qui correspond à cet opérande.
+    * Précondition : 
+    *    this.getNature() == NatureOperande.OpDirect
+    */
+   public Registre getRegistre() {
+<span class="nc" id="L222">      throw new ErreurOperande(</span>
+         &quot;getRegistre impossible sur opérande de nature &quot; + nature);
+   }
+
+   /**
+    * Le déplacement qui correspond à cet opérande.
+    * Précondition : 
+    *    this.getNature() == NatureOperande.OpIndirect ou
+    *    this.getNature() == NatureOperande.OpIndexe
+    */
+   public int getDeplacement() {
+<span class="nc" id="L233">      throw new ErreurOperande(</span>
+         &quot;getDeplacement impossible sur opérande de nature &quot; + nature);
+   }
+
+   /**
+    * Le registre de base qui correspond à cet opérande.
+    * Précondition : 
+    *    this.getNature() == NatureOperande.OpIndirect ou
+    *    this.getNature() == NatureOperande.OpIndexe
+    */
+   public Registre getRegistreBase() {
+<span class="nc" id="L244">      throw new ErreurOperande(</span>
+         &quot;getRegistreBase impossible sur opérande de nature &quot; + nature);
+   }
+
+   /**
+    * Le registre d'index qui correspond à cet opérande.
+    * Précondition : 
+    *    this.getNature() == NatureOperande.OpIndexe
+    */
+   public Registre getRegistreIndex() {
+<span class="nc" id="L254">      throw new ErreurOperande(</span>
+         &quot;getRegistreIndex impossible sur opérande de nature &quot; + nature);
+   }
+
+   /**
+    * L'entier qui correspond à cet opérande.
+    * Précondition : 
+    *    this.getNature() == NatureOperande.OpEntier
+    */
+   public int getEntier() {
+<span class="nc" id="L264">      throw new ErreurOperande(</span>
+         &quot;getEntier impossible sur opérande de nature &quot; + nature);
+   }
+
+   /**
+    * Le réel qui correspond à cet opérande.
+    * Précondition : 
+    *    this.getNature() == NatureOperande.OpReel
+    */
+   public float getReel() {
+<span class="nc" id="L274">      throw new ErreurOperande(</span>
+         &quot;getReel impossible sur opérande de nature &quot; + nature);
+   }
+
+   /**
+    * La chaîne qui correspond à cet opérande.
+    * Précondition : 
+    *    this.getNature() == NatureOperande.OpChaine
+    */
+   public String getChaine() {
+<span class="nc" id="L284">      throw new ErreurOperande(</span>
+         &quot;getChaine impossible sur opérande de nature &quot; + nature);
+   }
+
+   /**
+    * L'étiquette qui correspond à cet opérande.
+    * Précondition : 
+    *    this.getNature() == NatureOperande.OpEtiq
+    */
+   public Etiq getEtiq() {
+<span class="nc" id="L294">      throw new ErreurOperande(</span>
+         &quot;getEtiq impossible sur opérande de nature &quot; + nature);
+   }
+
+
+
+   // ------------------------------------------------------------------------
+   // Mutateurs
+   // ------------------------------------------------------------------------
+   //
+   //   Ces mutateurs sont privés pour diminuer le risque de bugs difficiles 
+   //   à trouver.
+   //
+
+   /** 
+    * Modifie le registre qui correspond à cet opérande.
+    * Précondition : 
+    *    this.getNature() == NatureOperande.OpDirect
+    */
+   private void setRegistre() {
+<span class="nc" id="L314">      throw new ErreurOperande(</span>
+         &quot;setRegistre impossible sur opérande de nature &quot; + nature);
+   }
+
+   /**
+    * Modifie le déplacement qui correspond à cet opérande.
+    * Précondition : 
+    *    this.getNature() == NatureOperande.OpIndirect ou
+    *    this.getNature() == NatureOperande.OpIndexe
+    */
+   private void setDeplacement(int deplacement) {
+<span class="nc" id="L325">      throw new ErreurOperande(</span>
+         &quot;setDeplacement impossible sur opérande de nature &quot; + nature);
+   }
+
+   /**
+    * Modifie le registre de base qui correspond à cet opérande.
+    * Précondition : 
+    *    this.getNature() == NatureOperande.OpIndirect ou
+    *    this.getNature() == NatureOperande.OpIndexe
+    */
+   private void setRegistreBase(Registre regBase) {
+<span class="nc" id="L336">      throw new ErreurOperande(</span>
+         &quot;setRegistreBase impossible sur opérande de nature &quot; + nature);
+   }
+
+   /**
+    * Modifie le registre d'index qui correspond à cet opérande.
+    * Précondition : 
+    *    this.getNature() == NatureOperande.OpIndexe
+    */
+   private void setRegistreIndex(Registre regIndex) {
+<span class="nc" id="L346">      throw new ErreurOperande(</span>
+         &quot;setRegistreIndex impossible sur opérande de nature &quot; + nature);
+   }
+
+   /**
+    * Modifie l'entier qui correspond à cet opérande.
+    * Précondition : 
+    *    this.getNature == NatureOperande.OpEntier
+    */
+   private void setEntier(int valEntier) {
+<span class="nc" id="L356">      throw new ErreurOperande(</span>
+         &quot;setEntier impossible sur opérande de nature &quot; + nature);
+   }
+
+   /**
+    * Modifie le réel qui correspond à cet opérande.
+    * Précondition : 
+    *    this.getNature() == NatureOperande.OpReel
+    */
+   private void setReel(int valReel) {
+<span class="nc" id="L366">      throw new ErreurOperande(</span>
+         &quot;setReel impossible sur opérande de nature &quot; + nature);
+   }
+
+   /**
+    * Modifie la chaîne qui correspond à cet opérande.
+    * Précondition : 
+    *    this.getNature() == NatureOperande.OpChaine
+    */
+   private void setChaine(String valChaine) {
+<span class="nc" id="L376">      throw new ErreurOperande(</span>
+         &quot;setChaine impossible sur opérande de nature &quot; + nature);
+   }
+
+   /**
+    * Modifie l'étiquette qui correspond à cet opérande.
+    * Précondition : 
+    *    this.getNature() == NatureOperande.OpEtiq
+    */
+   private void setEtiq(Etiq valEtiq) {
+<span class="nc" id="L386">      throw new ErreurOperande(</span>
+         &quot;setEtiq impossible sur opérande de nature &quot; + nature);
+   }
+
+}
+
+
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

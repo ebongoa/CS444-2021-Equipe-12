@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Verif.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">JaCoCo Coverage Report</a> &gt; <a href="index.source.html" class="el_package">fr.esisar.compilation.verif</a> &gt; <span class="el_source">Verif.java</span></div><h1>Verif.java</h1><pre class="source lang-java linenums">package fr.esisar.compilation.verif;
+
+import fr.esisar.compilation.global.src.*;
+ 
+/**
+ * Cette classe permet de réaliser la vérification et la décoration 
+ * de l'arbre abstrait d'un programme.
+ */
+public class Verif {
+
+   private Environ env; // L'environnement des identificateurs
+
+   /**
+    * Constructeur.
+    */
+<span class="nc" id="L16">   public Verif() {</span>
+<span class="nc" id="L17">      env = new Environ();</span>
+<span class="nc" id="L18">   }</span>
+
+   /**
+    * Vérifie les contraintes contextuelles du programme correspondant à 
+    * l'arbre abstrait a, qui est décoré et enrichi. 
+    * Les contraintes contextuelles sont décrites 
+    * dans Context.txt.
+    * En cas d'erreur contextuelle, un message d'erreur est affiché et 
+    * l'exception ErreurVerif est levée.
+    */
+   public void verifierDecorer(Arbre a) throws ErreurVerif {
+<span class="nc" id="L29">      verifier_PROGRAMME(a);</span>
+<span class="nc" id="L30">   }</span>
+
+   /**
+    * Initialisation de l'environnement avec les identificateurs prédéfinis.
+    */
+   private void initialiserEnv() {
+      Defn def;
+      // integer
+<span class="nc" id="L38">      def = Defn.creationType(Type.Integer);</span>
+<span class="nc" id="L39">      def.setGenre(Genre.PredefInteger);</span>
+<span class="nc" id="L40">      env.enrichir(&quot;integer&quot;, def);</span>
+      
+      // ------------
+      // A COMPLETER
+      // ------------
+<span class="nc" id="L45">   }</span>
+
+   /**************************************************************************
+    * PROGRAMME
+    **************************************************************************/
+   private void verifier_PROGRAMME(Arbre a) throws ErreurVerif {
+<span class="nc" id="L51">      initialiserEnv();</span>
+<span class="nc" id="L52">      verifier_LISTE_DECL(a.getFils1());</span>
+<span class="nc" id="L53">      verifier_LISTE_INST(a.getFils2());</span>
+<span class="nc" id="L54">   }</span>
+
+   /**************************************************************************
+    * LISTE_DECL
+    **************************************************************************/
+   private void verifier_LISTE_DECL(Arbre a) throws ErreurVerif {
+      // A COMPLETER
+<span class="nc" id="L61">   }</span>
+
+   /**************************************************************************
+    * LISTE_INST
+    **************************************************************************/
+   private void verifier_LISTE_INST(Arbre a) throws ErreurVerif {
+      // A COMPLETER
+<span class="nc" id="L68">   }</span>
+
+   // ------------------------------------------------------------------------
+   // COMPLETER les operations de vérifications et de décoration pour toutes 
+   // les constructions d'arbres
+   // ------------------------------------------------------------------------
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

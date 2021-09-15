@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Test.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">JaCoCo Coverage Report</a> &gt; <a href="index.source.html" class="el_package">fr.esisar.compilation.global.src3</a> &gt; <span class="el_source">Test.java</span></div><h1>Test.java</h1><pre class="source lang-java linenums">
+package fr.esisar.compilation.global.src3;
+
+<span class="nc" id="L4">class Test {</span>
+
+   public static void main(String[] args) {
+      // Test registre
+<span class="nc bnc" id="L8" title="All 2 branches missed.">      for (Registre r : Registre.values()) {</span>
+<span class="nc" id="L9">         System.out.print(r + &quot;, &quot;); </span>
+      }
+<span class="nc" id="L11">      System.out.println();</span>
+
+      // Test opérande
+<span class="nc" id="L14">      String s = &quot;a\&quot;b&quot;;</span>
+<span class="nc" id="L15">      Operande op1 = Operande.creationOpChaine(s);</span>
+<span class="nc" id="L16">      System.out.println(op1.getChaine() + &quot; -&gt; &quot; + op1);</span>
+<span class="nc" id="L17">      Operande op2 = Operande.opDirect(Registre.R0); </span>
+<span class="nc" id="L18">      System.out.println(op2.getRegistre() + &quot; -&gt; &quot; + op2); </span>
+<span class="nc" id="L19">      Operande op3 = Operande.creationOpEntier(-3);</span>
+<span class="nc" id="L20">      System.out.println(op3.getEntier() + &quot; -&gt; &quot; + op3); </span>
+<span class="nc" id="L21">      Operande op4 = Operande.creationOpEntier(576879867);</span>
+<span class="nc" id="L22">      System.out.println(op4.getEntier() + &quot; -&gt; &quot; + op4);</span>
+<span class="nc" id="L23">      Operande op5 = Operande.creationOpEtiq(Etiq.lEtiq(&quot;toto&quot;));</span>
+<span class="nc" id="L24">      System.out.println(op5.getEtiq() + &quot; -&gt; &quot; + op5); </span>
+<span class="nc" id="L25">      Operande op6 = Operande.creationOpIndexe(5, Registre.R0, Registre.GB); </span>
+<span class="nc" id="L26">      System.out.println(op6.getDeplacement() + &quot; &quot; + op6.getRegistreBase() +</span>
+<span class="nc" id="L27">         &quot; &quot; + op6.getRegistreIndex() + &quot; -&gt; &quot; + op6);</span>
+<span class="nc" id="L28">      Operande op7 = Operande.creationOpIndirect(-6, Registre.LB); </span>
+<span class="nc" id="L29">      System.out.println(op7.getDeplacement() + &quot; &quot; + op7.getRegistreBase() + </span>
+         &quot; -&gt; &quot; + op7); 
+<span class="nc" id="L31">      Operande op8 = Operande.creationOpReel(1.234e-6f); </span>
+<span class="nc" id="L32">      System.out.println(op8.getReel() + &quot; -&gt; &quot; + op8); </span>
+
+<span class="nc" id="L34">      System.out.println(); </span>
+<span class="nc" id="L35">      Operande op9 = Operande.R0; </span>
+<span class="nc" id="L36">      System.out.print(op9 + &quot; &quot;); </span>
+<span class="nc" id="L37">      op9 = Operande.R15; </span>
+<span class="nc" id="L38">      System.out.print(op9 + &quot; &quot;);</span>
+<span class="nc" id="L39">      op9 = Operande.GB;</span>
+<span class="nc" id="L40">      System.out.print(op9 + &quot; &quot;); </span>
+<span class="nc" id="L41">      op9 = Operande.LB; </span>
+<span class="nc" id="L42">      System.out.println(op9);</span>
+<span class="nc" id="L43">      op9 = Operande.opDirect(Registre.R0); </span>
+<span class="nc" id="L44">      System.out.print(op9 + &quot; &quot;); </span>
+<span class="nc" id="L45">      op9 = Operande.opDirect(Registre.R15); </span>
+<span class="nc" id="L46">      System.out.print(op9 + &quot; &quot;); </span>
+<span class="nc" id="L47">      op9 = Operande.opDirect(Registre.GB); </span>
+<span class="nc" id="L48">      System.out.print(op9 + &quot; &quot;); </span>
+<span class="nc" id="L49">      op9 = Operande.opDirect(Registre.LB); </span>
+<span class="nc" id="L50">      System.out.println(op9 + &quot; &quot;); </span>
+
+
+
+      // Test opération
+<span class="nc bnc" id="L55" title="All 2 branches missed.">      for (Operation op : Operation.values()) {</span>
+<span class="nc" id="L56">         System.out.println(op + &quot;(&quot; + op.getArite() + &quot;, &quot; + op.getEtiq() + </span>
+            &quot;)&quot;); 
+      }
+
+      // Test instruction
+<span class="nc" id="L61">      Inst inst1 = Inst.creation0(Operation.HALT); </span>
+<span class="nc" id="L62">      System.out.println(inst1);</span>
+<span class="nc" id="L63">      Inst inst2 = Inst.creation1(Operation.BRA, op5);</span>
+<span class="nc" id="L64">      System.out.println(inst2);</span>
+<span class="nc" id="L65">      Inst inst3 = Inst.creation1(Operation.WSTR, op1);</span>
+<span class="nc" id="L66">      System.out.println(inst3);</span>
+<span class="nc" id="L67">      Inst inst4 = Inst.creation2(Operation.LOAD, op6, op2);</span>
+<span class="nc" id="L68">      System.out.println(inst4);</span>
+
+      // Test ligne
+<span class="nc" id="L71">      Ligne lig1 = new Ligne(null, null, &quot;---------------&quot;);</span>
+<span class="nc" id="L72">      System.out.print(lig1);</span>
+<span class="nc" id="L73">      Ligne lig2 = new Ligne(null, inst1, null); </span>
+<span class="nc" id="L74">      System.out.print(lig2);</span>
+<span class="nc" id="L75">      Ligne lig3 = new Ligne(Etiq.nouvelle(&quot;toto&quot;), null, null);</span>
+<span class="nc" id="L76">      System.out.print(lig3);</span>
+<span class="nc" id="L77">      Ligne lig4 = new Ligne(Etiq.nouvelle(&quot;toto&quot;), null, &quot;et alors ?&quot;); </span>
+<span class="nc" id="L78">      System.out.print(lig4);</span>
+<span class="nc" id="L79">      Ligne lig5 = new Ligne(Etiq.nouvelle(&quot;toto&quot;), inst3, null);</span>
+<span class="nc" id="L80">      System.out.print(lig5);</span>
+<span class="nc" id="L81">      Ligne lig6 = new Ligne(Etiq.nouvelle(&quot;toto&quot;), inst4, &quot;instruction&quot;); </span>
+<span class="nc" id="L82">      System.out.print(lig6);</span>
+
+      // Test programme
+      // Prog p = Prog.ass();
+<span class="nc" id="L86">      Prog.ajouterGrosComment(&quot;a&quot;); </span>
+<span class="nc" id="L87">      Prog.ajouter(lig1); </span>
+<span class="nc" id="L88">      Prog.ajouterGrosComment(&quot;ab&quot;);</span>
+<span class="nc" id="L89">      Prog.ajouter(inst1);</span>
+<span class="nc" id="L90">      Prog.ajouterGrosComment(&quot;abc&quot;); </span>
+<span class="nc" id="L91">      Prog.ajouter(Etiq.nouvelle(&quot;toto&quot;)); </span>
+<span class="nc" id="L92">      Prog.ajouterGrosComment(&quot;abcd&quot;); </span>
+<span class="nc" id="L93">      Prog.ajouterComment(&quot;&quot;);</span>
+<span class="nc" id="L94">      Prog.ajouterComment(&quot;&quot;);</span>
+<span class="nc" id="L95">      Prog.ajouterComment(&quot;a&quot;);</span>
+<span class="nc" id="L96">      Prog.ajouterComment(&quot;ab&quot;);</span>
+<span class="nc" id="L97">      Prog.ajouterComment(&quot;abc&quot;);</span>
+<span class="nc" id="L98">      Prog.ajouterComment(&quot;abcd&quot;);</span>
+<span class="nc" id="L99">      Prog.ajouterComment(&quot;1234567890&quot;);</span>
+<span class="nc" id="L100">      Prog.ajouterComment(&quot;12345678901&quot;);</span>
+<span class="nc" id="L101">      Prog.ajouterComment(&quot;123456789012&quot;);</span>
+<span class="nc" id="L102">      Prog.ajouterComment(&quot;1234567890123456789012345678901234567890123456789012345678901234567&quot;);</span>
+<span class="nc" id="L103">      Prog.ajouterComment(&quot;12345678901234567890123456789012345678901234567890123456789012345678&quot;);</span>
+<span class="nc" id="L104">      Prog.ajouterComment(&quot;123456789012345678901234567890123456789012345678901234567890123456789&quot;);</span>
+<span class="nc" id="L105">      Prog.ajouterComment(&quot;1234567890123456789012345678901234567890123456789012345678901234567890&quot;);</span>
+<span class="nc" id="L106">      Prog.ajouterComment(&quot;12345678901234567890123456789012345678901234567890123456789012345678901&quot;);</span>
+<span class="nc" id="L107">      Prog.ajouterComment(&quot;123456789012345678901234567890123456789012345678901234567890123456789012&quot;);</span>
+
+<span class="nc" id="L109">      Prog.afficher();</span>
+
+<span class="nc" id="L111">   }</span>
+}
+
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>TypeInterval.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">JaCoCo Coverage Report</a> &gt; <a href="index.source.html" class="el_package">fr.esisar.compilation.global.src</a> &gt; <span class="el_source">TypeInterval.java</span></div><h1>TypeInterval.java</h1><pre class="source lang-java linenums">package fr.esisar.compilation.global.src;
+
+/**
+ * Classe des types intervalles.
+ */
+
+class TypeInterval extends Type {
+
+   private int borneInf; // La borne inférieure de ce type intervalle
+   private int borneSup; // La borne supérieure de ce type intervalle
+
+   /**
+    * Constructeur de type intervalle.
+    */
+   TypeInterval(int borneInf, int borneSup) {
+<span class="nc" id="L16">      super(NatureType.Interval);</span>
+<span class="nc" id="L17">      this.borneInf = borneInf;</span>
+<span class="nc" id="L18">      this.borneSup = borneSup;</span>
+<span class="nc" id="L19">   }</span>
+    
+   /**
+    * La borne inférieure de ce type. 
+    */
+
+   public int getBorneInf() {
+<span class="nc" id="L26">      return borneInf;</span>
+   }
+
+   /**
+    * La borne supérieure de ce type. 
+    */
+
+   public int getBorneSup() {
+<span class="nc" id="L34">      return borneSup;</span>
+   }
+
+   /**
+    * Modifie la borne inférieure de ce type.
+    */
+
+   public void setBorneInf(int borneInf) {
+<span class="nc" id="L42">      this.borneInf = borneInf;</span>
+<span class="nc" id="L43">   }</span>
+
+   /**
+    * Modifie la borne supérieure de ce type.
+    */
+
+   public void setBorneSup(int borneSup) {
+<span class="nc" id="L50">      this.borneSup = borneSup;</span>
+<span class="nc" id="L51">   }</span>
+
+
+}
+
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

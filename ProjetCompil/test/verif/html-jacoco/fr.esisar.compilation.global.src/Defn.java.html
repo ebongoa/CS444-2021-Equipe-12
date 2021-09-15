@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Defn.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">JaCoCo Coverage Report</a> &gt; <a href="index.source.html" class="el_package">fr.esisar.compilation.global.src</a> &gt; <span class="el_source">Defn.java</span></div><h1>Defn.java</h1><pre class="source lang-java linenums">package fr.esisar.compilation.global.src;
+
+import fr.esisar.compilation.global.src3.Operande;
+
+/**
+ * Classe des &quot;defns&quot;, définitions qui sont associées aux identificateurs.
+ */
+
+public class Defn { 
+
+   private NatureDefn nature; // La nature de la defn
+   private Type type;   // Le type de la defn
+   private Genre genre;       // Le genre d'une defn
+   private Operande operande; // L'opérande associé à une defn
+
+   // ------------------------------------------------------------------------
+   // CONSTRUCTEURS
+   // ------------------------------------------------------------------------
+
+   /**
+    * Constructeur de defn.
+    */
+<span class="nc" id="L23">   Defn(NatureDefn nature, Type type) {</span>
+<span class="nc" id="L24">      this.nature = nature;</span>
+<span class="nc" id="L25">      this.type = type;</span>
+<span class="nc" id="L26">      this.genre = Genre.NonPredefini;</span>
+<span class="nc" id="L27">      this.operande = null;</span>
+<span class="nc" id="L28">   }</span>
+
+   /**
+    * Constructeur de defn de nature NatureDefn.Var.
+    */
+
+   public static Defn creationVar(Type type) {
+<span class="nc" id="L35">      return new Defn(NatureDefn.Var, type);</span>
+   }
+
+   /**
+    * Constructeur de defn de nature NatureDefn.Type.
+    */
+
+   public static Defn creationType(Type type) {
+<span class="nc" id="L43">      return new Defn(NatureDefn.Type, type);</span>
+   }
+
+   /**
+    * Constructeur de defn de nature NatureDefn.ConstInteger de valeur val.
+    */
+
+   public static Defn creationConstInteger(int val) {
+<span class="nc" id="L51">      return new DefnConstInteger(val); </span>
+   }
+
+   /**
+    * Constructeur de defn de nature NatureDefn.ConstBoolean de valeur val.
+    */
+
+   public static Defn creationConstBoolean(boolean val) {
+<span class="nc" id="L59">      return new DefnConstBoolean(val);</span>
+   }
+
+   // ------------------------------------------------------------------------
+   // Sélecteurs
+   // ------------------------------------------------------------------------
+
+   /**
+    * La nature de cette defn.
+    */
+   public NatureDefn getNature() {
+<span class="nc" id="L70">      return nature;</span>
+   }
+
+   /**
+    * Le type de cette defn.
+    */
+   public Type getType() {
+<span class="nc" id="L77">      return type;</span>
+   }
+
+   /**
+    * Le genre de cette defn.
+    */
+   public Genre getGenre() {
+<span class="nc" id="L84">      return genre;</span>
+   }
+
+   /**
+    * L'opérande associé à cette defn.
+    */
+   public Operande getOperande() {
+<span class="nc" id="L91">      return operande;</span>
+   }
+
+   /**
+    * La valeur entière associée à cette defn. 
+    * Précondition : la nature de cette defn est NatureDefn.ConstInteger.
+    */
+   public int getValeurInteger() {
+<span class="nc" id="L99">      throw new ErreurDefn(&quot;getValeurInteger() impossible sur &quot; + nature);</span>
+   }
+
+   /**
+    * La valeur booléenne associée à cette defn. 
+    * Précondition : la nature de cette defn est NatureDefn.ConstBoolean.
+    */
+   public boolean getValeurBoolean() {
+<span class="nc" id="L107">      throw new ErreurDefn(&quot;getValeurBoolean() impossible sur &quot; + nature);</span>
+   }
+
+   // ------------------------------------------------------------------------
+   // Mutateurs
+   // ------------------------------------------------------------------------
+
+   /**
+    * Modifie le type de cette defn avec le type spécifié.
+    */
+   public void setType(Type type) {
+<span class="nc" id="L118">      this.type = type;</span>
+<span class="nc" id="L119">   }</span>
+
+   /**
+    * Modifie le genre de cette defn avec le genre spécifié.
+    */
+
+   public void setGenre(Genre genre) {
+<span class="nc" id="L126">      this.genre = genre;</span>
+<span class="nc" id="L127">   }</span>
+   
+   /**
+    * Modifie l'opérande associé à cette defn avec l'opérande spécifié.
+    */
+
+   public void setOperande(Operande operande) {
+<span class="nc" id="L134">      this.operande = operande;</span>
+<span class="nc" id="L135">   }</span>
+
+   /**
+    * Modifie la valeur entière associée à cette defn. 
+    * Précondition : la nature de cette defn est NatureDefn.ConstInteger.
+    */
+   public void setValeurInteger(int val) {
+<span class="nc" id="L142">      throw new ErreurDefn(&quot;setValeurInteger(val) impossible sur &quot; + nature);</span>
+   }
+
+   /**
+    * Modifie la valeur booléenne associée à cette defn. 
+    * Précondition : la nature de cette defn est NatureDefn.ConstBoolean.
+    */
+   public void setValeurBoolean(boolean val) {
+<span class="nc" id="L150">      throw new ErreurDefn(&quot;setValeurBoolean(val) impossible sur &quot; + nature);</span>
+   }
+
+   // ------------------------------------------------------------------------
+   // Divers
+   // ------------------------------------------------------------------------
+
+   /**
+    * Retourne la chaîne associée à la nature de cette defn.
+    * Forme de la chaîne : NatureDefn.Var ou NatureDefn.Type ou 
+    * NatureDefn.ConstInteger(1) ou NatureDefn.ConstBoolean(true).
+    */
+   public String natureToString() {
+<span class="nc" id="L163">      String s = nature.toString();</span>
+<span class="nc bnc" id="L164" title="All 3 branches missed.">      switch (nature) {</span>
+         case ConstInteger:
+<span class="nc" id="L166">            s = s + &quot;(&quot; + getValeurInteger() + &quot;)&quot;;</span>
+<span class="nc" id="L167">            break;</span>
+         case ConstBoolean:
+<span class="nc" id="L169">            s = s + &quot;(&quot; + getValeurBoolean() + &quot;)&quot;;</span>
+            break;
+      }
+<span class="nc" id="L172">      return s;</span>
+   }
+
+   /**
+    * Une chaîne de caractères qui représente cette defn.
+    */
+   public String toString() {
+<span class="nc" id="L179">      String s = &quot;(&quot; + natureToString();</span>
+<span class="nc" id="L180">      s = s + &quot;, &quot; + type + &quot;, &quot; + genre + &quot;, &quot; + operande + &quot;)&quot;;</span>
+<span class="nc" id="L181">      return s;</span>
+   }
+
+   /**
+    * Affiche cette defn, avec le niveau de détails spécifié.
+    */
+   public void afficher(int niveau) {
+      int c1, c2;
+<span class="nc" id="L189">      c1 = Affichage.getCol();</span>
+<span class="nc bnc" id="L190" title="All 2 branches missed.">      if (c1 == 1) {</span>
+<span class="nc" id="L191">         Affichage.commencer();</span>
+      }
+<span class="nc" id="L193">      Affichage.ecrire(&quot;(&quot; + natureToString() + &quot;, &quot;);</span>
+<span class="nc bnc" id="L194" title="All 2 branches missed.">      if (type == null) {</span>
+<span class="nc" id="L195">         Affichage.ecrire(&quot;null&quot;);</span>
+      } else {
+<span class="nc" id="L197">         type.afficher(niveau);</span>
+      }
+<span class="nc" id="L199">      Affichage.ecrire(&quot;)&quot;);</span>
+<span class="nc bnc" id="L200" title="All 2 branches missed.">      if (niveau &gt;= 2) {</span>
+<span class="nc" id="L201">         c2 = Affichage.getCol();</span>
+<span class="nc" id="L202">         Affichage.ecrire(&quot;\n&quot;);</span>
+<span class="nc" id="L203">         Affichage.commencer();</span>
+<span class="nc" id="L204">         Affichage.ecrire(&quot;... genre    = &quot; + genre + &quot;\n&quot;);</span>
+<span class="nc" id="L205">         Affichage.commencer();</span>
+<span class="nc" id="L206">         Affichage.ecrire(&quot;... operande = &quot; + operande);</span>
+<span class="nc bnc" id="L207" title="All 2 branches missed.">         if (c1 != 1) {</span>
+<span class="nc" id="L208">            Affichage.ecrire(&quot;\n&quot;);</span>
+<span class="nc" id="L209">            Affichage.commencer();</span>
+<span class="nc" id="L210">            Affichage.setCol(c2);</span>
+         }
+      }
+
+<span class="nc" id="L214">   }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

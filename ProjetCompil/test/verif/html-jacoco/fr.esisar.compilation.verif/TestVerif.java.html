@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>TestVerif.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">JaCoCo Coverage Report</a> &gt; <a href="index.source.html" class="el_package">fr.esisar.compilation.verif</a> &gt; <span class="el_source">TestVerif.java</span></div><h1>TestVerif.java</h1><pre class="source lang-java linenums">// ----------------------------------------------------------------------------
+// Testeur pour la passe de vérifications contextuelles
+// ----------------------------------------------------------------------------
+
+package fr.esisar.compilation.verif;
+
+import fr.esisar.compilation.global.src.*;
+import fr.esisar.compilation.syntaxe.*;
+
+/** 
+ * Classe qui permet de tester la passe de vérifications contextuelles.
+ */
+
+<span class="nc" id="L14">public class TestVerif {</span>
+
+
+   /**
+    * Méthode de test de la passe de vérifications contextuelles.
+    */
+   public static void main(String args[]) throws Exception {
+
+      try {
+         // Appel de l'analyseur syntaxique et récupération de l'arbre résultat
+<span class="nc" id="L24">         Arbre arbre = parser.analyseSyntaxique(args);</span>
+<span class="nc" id="L25">         arbre.afficher(0); // Avant le rendu, supprimer cette ligne</span>
+         // Décompilation de l'arbre
+<span class="nc" id="L27">         arbre.decompiler(0); // Avant le rendu, supprimer cette ligne</span>
+         // On construit un verificateur de passe 2
+<span class="nc" id="L29">         Verif passe2 = new Verif();</span>
+         // On vérifie et on décore l'arbre
+<span class="nc" id="L31">         passe2.verifierDecorer(arbre); </span>
+<span class="nc" id="L32">         arbre.afficher(1); // Avant le rendu, supprimer cette ligne</span>
+         // Décompilation de l'arbre
+<span class="nc" id="L34">         arbre.decompiler(1); // Avant le rendu, supprimer cette ligne</span>
+         
+<span class="fc" id="L36">      } catch (ErreurLexicale e) {</span>
+         // Recuperation de l'exception ErreurLexicale
+         // On ne fait rien
+<span class="nc" id="L39">      } catch (ErreurSyntaxe e) {</span>
+         // Recuperation de l'exception ErreurSyntaxe
+         // On ne fait rien
+<span class="nc" id="L42">      } catch (ErreurVerif e) {</span>
+         // Recuperation de l'exception ErreurVerif
+         // On ne fait rien
+<span class="pc" id="L45">      }</span>
+<span class="fc" id="L46">   }</span>
+
+}
+
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

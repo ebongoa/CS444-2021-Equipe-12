@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Operation.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">JaCoCo Coverage Report</a> &gt; <a href="index.source.html" class="el_package">fr.esisar.compilation.global.src3</a> &gt; <span class="el_source">Operation.java</span></div><h1>Operation.java</h1><pre class="source lang-java linenums">package fr.esisar.compilation.global.src3;
+
+/**
+ * Le type des opérations de la machine abstraite.
+ */
+
+<span class="nc" id="L7">public enum Operation {</span>
+
+   // Opération d'arité 0 
+<span class="nc" id="L10">   RTS(0), RNL(0), RINT(0), RFLOAT(0), WINT(0),</span>
+<span class="nc" id="L11">   WFLOAT(0), WNL(0), HALT(0),</span>
+   
+   // Opération d'arité 1, avec un opérande de type Etiq
+<span class="nc" id="L14">   BSR(1,true), BRA(1,true),</span>
+<span class="nc" id="L15">   BEQ(1,true), BNE(1,true),</span>
+<span class="nc" id="L16">   BGT(1,true), BLT(1,true),</span>
+<span class="nc" id="L17">   BGE(1,true), BLE(1,true),</span>
+<span class="nc" id="L18">   BOV(1,true),</span>
+
+   // Opération d'arité 1, avec opérande qui n'est pas de type Etiq
+<span class="nc" id="L21">   SEQ(1), SNE(1), SGT(1), SLT(1), SGE(1), SLE(1), SOV(1),</span>
+<span class="nc" id="L22">   ADDSP(1), SUBSP(1), </span>
+<span class="nc" id="L23">   PEA(1), PUSH(1), POP(1),</span>
+<span class="nc" id="L24">   TSTO(1),</span>
+<span class="nc" id="L25">   WSTR(1),</span>
+
+   // Opération d'arité 2
+<span class="nc" id="L28">   LOAD(2), STORE(2), LEA(2),</span>
+<span class="nc" id="L29">   ADD(2), SUB(2), MUL(2), OPP(2), DIV(2), MOD(2),</span>
+<span class="nc" id="L30">   CMP(2), INT(2), FLOAT(2);</span>
+
+
+   private int arite; // L'arité de l'opération (le nombre d'opérande)
+   private boolean etiq; 
+      // Vrai ssi cette opération attend un opérande de type Etiq
+
+   /**
+    * Constructeur d'opération d'arité spécifiée.
+    * Par défaut, etiq = false.
+    */
+<span class="nc" id="L41">   Operation (int arite) {</span>
+<span class="nc" id="L42">      this.arite = arite;</span>
+<span class="nc" id="L43">      etiq = false;</span>
+<span class="nc" id="L44">   }</span>
+
+   /**
+    * Constructeur d'opération d'arité et de contrainte d'étiquette spécifiées.
+    */
+<span class="nc" id="L49">   Operation (int arite, boolean etiq) {</span>
+<span class="nc" id="L50">      this.arite = arite;</span>
+<span class="nc" id="L51">      this.etiq = etiq;</span>
+<span class="nc" id="L52">   }</span>
+
+   /**
+    * L'arité de cette opération. L'arité correspond au nombre 
+    * d'opérandes attendu par cette opération.
+    */
+   public int getArite() {
+<span class="nc" id="L59">      return arite;</span>
+   }
+
+   /**
+    * getEtiq() est vrai ssi l'opération attend un opérande de type Etiq.
+    */
+   boolean getEtiq() {
+<span class="nc" id="L66">      return etiq;</span>
+   }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

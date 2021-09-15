@@ -1,0 +1,9 @@
+# On ne versionne pas les fichiers .class générés par le compilateur Java
+*.class
+
+# On ne versionne pas les fichiers générés par JFlex et cup
+/output
+Lexical.java
+parser.java 
+sym.java
+
