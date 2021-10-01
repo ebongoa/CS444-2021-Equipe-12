@@ -1,0 +1,13 @@
+program
+n, fact : integer;
+begin
+     write(" Entrer un entier : ");
+     read(n) ;
+     fact := 1 ;
+     while n >= 1 do
+          fact := fact * n ;
+          n := n - 1 ;
+     end ;
+     write("fact(", n, ") = ", fact) ;
+     new_line;
+end  
