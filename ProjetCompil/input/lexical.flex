@@ -226,12 +226,38 @@ import java.util.Hashtable;
 // Définition des macros
 // -------------------------------------
 
-CHIFFRE        = [0-9]
-LETTRE         = [a-zA-Z]
+CHIFFRE=[0-9]
+LETTRE=[a-zA-Z]
 
 // ------------
 // A COMPLETER
 // ------------
+
+// Identificateurs
+IDF			= {LETTRE}({LETTRE}|{CHIFFRE}|"_")*
+
+// Constantes numériques
+NUM  		= {CHIFFRE} {CHIFFRE}*
+SIGNE 		= ("+"|"-"|"")
+
+// Exposants
+EXP		= 'E' {SIGNE} {NUM}|'e' SIGNE {NUM}
+
+// Décimaux positifs
+DEC 		= {NUM} '.' {NUM}
+
+// Constantes entières 
+INT 		= {NUM} 
+   
+// Constantes réelles 
+REEL 		= {DEC} | {DEC} {EXP}
+
+// Chaines de caractère
+CHAINE_CAR	= (" " | "!" | [\043-\176])*
+CHAINE 	= \" ({CHAINE_CAR} | \"\")* \"
+
+// Commentaires
+COMM 		= "--" ({CHAINE_CAR} | \042 | [ \t])* \n
 
 %%
 
@@ -240,16 +266,71 @@ LETTRE         = [a-zA-Z]
 // ---------------------------
 
 [ \t]+                 { }
-
 \n                     { }
-
 "+"                    { return symbol(sym.PLUS); }
 
+// Symboles spéciaux
+"<"			{ return symbol(sym.INF); }
+">"			{ return symbol(sym.SUP); }
+"="			{ return symbol(sym.EGAL); }
+"/="		{ return symbol(sym.DIFF); }
+"<="		{ return symbol(sym.INF_EGAL); }
+">="		{ return symbol(sym.SUP_EGAL); }
+"-"			{ return symbol(sym.MOINS); }
+"*"			{ return symbol(sym.MULT); }
+"/"			{ return symbol(sym.DIV_REEL); }
+"("			{ return symbol(sym.PAR_OUVR); }
+")"			{ return symbol(sym.PAR_FERM); }
+".."		{ return symbol(sym.DOUBLE_POINT); }
+":"			{ return symbol(sym.DEUX_POINTS); }
+","			{ return symbol(sym.VIRGULE); }
+";"			{ return symbol(sym.POINT_VIRGULE); }
+"["			{ return symbol(sym.CROCH_OUVR); }
+"]"			{ return symbol(sym.CROCH_FERM); }
+":="		{ return symbol(sym.AFFECT); }
+"."			{ return symbol(sym.POINT); }
+
+// Séparateurs
+" "			{ }
+{COMM}		{ }
+
+// Mots réservés
+[aA][nN][dD]				{ return symbol(sym.AND); }
+[aA][rR][rR][aA][yY]			{ return symbol(sym.ARRAY); }           
+[bB][eE][gG][iI][nN]			{ return symbol(sym.BEGIN); }           
+[dD][iI][vV]				{ return symbol(sym.DIV); }
+[dD][oO]				{ return symbol(sym.DO); }    	          
+[dD][oO][wW][nN][tT][oO]		{ return symbol(sym.DOWNTO); }          
+[eE][lL][sS][eE]			{ return symbol(sym.ELSE); }            
+[eE][nN][dD]				{ return symbol(sym.END); }
+[fF][oO][rR]				{ return symbol(sym.FOR); }             
+[iI][fF]				{ return symbol(sym.IF); }              
+[mM][oO][dD]				{ return symbol(sym.MOD); }             
+[nN][eE][wW]_[lL][iI][nN][eE]		{ return symbol(sym.NEW_LINE); } 
+[nN][oO][tT]				{ return symbol(sym.NOT); }             
+[nN][uU][lL][lL]			{ return symbol(sym.NULL); }            
+[oO][fF]				{ return symbol(sym.OF); }              
+[oO][rR]				{ return symbol(sym.OR); }      
+[pP][rR][oO][gG][rR][aA][mM]		{ return symbol(sym.PROGRAM); }         
+[rR][eE][aA][dD]			{ return symbol(sym.READ); }            
+[tT][hH][eE][nN]			{ return symbol(sym.THEN); }            
+[tT][oO]				{ return symbol(sym.TO); }      
+[wW][hH][iI][lL][eE]			{ return symbol(sym.WHILE); }           
+[wW][rR][iI][tT][eE]			{ return symbol(sym.WRITE); }
+
+
+//Autres regles
+
+{IDF}	{return symbol(sym.IDF, yytext());}
+
+{INT} 		{return symbol(sym.CONST_ENT,Integer.parseInt(yytext()));}
+{REEL}		{return symbol(sym.CONST_REEL,Float.parseFloat(yytext()));}
+{CHAINE}		{return symbol(sym.CONST_CHAINE,yytext());}
+                         
+
+// Terminaison
 .                      { System.out.println("Erreur Lexicale : '" +
                             yytext() + "' non reconnu ... ligne " + 
                             numLigne()) ;
                          throw new ErreurLexicale() ; }
 
-// ------------
-// A COMPLETER
-// ------------
