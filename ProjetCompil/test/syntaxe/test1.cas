@@ -10,4 +10,4 @@ begin
      end ;
      write("fact(", n, ") = ", fact) ;
      new_line;
-end  
+end.  

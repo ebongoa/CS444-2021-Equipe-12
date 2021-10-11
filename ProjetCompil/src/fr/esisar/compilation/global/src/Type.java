@@ -270,5 +270,3 @@ public class Type {
    }
      
 }
-
-

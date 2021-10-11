@@ -161,7 +161,7 @@ liste_idf ::= liste_idf:lid1 VIRGULE idf:id1
    :}
    |  idf:id
    {:
-      RESULT = Arbre.creation2(Noeud.ListeIdent, Arbre.creation0(Noeud.Vide, parser.numLigne() , id, id.getNumLigne());
+      RESULT = Arbre.creation2(Noeud.ListeIdent, Arbre.creation0(Noeud.Vide, parser.numLigne()) , id, id.getNumLigne());
    :}
    ;
 
@@ -201,16 +201,16 @@ constante ::= PLUS const:c1
 
 const ::= CONST_ENT:c
    {:
-      ESULT = Arbre.creationEntier(c, c.getNumLigne());
+      RESULT = Arbre.creationEntier(c, cleft);
    :}
    |  idf:id1
    {:
       RESULT = id1;
    :}
    ;
-idf ::= IDF:id
+idf ::= IDF:i
    {:
-  RESULT = Arbre.creationIdent(id, ileft);
+  		RESULT = Arbre.creationIdent(i, ileft);
    :}
    ;
 
@@ -234,7 +234,7 @@ inst ::= NULL
    :}
    |  FOR:f pas:p1 DO liste_inst:li1 END
    {:
-      RESULT = Arbre.creation2(Noeud.Pour,p1,li1,fleft;      
+      RESULT = Arbre.creation2(Noeud.Pour,p1,li1,fleft);      
    :}
    |  WHILE:w exp:e1 DO liste_inst:li1 END
    {:
@@ -359,14 +359,15 @@ exp ::= facteur:f1
 
 facteur ::= CONST_ENT:c
    {:
-      RESULT = Arbre.creationEntier(c, parser.numLigne()
-   |  CONST_REEL
+      RESULT = Arbre.creationEntier(c, parser.numLigne());
+   :}
+   |  CONST_REEL:c
    {: 
-      RESULT = Arbre.creationReel(c, parser.numLigne()
+      RESULT = Arbre.creationReel(c, parser.numLigne());
    :}
    |  CONST_CHAINE:c
    {:   
-      RESULT = Arbre.creationChaine(c, parser.numLigne()
+      RESULT = Arbre.creationChaine(c, parser.numLigne());
    :}
    |  place:p1
    {:
