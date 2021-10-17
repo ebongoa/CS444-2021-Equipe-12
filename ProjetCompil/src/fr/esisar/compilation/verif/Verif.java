@@ -101,11 +101,15 @@ public class Verif {
 	*				|  Noeud.Vide
     **************************************************************************/
 // A COMPLETER
+   private Type verifier_LISTE_IDENT(Arbre a) throws ErreurVerif
+   { return null;}
    
    /**************************************************************************
    *IDENT 		-> Noeud.Ident                   -- attribut de type Chaine
    **************************************************************************/
 // A COMPLETER
+   private Type verifier_IDENT(Arbre a) throws ErreurVerif
+   { return null;}
    
    /**************************************************************************
     * TYPE		-> IDENT
@@ -191,6 +195,80 @@ public class Verif {
 				|  IDENT            
     **************************************************************************/
 // A COMPLETER   
+   private void verifier_EXP(Arbre a) throws ErreurVerif
+   {
+	   Type t1,t2; //On aura maximum 2 fils
+	   Arbre f1,f2; //On aura maximum 2 fils
+	   
+	   switch (a.getNoeud())
+	   {
+	   //Type.Boolean -> Type.Boolean
+	   case Non:
+		   
+	   //Type.Boolean, Type.Boolean -> Type.Boolean   
+	   case Et:
+	   case Ou:
+		   f1 = a.getFils1();
+		   f2 = a.getFils2();
+		   
+		   verifier_EXP(f1);
+		   verifier_EXP(f2);
+		   
+		   t1 = f1.getDecor().getType();
+		   t2 = f2.getDecor().getType();
+		   
+		   if (t1.equals(t2) && t1.equals(Type.Boolean) )
+		   {
+			   a.setDecor(new Decor(Type.Boolean));
+			   break; 
+		   }
+		   else ErreurContext.ErreurNonRepertoriee.leverErreurContext("("+t1 + " , " + t2+")", a.getNumLigne());
+		   
+		   
+	   //Type.Interval, Type.Interval -> Type.Boolean
+  	   //Type.Interval, Type.Real     -> Type.Boolean
+  	   //Type.Real,     Type.Interval -> Type.Boolean
+  	   //Type.Real,     Type.Real     -> Type.Boolean
+	   case Egal:
+	   case Inf:
+	   case Sup:
+	   case NonEgal:
+	   case InfEgal:
+	   case SupEgal:
+		
+	   //Type.Interval -> Type.Integer
+  	   //Type.Real     -> Type.Real 
+	   case PlusUnaire:
+	   case MoinsUnaire:
+		   
+	   //Type.Interval, Type.Interval -> Type.Integer
+  	   //Type.Interval, Type.Real     -> Type.Real
+  	   //Type.Real,     Type.Interval -> Type.Real 		
+  	   //Type.Real,     Type.Real     -> Type.Real	   
+	   case Plus:
+	   case Moins:
+	   case Mult:
+	
+	   //Type.Interval, Type.Interval -> Type.Integer
+	   case Quotient:
+	   case Reste:
+		
+	   //Type.Interval, Type.Interval -> Type.Real 
+	   //Type.Interval, Type.Real     -> Type.Real
+	   //Type.Real,     Type.Interval -> Type.Real
+	   //Type.Real,     Type.Real     -> Type.Real	   
+	   case DivReel:
+		
+	   //Array(Type.Interval, <type>), Type.Interval -> <type>	   
+	   case Index:
+	   
+       default:
+           throw new ErreurInterneVerif("Appel incorrect a verifier_EXP ligne " + a.getNumLigne());
+	   }
+
+   }
+   
+   
    // ------------------------------------------------------------------------
    // COMPLETER les operations de vérifications et de décoration pour toutes 
    // les constructions d'arbres
