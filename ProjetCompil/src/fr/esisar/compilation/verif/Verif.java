@@ -108,8 +108,19 @@ public class Verif {
    *IDENT 		-> Noeud.Ident                   -- attribut de type Chaine
    **************************************************************************/
 // A COMPLETER
-   private Type verifier_IDENT(Arbre a) throws ErreurVerif
-   { return null;}
+   private Decor verifier_IDENT(Arbre a) throws ErreurVerif
+   { 
+	   if(a.getNoeud() != Noeud.Ident) throw new ErreurInterneVerif("Appel incorrect a verifier_IDENT ligne " + a.getNumLigne());
+
+	   Defn def = env.chercher(a.getChaine()); 
+       
+	   if(def == null) {
+       	ErreurContext.ErreurNonRepertoriee.leverErreurContext(a.getChaine(), a.getNumLigne());
+       	//Variable non declaree
+       }
+       
+       return new Decor(def, def.getType());
+   }
    
    /**************************************************************************
     * TYPE		-> IDENT
@@ -166,8 +177,30 @@ public class Verif {
    /**************************************************************************
     * LISTE_EXP   	-> Noeud.Vide
 					|  Noeud.ListeExp(LISTE_EXP, EXP) 
+ * @throws ErreurVerif 
     **************************************************************************/
 // A COMPLETER
+   private void verifier_LISTE_EXP(Arbre a) throws ErreurVerif
+   {
+       
+     switch(a.getNoeud()) 
+     {   
+         case Vide:
+             break;
+             
+         case ListeExp:
+        	 Arbre f2 = a.getFils2();
+             verifier_LISTE_EXP(a.getFils1());
+             verifier_EXP(f2);
+             
+             a.setDecor(f2.getDecor());
+             break;
+                
+             default:
+                 throw new ErreurInterneVerif("Appel incorrect a verifier_LISTE_EXP ligne " + a.getNumLigne());
+        
+     }
+   }
    
    /**************************************************************************
     * EXP 		-> Noeud.Et(EXP, EXP) 
@@ -197,33 +230,46 @@ public class Verif {
 // A COMPLETER   
    private void verifier_EXP(Arbre a) throws ErreurVerif
    {
-	   Type t1,t2; //On aura maximum 2 fils
-	   Arbre f1,f2; //On aura maximum 2 fils
+	   Type t1 = null,t2 = null; //On aura maximum 2 fils
+	   Arbre f1 = null,f2 = null; //On aura maximum 2 fils
+	   
+	   if (a.getArite() > 0)
+	   {
+		   f1 = a.getFils1();
+		   t1 = f1.getDecor().getType();
+	   }
+	   if (a.getArite() > 1)
+	   {
+		   f2 = a.getFils2();
+		   t2 = f2.getDecor().getType();
+	   }
+	   
 	   
 	   switch (a.getNoeud())
 	   {
 	   //Type.Boolean -> Type.Boolean
 	   case Non:
+     		verifier_EXP(f1);
+	   	   if(t1.equals(Type.Boolean)) 
+		   {
+			   a.setDecor(new Decor(Type.Boolean));
+			   break;
+		   } 
+		   else ErreurContext.ErreurNonRepertoriee.leverErreurContext("("+t1+")", a.getNumLigne());
+    	//Operateur Unaire attend un bool
 		   
 	   //Type.Boolean, Type.Boolean -> Type.Boolean   
 	   case Et:
 	   case Ou:
-		   f1 = a.getFils1();
-		   f2 = a.getFils2();
-		   
-		   verifier_EXP(f1);
-		   verifier_EXP(f2);
-		   
-		   t1 = f1.getDecor().getType();
-		   t2 = f2.getDecor().getType();
-		   
+     		verifier_EXP(f1);
+     		verifier_EXP(f2);
 		   if (t1.equals(t2) && t1.equals(Type.Boolean) )
 		   {
 			   a.setDecor(new Decor(Type.Boolean));
 			   break; 
 		   }
 		   else ErreurContext.ErreurNonRepertoriee.leverErreurContext("("+t1 + " , " + t2+")", a.getNumLigne());
-		   
+		   //Operateur Binaire attend deux bool
 		   
 	   //Type.Interval, Type.Interval -> Type.Boolean
   	   //Type.Interval, Type.Real     -> Type.Boolean
@@ -234,12 +280,28 @@ public class Verif {
 	   case Sup:
 	   case NonEgal:
 	   case InfEgal:
-	   case SupEgal:
+	   case SupEgal:  
+     		verifier_EXP(f1);
+     		verifier_EXP(f2);
+		   if ( (t1.getNature().equals(NatureType.Interval) || t1.equals(Type.Real)) && (t2.getNature().equals(NatureType.Interval) || t2.equals(Type.Real))) 		   
+		   {
+			    if (!t1.getNature().equals(t2.getNature())) //L'un des deux est un interval et l'autre un reel , on ajoute donc un noeud conversion;
+           		a.setDecor(new Decor(Type.Boolean));
+           		break;
+		   }   
+      	   else ErreurContext.ErreurNonRepertoriee.leverErreurContext("("+t1 + " , " + t2+")", a.getNumLigne());
+		   //Operateur binaire attends deux Interval ou deux Reel ou un de chaque.
 		
 	   //Type.Interval -> Type.Integer
   	   //Type.Real     -> Type.Real 
 	   case PlusUnaire:
 	   case MoinsUnaire:
+     		verifier_EXP(f1);
+		   if ( t1.equals(NatureType.Interval) ) a.setDecor(new Decor(Type.Integer));
+		   else if (t1.equals(Type.Real))        a.setDecor(new Decor(Type.Real));
+		   else ErreurContext.ErreurNonRepertoriee.leverErreurContext("("+t1+")", a.getNumLigne());
+		   break;
+		   //Operateur Unaire attends un Interval ou un reel
 		   
 	   //Type.Interval, Type.Interval -> Type.Integer
   	   //Type.Interval, Type.Real     -> Type.Real
@@ -248,20 +310,84 @@ public class Verif {
 	   case Plus:
 	   case Moins:
 	   case Mult:
+      		verifier_EXP(f1);
+      		verifier_EXP(f2);
+		   if ( (t1.getNature().equals(NatureType.Interval) || t1.equals(Type.Real)) && (t2.getNature().equals(NatureType.Interval) || t2.equals(Type.Real))) 		   
+		   {
+			    if (!t1.getNature().equals(t2.getNature())) //L'un des deux est un interval et l'autre un reel , on ajoute donc un noeud conversion;
+	           	
+			    if (t1.getNature().equals(t2.getNature()) && t1.getNature().equals(NatureType.Interval)) a.setDecor(new Decor(Type.Integer));
+	           	else a.setDecor(new Decor(Type.Real));
+			    
+			    break;
+			   }   
+	      	   else ErreurContext.ErreurNonRepertoriee.leverErreurContext("("+t1 + " , " + t2+")", a.getNumLigne());
+			   //Operateur binaire attends deux Interval ou deux Reel ou un de chaque.
 	
 	   //Type.Interval, Type.Interval -> Type.Integer
 	   case Quotient:
 	   case Reste:
+     		verifier_EXP(f1);
+     		verifier_EXP(f2);
+     		
+     		if (t1.getNature().equals(t2.getNature()) && t1.getNature().equals(NatureType.Interval) )
+     		{
+     			a.setDecor(new Decor(Type.Integer));
+     			break;
+     		}
+     		else ErreurContext.ErreurNonRepertoriee.leverErreurContext("("+t1 + " , " + t2+")", a.getNumLigne());
+     		//Operateur Binaire attends deux Interval
 		
 	   //Type.Interval, Type.Interval -> Type.Real 
 	   //Type.Interval, Type.Real     -> Type.Real
 	   //Type.Real,     Type.Interval -> Type.Real
 	   //Type.Real,     Type.Real     -> Type.Real	   
 	   case DivReel:
-		
+       		verifier_EXP(f1);
+       		verifier_EXP(f2);
+		   if ( (t1.getNature().equals(NatureType.Interval) || t1.equals(Type.Real)) && (t2.getNature().equals(NatureType.Interval) || t2.equals(Type.Real))) 		   
+		   {
+			    if (!t1.getNature().equals(t2.getNature())) //L'un des deux est un interval et l'autre un reel , on ajoute donc un noeud conversion;
+           		a.setDecor(new Decor(Type.Real));
+           		break;
+		   }   
+      	   else ErreurContext.ErreurNonRepertoriee.leverErreurContext("("+t1 + " , " + t2+")", a.getNumLigne());
+		  //Operateur binaire attend deux Interval ou deux Reel ou un de chaque.
+		   
 	   //Array(Type.Interval, <type>), Type.Interval -> <type>	   
-	   case Index:
+       case Index:
+       	   //verifier_PLACE(f1); ####################################################################################################
+           verifier_EXP(f2);        
+           
+           if(t1.getNature() != NatureType.Array) ErreurContext.ErreurNonRepertoriee.leverErreurContext("("+t1.getNature()+")", a.getNumLigne());
+       		//On ne peut indexer qu'un tableau
+            else if(t2.getNature() != NatureType.Interval)	ErreurContext.ErreurNonRepertoriee.leverErreurContext("("+t2.getNature()+")", a.getNumLigne()); 
+	   		//L'indexation se fait par intervalle
+            else a.setDecor(new Decor(a.getFils1().getDecor().getType().getElement()));
+            
+	   		break;
 	   
+       case Entier:
+           a.setDecor(new Decor(Type.Integer));
+           break;
+
+       case Reel:
+    	   a.setDecor(new Decor(Type.Real));
+       	   break;
+
+       case Chaine:
+    	   a.setDecor(new Decor(Type.String));
+    	   break;
+	   		
+	   case Ident:
+		    Decor def = verifier_IDENT(a);
+      		NatureDefn nature = a.getDecor().getDefn().getNature(); 
+      		if (nature == NatureDefn.Type) ErreurContext.ErreurNonRepertoriee.leverErreurContext(a.getChaine(), a.getNumLigne());
+      		//Identifiant de Variable ou de Constante attendue
+      		else a.setDecor(def);
+               break;
+       	
+       
        default:
            throw new ErreurInterneVerif("Appel incorrect a verifier_EXP ligne " + a.getNumLigne());
 	   }
