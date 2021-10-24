@@ -13,8 +13,33 @@ package fr.esisar.compilation.verif;
 
 public enum ErreurContext {
    
-   ErreurNonRepertoriee;
+    ErreurNonRepertoriee,
 
+    ErreurOperateurBinaireIntervalOuReel,
+	ErreurOperateurBinaireInterval,
+	ErreurOperateurBinaireBool,
+	
+	ErreurOperateurUnaireIntervalOuReel,
+	ErreurOperateurUnaireBool,
+	
+	ErreurIndexationTableau,
+	ErreurIndexInterval,
+	
+	ErreurConstInteger,
+	
+	ErreurIdent,
+	ErreurIdentVar,
+	ErreurIdentVarOuConst,
+	
+	ErreurInterval,
+	ErreurIntervalInteger,
+	
+	ErreurTypeInconnu,
+	ErreurDejaDefini,
+	
+	
+	;
+	
    void leverErreurContext(String s, int numLigne) throws ErreurVerif {
       System.err.println("Erreur contextuelle : ");
       switch (this) {

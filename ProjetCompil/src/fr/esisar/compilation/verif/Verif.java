@@ -146,8 +146,8 @@ public class Verif {
        
 		   if(def == null) 
 		   {
-			   ErreurContext.ErreurNonRepertoriee.leverErreurContext(a.getChaine(), a.getNumLigne());
-			   //Variable non declaree
+			   ErreurContext.ErreurIdent.leverErreurContext(a.getChaine(), a.getNumLigne());
+			   //Ident non défini
 		   }       
 		   return new Decor(def, def.getType());
 	   }
@@ -166,7 +166,7 @@ public class Verif {
 			case ConstInteger:
 			case Type:
 			case Var:
-				ErreurContext.ErreurNonRepertoriee.leverErreurContext(a.getChaine(), a.getNumLigne());
+				ErreurContext.ErreurDejaDefini.leverErreurContext(a.getChaine(), a.getNumLigne());
 				//l'identifiant existe déjà dans l'environnement
 			default:
 				throw new ErreurInterneVerif("Appel incorrect a verifier_IDENT ligne " + a.getNumLigne());
@@ -193,7 +193,7 @@ public class Verif {
                Defn def = env.chercher(a.getChaine());
                if(def == null || !def.getNature().equals(NatureDefn.Type)) //Ne correspond a rien du tout
                {
-               	ErreurContext.ErreurNonRepertoriee.leverErreurContext(a.getChaine(), a.getNumLigne());
+               	ErreurContext.ErreurTypeInconnu.leverErreurContext(a.getChaine(), a.getNumLigne());
                	//Cet ident n'existe pas ou ne designe pas un type
                } 
                else //L'ident existe et est un type
@@ -211,7 +211,7 @@ public class Verif {
         	   if(t1.getNature().equals(NatureType.Interval)) 
         		   return Type.creationArray(t1, verifier_TYPE(a.getFils2()));
         	   else
-        		   ErreurContext.ErreurNonRepertoriee.leverErreurContext(t1.getNature().toString(), a.getNumLigne());
+        		   ErreurContext.ErreurIndexInterval.leverErreurContext(t1.getNature().toString(), a.getNumLigne());
         	   	   //Un indice est de type Interval
            default:
 				throw new ErreurInterneVerif("Appel incorrect a verifier_TYPE ligne " + a.getNumLigne());
@@ -234,12 +234,12 @@ public class Verif {
         	//Verifier que les noeuds sont de type interval
         	if(!(f1.getDecor().getType().equals(Type.Integer))) 
         	{
-        		ErreurContext.ErreurNonRepertoriee.leverErreurContext(f1.getDecor().getType().toString(), a.getNumLigne());
+        		ErreurContext.ErreurIntervalInteger.leverErreurContext(f1.getDecor().getType().toString(), a.getNumLigne());
         		//La borne n'est pas un entier
         	}
         	else if(!(f1.getDecor().getType().equals(Type.Integer))) 
         	{
-        		ErreurContext.ErreurNonRepertoriee.leverErreurContext(f2.getDecor().getType().toString(), a.getNumLigne());
+        		ErreurContext.ErreurIntervalInteger.leverErreurContext(f2.getDecor().getType().toString(), a.getNumLigne());
         		//La borne n'est pas un entier
         	}
         
@@ -266,12 +266,12 @@ public class Verif {
             	Defn def = env.chercher(a.getChaine());
                 if(def == null) 
                 {
-                	ErreurContext.ErreurNonRepertoriee.leverErreurContext(a.getChaine(), a.getNumLigne());
+                	ErreurContext.ErreurIdent.leverErreurContext(a.getChaine(), a.getNumLigne());
                  	//Cet ident n'existe pas
                 } 
                 else if(!(def.getNature().equals(NatureDefn.ConstInteger))) 
                 {
-                	ErreurContext.ErreurNonRepertoriee.leverErreurContext(def.getNature().toString(), a.getNumLigne());
+                	ErreurContext.ErreurConstInteger.leverErreurContext(def.getNature().toString(), a.getNumLigne());
                 	//On ne fait pas d'intervale avec une constante booleene
                 }
                 
@@ -362,17 +362,17 @@ public class Verif {
                 
                 if(!(t1.getNature().equals(NatureType.Interval))) 
                 {
-                	ErreurContext.ErreurNonRepertoriee.leverErreurContext(t1.toString(), a.getNumLigne());
+                	ErreurContext.ErreurInterval.leverErreurContext(t1.toString(), a.getNumLigne());
                 	//On attends un interval
                 } 
                 else if(!(t2.getNature().equals(NatureType.Interval))) 
                 {
-            		ErreurContext.ErreurNonRepertoriee.leverErreurContext(t2.toString(), a.getNumLigne());
+            		ErreurContext.ErreurInterval.leverErreurContext(t2.toString(), a.getNumLigne());
             		//On attends un interval
             	} 
                 else if(!(t3.getNature().equals(NatureType.Interval))) 
                 {
-            		ErreurContext.ErreurNonRepertoriee.leverErreurContext(t3.toString(), a.getNumLigne());
+            		ErreurContext.ErreurInterval.leverErreurContext(t3.toString(), a.getNumLigne());
             		//On attends un interval
             	} 
                 else 
@@ -401,7 +401,7 @@ public class Verif {
             	} 
             	else 
             	{
-            		ErreurContext.ErreurNonRepertoriee.leverErreurContext(a.getChaine(), a.getNumLigne());
+            		ErreurContext.ErreurIdentVar.leverErreurContext(a.getChaine(), a.getNumLigne());
             		//L'ident devrait être un Var
             	}
             case Index:
@@ -416,12 +416,12 @@ public class Verif {
                 
                 if (!(t1.getNature().equals(NatureType.Array)))
                 {
-                	ErreurContext.ErreurNonRepertoriee.leverErreurContext(t1.getNature().toString(), a.getNumLigne());
+                	ErreurContext.ErreurIndexationTableau.leverErreurContext(t1.getNature().toString(), a.getNumLigne());
                 	//On ne peux indexer qu'un tableau               	
                 }                             
                 else if( !(t2.getNature().equals(NatureType.Interval))) 
                 {
-                	ErreurContext.ErreurNonRepertoriee.leverErreurContext(t2.getNature().toString(), a.getNumLigne());
+                	ErreurContext.ErreurIndexInterval.leverErreurContext(t2.getNature().toString(), a.getNumLigne());
                 	//Un indice est de type Interval
                 } 
                 else 
@@ -514,7 +514,7 @@ public class Verif {
 			   a.setDecor(new Decor(Type.Boolean));
 			   break;
 		   } 
-		   else ErreurContext.ErreurNonRepertoriee.leverErreurContext("("+t1+")", a.getNumLigne());
+		   else ErreurContext.ErreurOperateurUnaireBool.leverErreurContext("("+t1+")", a.getNumLigne());
     	//Operateur Unaire attend un bool
 		   
 	   //Type.Boolean, Type.Boolean -> Type.Boolean   
@@ -527,7 +527,7 @@ public class Verif {
 			   a.setDecor(new Decor(Type.Boolean));
 			   break; 
 		   }
-		   else ErreurContext.ErreurNonRepertoriee.leverErreurContext("("+t1 + " , " + t2+")", a.getNumLigne());
+		   else ErreurContext.ErreurOperateurBinaireBool.leverErreurContext("("+t1 + " , " + t2+")", a.getNumLigne());
 		   //Operateur Binaire attend deux bool
 		   
 	   //Type.Interval, Type.Interval -> Type.Boolean
@@ -548,7 +548,7 @@ public class Verif {
            		a.setDecor(new Decor(Type.Boolean));
            		break;
 		   }   
-      	   else ErreurContext.ErreurNonRepertoriee.leverErreurContext("("+t1 + " , " + t2+")", a.getNumLigne());
+      	   else ErreurContext.ErreurOperateurBinaireIntervalOuReel.leverErreurContext("("+t1 + " , " + t2+")", a.getNumLigne());
 		   //Operateur binaire attends deux Interval ou deux Reel ou un de chaque.
 		
 	   //Type.Interval -> Type.Integer
@@ -558,7 +558,7 @@ public class Verif {
      		verifier_EXP(f1);
 		   if ( t1.equals(NatureType.Interval) ) a.setDecor(new Decor(Type.Integer));
 		   else if (t1.equals(Type.Real))        a.setDecor(new Decor(Type.Real));
-		   else ErreurContext.ErreurNonRepertoriee.leverErreurContext("("+t1+")", a.getNumLigne());
+		   else ErreurContext.ErreurOperateurUnaireIntervalOuReel.leverErreurContext("("+t1+")", a.getNumLigne());
 		   break;
 		   //Operateur Unaire attends un Interval ou un reel
 		   
@@ -580,7 +580,7 @@ public class Verif {
 			    
 			    break;
 			   }   
-	      	   else ErreurContext.ErreurNonRepertoriee.leverErreurContext("("+t1 + " , " + t2+")", a.getNumLigne());
+	      	   else ErreurContext.ErreurOperateurBinaireIntervalOuReel.leverErreurContext("("+t1 + " , " + t2+")", a.getNumLigne());
 			   //Operateur binaire attends deux Interval ou deux Reel ou un de chaque.
 	
 	   //Type.Interval, Type.Interval -> Type.Integer
@@ -594,7 +594,7 @@ public class Verif {
      			a.setDecor(new Decor(Type.Integer));
      			break;
      		}
-     		else ErreurContext.ErreurNonRepertoriee.leverErreurContext("("+t1 + " , " + t2+")", a.getNumLigne());
+     		else ErreurContext.ErreurOperateurBinaireInterval.leverErreurContext("("+t1 + " , " + t2+")", a.getNumLigne());
      		//Operateur Binaire attends deux Interval
 		
 	   //Type.Interval, Type.Interval -> Type.Real 
@@ -610,17 +610,17 @@ public class Verif {
            		a.setDecor(new Decor(Type.Real));
            		break;
 		   }   
-      	   else ErreurContext.ErreurNonRepertoriee.leverErreurContext("("+t1 + " , " + t2+")", a.getNumLigne());
+      	   else ErreurContext.ErreurOperateurBinaireIntervalOuReel.leverErreurContext("("+t1 + " , " + t2+")", a.getNumLigne());
 		  //Operateur binaire attend deux Interval ou deux Reel ou un de chaque.
 		   
 	   //Array(Type.Interval, <type>), Type.Interval -> <type>	   
        case Index:
-       	   //verifier_PLACE(f1); ####################################################################################################
+       	   verifier_PLACE(f1);
            verifier_EXP(f2);        
            
-           if(t1.getNature() != NatureType.Array) ErreurContext.ErreurNonRepertoriee.leverErreurContext("("+t1.getNature()+")", a.getNumLigne());
+           if(t1.getNature() != NatureType.Array) ErreurContext.ErreurIndexationTableau.leverErreurContext("("+t1.getNature()+")", a.getNumLigne());
        		//On ne peut indexer qu'un tableau
-            else if(t2.getNature() != NatureType.Interval)	ErreurContext.ErreurNonRepertoriee.leverErreurContext("("+t2.getNature()+")", a.getNumLigne()); 
+            else if(t2.getNature() != NatureType.Interval)	ErreurContext.ErreurIndexInterval.leverErreurContext("("+t2.getNature()+")", a.getNumLigne()); 
 	   		//L'indexation se fait par intervalle
             else a.setDecor(new Decor(a.getFils1().getDecor().getType().getElement()));
             
@@ -641,7 +641,7 @@ public class Verif {
 	   case Ident:
 		    Decor def = verifier_IDENT(a);
       		NatureDefn nature = a.getDecor().getDefn().getNature(); 
-      		if (nature == NatureDefn.Type) ErreurContext.ErreurNonRepertoriee.leverErreurContext(a.getChaine(), a.getNumLigne());
+      		if (nature == NatureDefn.Type) ErreurContext.ErreurIdentVarOuConst.leverErreurContext(a.getChaine(), a.getNumLigne());
       		//Identifiant de Variable ou de Constante attendue
       		else a.setDecor(def);
                break;
