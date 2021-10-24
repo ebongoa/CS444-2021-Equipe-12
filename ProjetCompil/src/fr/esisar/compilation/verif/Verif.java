@@ -76,7 +76,8 @@ public class Verif {
     * PROGRAMME
     * PROGRAMME 	-> Noeud.Programme(LISTE_DECL, LISTE_INST) 
     **************************************************************************/
-   private void verifier_PROGRAMME(Arbre a) throws ErreurVerif {
+   private void verifier_PROGRAMME(Arbre a) throws ErreurVerif 
+   {
       initialiserEnv();
       verifier_LISTE_DECL(a.getFils1());
       verifier_LISTE_INST(a.getFils2());
@@ -87,39 +88,96 @@ public class Verif {
     * LISTE_DECL 	-> Noeud.ListeDecl(LISTE_DECL, DECL) 
 					|  Noeud.Vide 
     **************************************************************************/
-   private void verifier_LISTE_DECL(Arbre a) throws ErreurVerif {
-      // A COMPLETER
+   private void verifier_LISTE_DECL(Arbre a) throws ErreurVerif 
+   {
+	        switch(a.getNoeud()) {
+	            case Vide:
+	                break;
+	            case ListeDecl:
+	                verifier_LISTE_DECL(a.getFils1());
+	                verifier_DECL(a.getFils2());
+	                break;
+	            default:
+	                throw new ErreurInterneVerif("Appel incorrect a verifier_LISTE_DECL ligne " + a.getNumLigne());
+	        }
    }
    
    /**************************************************************************
     * DECL	 	-> Noeud.Decl(LISTE_IDENT, TYPE)
     **************************************************************************/
-// A COMPLETER
+	private void verifier_DECL(Arbre a) throws ErreurVerif 
+	{
+        if(a.getNoeud().equals(Noeud.Decl)) 
+        {
+            Type type = verifier_TYPE(a.getFils2());
+            verifier_LISTE_IDENT(a.getFils1(), type);
+        }
+        else throw new ErreurInterneVerif("Appel incorrect a verifier_DECL ligne " + a.getNumLigne());
+
+
+	}
    
-   /**************************************************************************
+	/**************************************************************************
     * LISTE_IDENT 	-> Noeud.ListeIdent(LISTE_IDENT, IDENT) 
 	*				|  Noeud.Vide
     **************************************************************************/
-// A COMPLETER
-   private Type verifier_LISTE_IDENT(Arbre a) throws ErreurVerif
-   { return null;}
+   private void verifier_LISTE_IDENT(Arbre a, Type t) throws ErreurVerif 
+   {
+       switch(a.getNoeud()) {
+           case ListeIdent:
+               verifier_LISTE_IDENT(a.getFils1(), t);
+               verifier_IDENT(a.getFils2(), t);
+               break;
+           case Vide:
+               break;
+           default:
+        	   throw new ErreurInterneVerif("Appel incorrect a verifier_LISTE_IDENT ligne " + a.getNumLigne());
+       }
+   }
    
    /**************************************************************************
    *IDENT 		-> Noeud.Ident                   -- attribut de type Chaine
    **************************************************************************/
-// A COMPLETER
    private Decor verifier_IDENT(Arbre a) throws ErreurVerif
    { 
-	   if(a.getNoeud() != Noeud.Ident) throw new ErreurInterneVerif("Appel incorrect a verifier_IDENT ligne " + a.getNumLigne());
-
-	   Defn def = env.chercher(a.getChaine()); 
+	   if(a.getNoeud().equals(Noeud.Ident)) 
+	   {
+		   Defn def = env.chercher(a.getChaine()); 
        
-	   if(def == null) {
-       	ErreurContext.ErreurNonRepertoriee.leverErreurContext(a.getChaine(), a.getNumLigne());
-       	//Variable non declaree
+		   if(def == null) 
+		   {
+			   ErreurContext.ErreurNonRepertoriee.leverErreurContext(a.getChaine(), a.getNumLigne());
+			   //Variable non declaree
+		   }       
+		   return new Decor(def, def.getType());
+	   }
+       else throw new ErreurInterneVerif("Appel incorrect a verifier_IDENT ligne " + a.getNumLigne());
+   }
+   
+   private void verifier_IDENT(Arbre a, Type t1) throws ErreurVerif 
+   {
+	   String chaine = a.getChaine();
+	   if(!a.getNoeud().equals(Noeud.Ident)) throw new ErreurInterneVerif("Appel incorrect a verifier_IDENT ligne " + a.getNumLigne());
+       else if(env.chercher(chaine) != null) 
+       {
+       	switch(env.chercher(chaine).getNature()) 
+       	{
+       		case ConstBoolean:
+			case ConstInteger:
+			case Type:
+			case Var:
+				ErreurContext.ErreurNonRepertoriee.leverErreurContext(a.getChaine(), a.getNumLigne());
+				//l'identifiant existe déjà dans l'environnement
+			default:
+				throw new ErreurInterneVerif("Appel incorrect a verifier_IDENT ligne " + a.getNumLigne());
+       	}
+       } 
+       else 
+       {
+    	   Defn def = Defn.creationVar(t1);
+           a.setDecor(new Decor(def));
+           env.enrichir(a.getChaine(), def);
        }
-       
-       return new Decor(def, def.getType());
    }
    
    /**************************************************************************
@@ -127,28 +185,141 @@ public class Verif {
     *			|  TYPE_INTERVALLE
 	*			|  Noeud.Tableau(TYPE_INTERVALLE, TYPE) 
     **************************************************************************/
-// A COMPLETER
+   	private Type verifier_TYPE(Arbre a) throws ErreurVerif 
+   	{
+       switch(a.getNoeud()) 
+       {
+           case Ident:
+               Defn def = env.chercher(a.getChaine());
+               if(def == null || !def.getNature().equals(NatureDefn.Type)) //Ne correspond a rien du tout
+               {
+               	ErreurContext.ErreurNonRepertoriee.leverErreurContext(a.getChaine(), a.getNumLigne());
+               	//Cet ident n'existe pas ou ne designe pas un type
+               } 
+               else //L'ident existe et est un type
+               {
+               	   a.setDecor(new Decor(def));
+                   return def.getType();
+               }
+               
+           case Intervalle:
+               return verifier_TYPE_INTERVALLE(a);
+           
+           case Tableau:
+        	   Type t1 = verifier_TYPE_INTERVALLE(a.getFils1());
+            
+        	   if(t1.getNature().equals(NatureType.Interval)) 
+        		   return Type.creationArray(t1, verifier_TYPE(a.getFils2()));
+        	   else
+        		   ErreurContext.ErreurNonRepertoriee.leverErreurContext(t1.getNature().toString(), a.getNumLigne());
+        	   	   //Un indice est de type Interval
+           default:
+				throw new ErreurInterneVerif("Appel incorrect a verifier_TYPE ligne " + a.getNumLigne());
+       }
+   }
    
    /**************************************************************************
     * TYPE_INTERVALLE -> Noeud.Intervalle(EXP_CONST, EXP_CONST)
     **************************************************************************/
-// A COMPLETER
+    private Type verifier_TYPE_INTERVALLE(Arbre a) throws ErreurVerif 
+    {
+        if(a.getNoeud().equals(Noeud.Intervalle)) 
+        {  
+        	Arbre f1 = a.getFils1();
+        	Arbre f2 = a.getFils2();
+        	
+        	int borne_inf = verifier_EXP_CONST(f1);
+        	int borne_sup = verifier_EXP_CONST(f2);
+        
+        	//Verifier que les noeuds sont de type interval
+        	if(!(f1.getDecor().getType().equals(Type.Integer))) 
+        	{
+        		ErreurContext.ErreurNonRepertoriee.leverErreurContext(f1.getDecor().getType().toString(), a.getNumLigne());
+        		//La borne n'est pas un entier
+        	}
+        	else if(!(f1.getDecor().getType().equals(Type.Integer))) 
+        	{
+        		ErreurContext.ErreurNonRepertoriee.leverErreurContext(f2.getDecor().getType().toString(), a.getNumLigne());
+        		//La borne n'est pas un entier
+        	}
+        
+        	return Type.creationInterval(borne_inf, borne_sup);
+        }
+        else throw new ErreurInterneVerif("Appel incorrect a verifier_TYPE_INTERVALLE ligne " + a.getNumLigne());
+    }
    
    /**************************************************************************
     * EXP_CONST 	-> IDENT
                 	|  Noeud.Entier                  -- attribut de type Entier
 					|  Noeud.PlusUnaire(EXP_CONST)
 					|  Noeud.MoinsUnaire(EXP_CONST)
+	N'est appelé que pour verifier un interval i.e on attend une ConstInteger
     **************************************************************************/
-// A COMPLETER
+    private int verifier_EXP_CONST(Arbre a) throws ErreurVerif 
+	{
+    	int value;
+    	Arbre f1;
+
+        switch(a.getNoeud())
+        {
+            case Ident:
+            	Defn def = env.chercher(a.getChaine());
+                if(def == null) 
+                {
+                	ErreurContext.ErreurNonRepertoriee.leverErreurContext(a.getChaine(), a.getNumLigne());
+                 	//Cet ident n'existe pas
+                } 
+                else if(!(def.getNature().equals(NatureDefn.ConstInteger))) 
+                {
+                	ErreurContext.ErreurNonRepertoriee.leverErreurContext(def.getNature().toString(), a.getNumLigne());
+                	//On ne fait pas d'intervale avec une constante booleene
+                }
+                
+                a.setDecor(new Decor(def, def.getType()));
+                return def.getValeurInteger();
+        
+            case Entier:
+            	a.setDecor(new Decor(Type.Integer));
+            	return a.getEntier();
+            
+            case PlusUnaire:
+            	f1 = a.getFils1();
+            	value = verifier_EXP_CONST(f1);
+            	a.setDecor(f1.getDecor());
+            	return value;
+            
+            case MoinsUnaire:
+            	f1 = a.getFils1();
+            	value = verifier_EXP_CONST(f1);
+            	a.setDecor(f1.getDecor());
+            	return -value;
+            
+            default:
+                throw new ErreurInterneVerif("Appel incorrect a verifier_EXP_CONST ligne " + a.getNumLigne());
+        }
+    }
    
    /**************************************************************************
     * LISTE_INST 	-> Noeud.Vide 
 					|  Noeud.ListeInst(LISTE_INST, INST) 
     **************************************************************************/
-   private void verifier_LISTE_INST(Arbre a) throws ErreurVerif {
-      // A COMPLETER
-   }
+    private void verifier_LISTE_INST(Arbre a) throws ErreurVerif
+    {
+        
+        switch(a.getNoeud())
+        {
+            case Vide:
+                break;
+                
+            case ListeInst:
+                verifier_LISTE_INST(a.getFils1());
+                verifier_INST(a.getFils2());
+                break;
+            default:
+            	 throw new ErreurInterneVerif("Appel incorrect a verifier_LISTE_INST ligne " + a.getNumLigne());
+        }
+           
+    }
 
    /**************************************************************************
     * INST		-> Noeud.Nop
@@ -166,20 +337,109 @@ public class Verif {
     * PAS 		-> Noeud.Increment(IDENT, EXP, EXP) 
 				|  Noeud.Decrement(IDENT, EXP, EXP) 	
     **************************************************************************/
-// A COMPLETER
+    private void verifier_PAS(Arbre a) throws ErreurVerif 
+    {   
+    	Arbre f1;
+    	Arbre f2;
+    	Arbre f3;
+    	
+        switch(a.getNoeud()) 
+        {         
+            case Increment:
+            case Decrement:
+            	f1 = a.getFils1();
+            	f2 = a.getFils2();
+            	f3 = a.getFils3();
+                
+            	verifier_IDENT(f1);
+                verifier_EXP(f2);
+                verifier_EXP(f3);
+                
+                Type t1 = f1.getDecor().getDefn().getType();
+                Type t2 = f2.getDecor().getType();
+                Type t3 = f3.getDecor().getType();
+
+                
+                if(!(t1.getNature().equals(NatureType.Interval))) 
+                {
+                	ErreurContext.ErreurNonRepertoriee.leverErreurContext(t1.toString(), a.getNumLigne());
+                	//On attends un interval
+                } 
+                else if(!(t2.getNature().equals(NatureType.Interval))) 
+                {
+            		ErreurContext.ErreurNonRepertoriee.leverErreurContext(t2.toString(), a.getNumLigne());
+            		//On attends un interval
+            	} 
+                else if(!(t3.getNature().equals(NatureType.Interval))) 
+                {
+            		ErreurContext.ErreurNonRepertoriee.leverErreurContext(t3.toString(), a.getNumLigne());
+            		//On attends un interval
+            	} 
+                else 
+                {
+            		break;
+            	} 
+            default:
+                throw new ErreurInterneVerif("Appel incorrect a verifier_PAS ligne " + a.getNumLigne());         
+        }         
+    }
    
    /**************************************************************************
-    * PLACE 		-> IDENT
-					|  Noeud.Index(PLACE, EXP) 
+    * PLACE 		-> IDENT | IDENT est un identificateur de variable  
+					|  Noeud.Index(PLACE, EXP)     
     **************************************************************************/
-// A COMPLETER
+    private void verifier_PLACE(Arbre a) throws ErreurVerif 
+    {    
+        switch(a.getNoeud())
+        {    
+            case Ident:
+            	verifier_IDENT(a);
+            	if(a.getDecor().getDefn().getNature().equals(NatureDefn.Var)) 
+            	{  		
+            		a.setDecor(a.getDecor());
+                    break;   		
+            	} 
+            	else 
+            	{
+            		ErreurContext.ErreurNonRepertoriee.leverErreurContext(a.getChaine(), a.getNumLigne());
+            		//L'ident devrait être un Var
+            	}
+            case Index:
+            	Arbre f1 = a.getFils1();
+            	Arbre f2 = a.getFils2();
+            	
+            	verifier_PLACE(f2);
+                verifier_EXP(f2);
+                
+                Type t1 = f1.getDecor().getType();
+                Type t2 = f2.getDecor().getType();
+                
+                if (!(t1.getNature().equals(NatureType.Array)))
+                {
+                	ErreurContext.ErreurNonRepertoriee.leverErreurContext(t1.getNature().toString(), a.getNumLigne());
+                	//On ne peux indexer qu'un tableau               	
+                }                             
+                else if( !(t2.getNature().equals(NatureType.Interval))) 
+                {
+                	ErreurContext.ErreurNonRepertoriee.leverErreurContext(t2.getNature().toString(), a.getNumLigne());
+                	//Un indice est de type Interval
+                } 
+                else 
+                {
+                	a.setDecor(new Decor(t1.getElement()));
+                    break;
+                }
+            default:
+                throw new ErreurInterneVerif("Appel incorrect a verifier_PLACE ligne " + a.getNumLigne());
+           
+        }
+    }
    
    /**************************************************************************
     * LISTE_EXP   	-> Noeud.Vide
 					|  Noeud.ListeExp(LISTE_EXP, EXP) 
  * @throws ErreurVerif 
     **************************************************************************/
-// A COMPLETER
    private void verifier_LISTE_EXP(Arbre a) throws ErreurVerif
    {
        
@@ -226,8 +486,7 @@ public class Verif {
 				|  Noeud.Reel                    -- attribut de type Reel
 				|  Noeud.Chaine                  -- attribut de type Chaine
 				|  IDENT            
-    **************************************************************************/
-// A COMPLETER   
+    **************************************************************************/  
    private void verifier_EXP(Arbre a) throws ErreurVerif
    {
 	   Type t1 = null,t2 = null; //On aura maximum 2 fils
