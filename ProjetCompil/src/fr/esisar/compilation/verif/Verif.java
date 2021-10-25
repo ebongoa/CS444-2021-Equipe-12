@@ -331,7 +331,95 @@ public class Verif {
 				|  Noeud.Ecriture(LISTE_EXP) 
                 |  Noeud.Ligne
     **************************************************************************/
-// A COMPLETER  
+    private void verifier_INST(Arbre a) throws ErreurVerif
+    {
+    	Arbre f1;
+    	Type t1;
+    	Arbre f2;
+    	Arbre f3;
+    	
+    	switch(a.getNoeud())
+    	{
+    		case Nop:
+    			break;
+    		
+    		case Affect:
+    			break;
+    			
+            case Pour:
+                verifier_PAS(a.getFils1());
+                verifier_LISTE_INST(a.getFils2());
+                break;
+            
+            case TantQue:
+            	t1 = a.getFils1().getDecor().getType();
+            	
+                verifier_EXP(a.getFils1());
+                verifier_LISTE_INST(a.getFils2());
+                
+                //On attend de l'expression qu'elle retourne un boolean
+                if(!(t1.equals(Type.Boolean))) 
+                {
+                	ErreurContext.ErreurBool.leverErreurContext(t1.toString(), a.getNumLigne());
+                } 
+                else
+                {
+                	break;
+                }
+                
+            case Si:
+                verifier_EXP(a.getFils1());
+                verifier_LISTE_INST(a.getFils2());
+                verifier_LISTE_INST(a.getFils3());
+                
+            	t1 = a.getFils1().getDecor().getType();
+                
+              //On attend de l'expression qu'elle retourne un boolean
+                if(!(t1.equals(Type.Boolean)))  
+                {
+                	ErreurContext.ErreurBool.leverErreurContext(t1.toString(), a.getNumLigne());
+                } 
+                else
+                {
+                	break;
+                }
+            //Instruction read : la place doit etre de type Type.Interval ou Type.Real.
+            case Lecture:
+                verifier_PLACE(a.getFils1());
+                
+            	t1 = a.getFils1().getDecor().getType();
+                
+                if( !(t1.getNature().equals(NatureType.Interval)) && !(t1.equals(Type.Real)))
+                {
+                	ErreurContext.ErreurIntervalReel.leverErreurContext("[Read] "+t1.toString(), a.getNumLigne());
+                } 
+                else 
+                {
+                	break;
+                }        
+             
+            // - Instruction write : les expressions doivent être de type Type.Interval, Type.Real ou Type.String.
+            case Ecriture:
+                verifier_LISTE_EXP(a.getFils1());
+                
+                t1 = a.getFils1().getDecor().getType();
+                
+                if( !(t1.getNature().equals(NatureType.Interval)) && !(t1.equals(Type.Real)) && !(t1.equals(Type.String)))
+                {
+                	ErreurContext.ErreurIntervalReel.leverErreurContext("[Write] "+t1.toString(), a.getNumLigne());
+                } 
+                else 
+                {
+                	break;
+                }              
+            
+            case Ligne:
+                break;
+    		default:
+    			throw new ErreurInterneVerif("Appel incorrect a verifier_INST ligne " + a.getNumLigne());         
+    	}
+    	
+    }
    
    /**************************************************************************
     * PAS 		-> Noeud.Increment(IDENT, EXP, EXP) 

@@ -33,11 +33,12 @@ public enum ErreurContext {
 	
 	ErreurInterval,
 	ErreurIntervalInteger,
+	ErreurIntervalReel,
 	
 	ErreurTypeInconnu,
 	ErreurDejaDefini,
 	
-	
+	ErreurBool,
 	;
 	
    void leverErreurContext(String s, int numLigne) throws ErreurVerif {
