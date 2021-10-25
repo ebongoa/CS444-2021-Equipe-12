@@ -227,19 +227,21 @@ public class Verif {
         {  
         	Arbre f1 = a.getFils1();
         	Arbre f2 = a.getFils2();
+        	Type t1 = f1.getDecor().getType();
+        	Type t2 = f2.getDecor().getType();
         	
         	int borne_inf = verifier_EXP_CONST(f1);
         	int borne_sup = verifier_EXP_CONST(f2);
         
         	//Verifier que les noeuds sont de type interval
-        	if(!(f1.getDecor().getType().equals(Type.Integer))) 
+        	if(!(t1.equals(Type.Integer))) 
         	{
-        		ErreurContext.ErreurIntervalInteger.leverErreurContext(f1.getDecor().getType().toString(), a.getNumLigne());
+        		ErreurContext.ErreurIntervalInteger.leverErreurContext(t1.toString(), a.getNumLigne());
         		//La borne n'est pas un entier
         	}
-        	else if(!(f1.getDecor().getType().equals(Type.Integer))) 
+        	else if(!(t2.equals(Type.Integer))) 
         	{
-        		ErreurContext.ErreurIntervalInteger.leverErreurContext(f2.getDecor().getType().toString(), a.getNumLigne());
+        		ErreurContext.ErreurIntervalInteger.leverErreurContext(t2.toString(), a.getNumLigne());
         		//La borne n'est pas un entier
         	}
         
@@ -417,7 +419,7 @@ public class Verif {
                 	}
                 	else
                 	{
-                		ErreurContext.ErreurBool.leverErreurContext("Boolean attendu. Obtenu : "+ t1.toString() +" à "+t2.toString(), a.getNumLigne());         
+                		ErreurContext.ErreurBool.leverErreurContext(t2.toString(), a.getNumLigne());         
                 	}
                 }
                 else
@@ -473,7 +475,7 @@ public class Verif {
                 
                 if( !(t1.getNature().equals(NatureType.Interval)) && !(t1.equals(Type.Real)))
                 {
-                	ErreurContext.ErreurIntervalReel.leverErreurContext("[Read] "+t1.toString(), a.getNumLigne());
+                	ErreurContext.ErreurIntervalReel.leverErreurContext("[Read] "+t1.getNature().toString() + "/" + t1.toString(), a.getNumLigne());
                 } 
                 else 
                 {
@@ -488,7 +490,7 @@ public class Verif {
                 
                 if( !(t1.getNature().equals(NatureType.Interval)) && !(t1.equals(Type.Real)) && !(t1.equals(Type.String)))
                 {
-                	ErreurContext.ErreurIntervalReel.leverErreurContext("[Write] "+t1.toString(), a.getNumLigne());
+                	ErreurContext.ErreurIntervalReel.leverErreurContext("[Write] "+t1.getNature().toString() + "/" + t1.toString(), a.getNumLigne());
                 } 
                 else 
                 {
@@ -533,17 +535,17 @@ public class Verif {
                 
                 if(!(t1.getNature().equals(NatureType.Interval))) 
                 {
-                	ErreurContext.ErreurInterval.leverErreurContext(t1.toString(), a.getNumLigne());
+                	ErreurContext.ErreurInterval.leverErreurContext(t1.getNature().toString(), a.getNumLigne());
                 	//On attends un interval
                 } 
                 else if(!(t2.getNature().equals(NatureType.Interval))) 
                 {
-            		ErreurContext.ErreurInterval.leverErreurContext(t2.toString(), a.getNumLigne());
+            		ErreurContext.ErreurInterval.leverErreurContext(t2.getNature().toString(), a.getNumLigne());
             		//On attends un interval
             	} 
                 else if(!(t3.getNature().equals(NatureType.Interval))) 
                 {
-            		ErreurContext.ErreurInterval.leverErreurContext(t3.toString(), a.getNumLigne());
+            		ErreurContext.ErreurInterval.leverErreurContext(t3.getNature().toString(), a.getNumLigne());
             		//On attends un interval
             	} 
                 else 
@@ -685,7 +687,7 @@ public class Verif {
 			   a.setDecor(new Decor(Type.Boolean));
 			   break;
 		   } 
-		   else ErreurContext.ErreurOperateurUnaireBool.leverErreurContext("("+t1+")", a.getNumLigne());
+		   else ErreurContext.ErreurOperateurUnaireBool.leverErreurContext(t1.toString(), a.getNumLigne());
     	//Operateur Unaire attend un bool
 		   
 	   //Type.Boolean, Type.Boolean -> Type.Boolean   
@@ -698,7 +700,7 @@ public class Verif {
 			   a.setDecor(new Decor(Type.Boolean));
 			   break; 
 		   }
-		   else ErreurContext.ErreurOperateurBinaireBool.leverErreurContext("("+t1 + " , " + t2+")", a.getNumLigne());
+		   else ErreurContext.ErreurOperateurBinaireBool.leverErreurContext(t1.toString() + " , " + t2.toString(), a.getNumLigne());
 		   //Operateur Binaire attend deux bool
 		   
 	   //Type.Interval, Type.Interval -> Type.Boolean
@@ -715,11 +717,23 @@ public class Verif {
      		verifier_EXP(f2);
 		   if ( (t1.getNature().equals(NatureType.Interval) || t1.equals(Type.Real)) && (t2.getNature().equals(NatureType.Interval) || t2.equals(Type.Real))) 		   
 		   {
-			    if (!t1.getNature().equals(t2.getNature())) //L'un des deux est un interval et l'autre un reel , on ajoute donc un noeud conversion;
-           		a.setDecor(new Decor(Type.Boolean));
+			    Arbre cast;
+			    if(!t1.equals(Type.Real))
+			    {
+			    	cast = Arbre.creation1(Noeud.Conversion, f1, a.getNumLigne());
+			    	cast.setDecor(new Decor(Type.Real));
+              		a.setFils1(cast);
+			    }
+			    if(!t2.equals(Type.Real))
+			    {
+			    	cast = Arbre.creation1(Noeud.Conversion, f2, a.getNumLigne());
+			    	cast.setDecor(new Decor(Type.Real));
+              		a.setFils2(cast);
+			    }
+       			a.setDecor(new Decor(Type.Boolean));
            		break;
 		   }   
-      	   else ErreurContext.ErreurOperateurBinaireIntervalOuReel.leverErreurContext("("+t1 + " , " + t2+")", a.getNumLigne());
+      	   else ErreurContext.ErreurOperateurBinaireIntervalOuReel.leverErreurContext(t1.getNature().toString()+"/"+t1.toString() + " , " + t2.getNature().toString()+"/"+t2.toString(), a.getNumLigne());
 		   //Operateur binaire attends deux Interval ou deux Reel ou un de chaque.
 		
 	   //Type.Interval -> Type.Integer
@@ -727,9 +741,9 @@ public class Verif {
 	   case PlusUnaire:
 	   case MoinsUnaire:
      		verifier_EXP(f1);
-		   if ( t1.equals(NatureType.Interval) ) a.setDecor(new Decor(Type.Integer));
+		   if ( t1.getNature().equals(NatureType.Interval) ) a.setDecor(new Decor(Type.Integer));
 		   else if (t1.equals(Type.Real))        a.setDecor(new Decor(Type.Real));
-		   else ErreurContext.ErreurOperateurUnaireIntervalOuReel.leverErreurContext("("+t1+")", a.getNumLigne());
+		   else ErreurContext.ErreurOperateurUnaireIntervalOuReel.leverErreurContext(t1.getNature().toString()+"/"+t1.toString(), a.getNumLigne());
 		   break;
 		   //Operateur Unaire attends un Interval ou un reel
 		   
@@ -744,14 +758,31 @@ public class Verif {
       		verifier_EXP(f2);
 		   if ( (t1.getNature().equals(NatureType.Interval) || t1.equals(Type.Real)) && (t2.getNature().equals(NatureType.Interval) || t2.equals(Type.Real))) 		   
 		   {
-			    if (!t1.getNature().equals(t2.getNature())) //L'un des deux est un interval et l'autre un reel , on ajoute donc un noeud conversion;
-	           	
-			    if (t1.getNature().equals(t2.getNature()) && t1.getNature().equals(NatureType.Interval)) a.setDecor(new Decor(Type.Integer));
-	           	else a.setDecor(new Decor(Type.Real));
+		  	    if (t1.getNature().equals(t2.getNature()) && t1.getNature().equals(NatureType.Interval)) 
+		  	    {
+		  	    	a.setDecor(new Decor(Type.Integer));
+		  	    }
+		  	    else //L'un des deux est un interval et l'autre un reel , on ajoute donc un noeud conversion;
+		  	    {
+				    Arbre cast;
+				    if(!t1.equals(Type.Real))
+				    {
+				    	cast = Arbre.creation1(Noeud.Conversion, f1, a.getNumLigne());
+				    	cast.setDecor(new Decor(Type.Real));
+	               		a.setFils1(cast);
+				    }
+				    if(!t2.equals(Type.Real))
+				    {
+				    	cast = Arbre.creation1(Noeud.Conversion, f2, a.getNumLigne());
+				    	cast.setDecor(new Decor(Type.Real));
+	               		a.setFils2(cast);
+				    }	
+		  	    	a.setDecor(new Decor(Type.Real));
+		  	    }
 			    
 			    break;
 			   }   
-	      	   else ErreurContext.ErreurOperateurBinaireIntervalOuReel.leverErreurContext("("+t1 + " , " + t2+")", a.getNumLigne());
+	      	   else ErreurContext.ErreurOperateurBinaireIntervalOuReel.leverErreurContext(t1.getNature().toString()+"/"+t1.toString() + " , " + t2.getNature().toString()+"/"+t2.toString(), a.getNumLigne());
 			   //Operateur binaire attends deux Interval ou deux Reel ou un de chaque.
 	
 	   //Type.Interval, Type.Interval -> Type.Integer
@@ -765,7 +796,7 @@ public class Verif {
      			a.setDecor(new Decor(Type.Integer));
      			break;
      		}
-     		else ErreurContext.ErreurOperateurBinaireInterval.leverErreurContext("("+t1 + " , " + t2+")", a.getNumLigne());
+     		else ErreurContext.ErreurOperateurBinaireInterval.leverErreurContext(t1.getNature().toString() + " , " + t2.getNature().toString(), a.getNumLigne());
      		//Operateur Binaire attends deux Interval
 		
 	   //Type.Interval, Type.Interval -> Type.Real 
@@ -777,11 +808,24 @@ public class Verif {
        		verifier_EXP(f2);
 		   if ( (t1.getNature().equals(NatureType.Interval) || t1.equals(Type.Real)) && (t2.getNature().equals(NatureType.Interval) || t2.equals(Type.Real))) 		   
 		   {
-			    if (!t1.getNature().equals(t2.getNature())) //L'un des deux est un interval et l'autre un reel , on ajoute donc un noeud conversion;
-           		a.setDecor(new Decor(Type.Real));
+			    Arbre cast;
+			    if(!t1.equals(Type.Real))
+			    {
+			    	cast = Arbre.creation1(Noeud.Conversion, f1, a.getNumLigne());
+			    	cast.setDecor(new Decor(Type.Real));
+               		a.setFils1(cast);
+			    }
+			    if(!t2.equals(Type.Real))
+			    {
+			    	cast = Arbre.creation1(Noeud.Conversion, f2, a.getNumLigne());
+			    	cast.setDecor(new Decor(Type.Real));
+               		a.setFils2(cast);
+			    }
+			    a.setDecor(new Decor(Type.Real));
+
            		break;
 		   }   
-      	   else ErreurContext.ErreurOperateurBinaireIntervalOuReel.leverErreurContext("("+t1 + " , " + t2+")", a.getNumLigne());
+      	   else ErreurContext.ErreurOperateurBinaireIntervalOuReel.leverErreurContext(t1.getNature().toString()+"/"+t1.toString() + " , " + t2.getNature().toString()+"/"+t2.toString(), a.getNumLigne());
 		  //Operateur binaire attend deux Interval ou deux Reel ou un de chaque.
 		   
 	   //Array(Type.Interval, <type>), Type.Interval -> <type>	   
@@ -789,9 +833,9 @@ public class Verif {
        	   verifier_PLACE(f1);
            verifier_EXP(f2);        
            
-           if(t1.getNature() != NatureType.Array) ErreurContext.ErreurIndexationTableau.leverErreurContext("("+t1.getNature()+")", a.getNumLigne());
+           if(!(t1.getNature().equals(NatureType.Array))) ErreurContext.ErreurIndexationTableau.leverErreurContext(t1.getNature().toString(), a.getNumLigne());
        		//On ne peut indexer qu'un tableau
-            else if(t2.getNature() != NatureType.Interval)	ErreurContext.ErreurIndexInterval.leverErreurContext("("+t2.getNature()+")", a.getNumLigne()); 
+            else if (!(t2.getNature().equals(NatureType.Interval)))	ErreurContext.ErreurIndexInterval.leverErreurContext(t2.getNature().toString(), a.getNumLigne()); 
 	   		//L'indexation se fait par intervalle
             else a.setDecor(new Decor(a.getFils1().getDecor().getType().getElement()));
             
@@ -812,7 +856,7 @@ public class Verif {
 	   case Ident:
 		    Decor def = verifier_IDENT(a);
       		NatureDefn nature = a.getDecor().getDefn().getNature(); 
-      		if (nature == NatureDefn.Type) ErreurContext.ErreurIdentVarOuConst.leverErreurContext(a.getChaine(), a.getNumLigne());
+      		if (nature.equals(NatureDefn.Type)) ErreurContext.ErreurIdentVarOuConst.leverErreurContext(a.getChaine(), a.getNumLigne());
       		//Identifiant de Variable ou de Constante attendue
       		else a.setDecor(def);
                break;
