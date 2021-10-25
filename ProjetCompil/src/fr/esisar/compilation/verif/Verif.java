@@ -475,7 +475,7 @@ public class Verif {
                 
                 if( !(t1.getNature().equals(NatureType.Interval)) && !(t1.equals(Type.Real)))
                 {
-                	ErreurContext.ErreurIntervalReel.leverErreurContext("[Read] "+t1.getNature().toString() + "/" + t1.toString(), a.getNumLigne());
+                	ErreurContext.ErreurLecture.leverErreurContext(t1.getNature().toString() + "/" + t1.toString(), a.getNumLigne());
                 } 
                 else 
                 {
@@ -490,7 +490,7 @@ public class Verif {
                 
                 if( !(t1.getNature().equals(NatureType.Interval)) && !(t1.equals(Type.Real)) && !(t1.equals(Type.String)))
                 {
-                	ErreurContext.ErreurIntervalReel.leverErreurContext("[Write] "+t1.getNature().toString() + "/" + t1.toString(), a.getNumLigne());
+                	ErreurContext.ErreurEcriture.leverErreurContext(t1.getNature().toString() + "/" + t1.toString(), a.getNumLigne());
                 } 
                 else 
                 {
