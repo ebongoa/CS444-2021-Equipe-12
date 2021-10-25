@@ -333,10 +333,8 @@ public class Verif {
     **************************************************************************/
     private void verifier_INST(Arbre a) throws ErreurVerif
     {
-    	Arbre f1;
     	Type t1;
-    	Arbre f2;
-    	Arbre f3;
+    	Type t2;
     	
     	switch(a.getNoeud())
     	{
@@ -344,6 +342,90 @@ public class Verif {
     			break;
     		
     		case Affect:
+   			
+                verifier_PLACE(a.getFils1());
+                verifier_EXP(a.getFils2());
+                
+                t1 = a.getFils1().getDecor().getType();
+                t2 = a.getFils2().getDecor().getType();
+                   
+                //. <place> et <expression> de type Array, les types des indices étant identiques (plus précisement, de type Type.Interval, avec les mêmes 
+                // bornes), et les types des éléments compatibles pour l'affectation.
+                if (t1.getNature().equals(NatureType.Array))
+                {
+                	//On test les bornes
+                	if (t1.getIndice().getBorneInf() == t2.getIndice().getBorneInf())
+                	{
+                		if (t1.getIndice().getBorneSup() == t2.getIndice().getBorneSup())
+                		{
+               			
+                			//De même Type
+                			if (! t1.getElement().equals(t2.getElement()))
+                			{    
+                				ErreurContext.ErreurAffect.leverErreurContext("Les indices devraient être de même type.Obtenu : "+ t1.getElement().toString() +" à "+t2.getElement().toString(), a.getNumLigne());
+                			}             			
+                		}
+                		else
+                		{
+                    		ErreurContext.ErreurAffect.leverErreurContext("Bornes sup différentes : "+ t1.getIndice().getBorneSup() +" et "+t2.getIndice().getBorneSup(), a.getNumLigne());     
+                			//Pas les même bornes sup
+                		}
+                	}
+                	else
+                	{
+                		ErreurContext.ErreurAffect.leverErreurContext("Bornes inf différentes : "+ t1.getIndice().getBorneInf() +" et "+t2.getIndice().getBorneInf(), a.getNumLigne());     
+                		//Pas les même bornes inf
+                	}
+                }
+                
+                // . <place> et <expression> de type Type.Interval (pas forcément avec les mêmes bornes) ;                
+                else if (t1.getNature().equals(NatureType.Interval))
+                {
+                	if (!(t2.getNature().equals(NatureType.Interval)))
+                	{
+                		ErreurContext.ErreurInterval.leverErreurContext(t2.toString(), a.getNumLigne());   
+                	}
+                }
+                
+                //. <place> et <expression> de type Type.Real ;
+                //. <place> de type Type.Real et <expression> de type Type.Interval ;
+                else if (t1.equals(Type.Real))
+                {
+                	if (t2.equals(Type.Real))
+                	{
+                		;//compatible tel quel
+                	}
+                	else if(t2.getNature().equals(NatureType.Interval))
+                	{
+                		//On a un cast a faire
+            			Arbre cast = Arbre.creation1(Noeud.Conversion, a.getFils2(), a.getNumLigne());
+            			cast.setDecor(new Decor(Type.Real));
+            	   		a.setFils2(cast);
+                	}
+                	else
+                	{
+                		ErreurContext.ErreurAffect.leverErreurContext("Cast impossible de "+ t1.toString() +" à "+t2.toString(), a.getNumLigne());                         	                                        			
+                	}
+                }
+                
+                //. <place> et <expression> de type Type.Boolean ; 
+                else if (t1.equals(Type.Boolean))
+                {
+                	if (t2.equals(Type.Boolean))
+                	{
+                		;
+                	}
+                	else
+                	{
+                		ErreurContext.ErreurBool.leverErreurContext("Boolean attendu. Obtenu : "+ t1.toString() +" à "+t2.toString(), a.getNumLigne());         
+                	}
+                }
+                else
+                {
+            		ErreurContext.ErreurAffect.leverErreurContext("Array ou Real ou Interval ou Boolean attendu. Obtenu : "+ t1.toString(), a.getNumLigne());
+                }
+                
+                a.setDecor(new Decor(t2));               
     			break;
     			
             case Pour:
@@ -351,11 +433,11 @@ public class Verif {
                 verifier_LISTE_INST(a.getFils2());
                 break;
             
-            case TantQue:
-            	t1 = a.getFils1().getDecor().getType();
-            	
+            case TantQue:           	
                 verifier_EXP(a.getFils1());
                 verifier_LISTE_INST(a.getFils2());
+                
+            	t1 = a.getFils1().getDecor().getType();
                 
                 //On attend de l'expression qu'elle retourne un boolean
                 if(!(t1.equals(Type.Boolean))) 
@@ -415,6 +497,7 @@ public class Verif {
             
             case Ligne:
                 break;
+                
     		default:
     			throw new ErreurInterneVerif("Appel incorrect a verifier_INST ligne " + a.getNumLigne());         
     	}
@@ -496,7 +579,7 @@ public class Verif {
             	Arbre f1 = a.getFils1();
             	Arbre f2 = a.getFils2();
             	
-            	verifier_PLACE(f2);
+            	verifier_PLACE(f1);
                 verifier_EXP(f2);
                 
                 Type t1 = f1.getDecor().getType();

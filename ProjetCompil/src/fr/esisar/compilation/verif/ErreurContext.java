@@ -39,6 +39,7 @@ public enum ErreurContext {
 	ErreurDejaDefini,
 	
 	ErreurBool,
+	ErreurAffect,
 	;
 	
    void leverErreurContext(String s, int numLigne) throws ErreurVerif {
