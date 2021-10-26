@@ -524,11 +524,11 @@ public class Verif {
             	f2 = a.getFils2();
             	f3 = a.getFils3();
                 
-            	verifier_IDENT(f1);
+            	Decor d = verifier_IDENT(f1);
                 verifier_EXP(f2);
                 verifier_EXP(f3);
                 
-                Type t1 = f1.getDecor().getDefn().getType();
+                Type t1 = d.getDefn().getType();
                 Type t2 = f2.getDecor().getType();
                 Type t3 = f3.getDecor().getType();
 
@@ -566,10 +566,13 @@ public class Verif {
         switch(a.getNoeud())
         {    
             case Ident:
-            	verifier_IDENT(a);
-            	if(a.getDecor().getDefn().getNature().equals(NatureDefn.Var)) 
+            	Decor d = verifier_IDENT(a);
+            	if(d
+            			.getDefn()
+            			.getNature()
+            			.equals(NatureDefn.Var)) 
             	{  		
-            		a.setDecor(a.getDecor());
+            		a.setDecor(d);
                     break;   		
             	} 
             	else 
@@ -854,11 +857,13 @@ public class Verif {
     	   break;
 	   		
 	   case Ident:
-		    Decor def = verifier_IDENT(a);
-      		NatureDefn nature = a.getDecor().getDefn().getNature(); 
+		    Decor dec = verifier_IDENT(a);
+      		NatureDefn nature = dec
+      				.getDefn()
+      				.getNature(); 
       		if (nature.equals(NatureDefn.Type)) ErreurContext.ErreurIdentVarOuConst.leverErreurContext(a.getChaine(), a.getNumLigne());
       		//Identifiant de Variable ou de Constante attendue
-      		else a.setDecor(def);
+      		else a.setDecor(dec);
                break;
        	
        
