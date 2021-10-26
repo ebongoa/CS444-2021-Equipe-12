@@ -1,0 +1,9 @@
+program
+   i: integer;
+   j: real;
+begin
+   j := 1.1;
+   for i := j downto 0 do
+      null;
+   end;
+end.

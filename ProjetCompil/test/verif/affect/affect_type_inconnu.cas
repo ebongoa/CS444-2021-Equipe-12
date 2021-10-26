@@ -1,0 +1,5 @@
+program
+    a: bool;
+begin
+    null;
+end.

@@ -1,0 +1,7 @@
+program
+   i: integer;
+begin
+   for i := 2.5 downto 0 do
+      null;
+   end;
+end.
