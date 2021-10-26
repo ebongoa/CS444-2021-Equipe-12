@@ -241,10 +241,10 @@ NUM  		= {CHIFFRE} {CHIFFRE}*
 SIGNE 		= ("+"|"-"|"")
 
 // Exposants
-EXP		= 'E' {SIGNE} {NUM}|'e' SIGNE {NUM}
+EXP		= "E" {SIGNE} {NUM}|"e" SIGNE {NUM}
 
 // Décimaux positifs
-DEC 		= {NUM} '.' {NUM}
+DEC 		= {NUM} "." {NUM}
 
 // Constantes entières 
 INT 		= {NUM} 
