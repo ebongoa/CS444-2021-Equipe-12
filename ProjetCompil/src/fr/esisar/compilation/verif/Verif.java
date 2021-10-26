@@ -666,26 +666,17 @@ public class Verif {
    private void verifier_EXP(Arbre a) throws ErreurVerif
    {
 	   Type t1 = null,t2 = null; //On aura maximum 2 fils
-	   Arbre f1 = null,f2 = null; //On aura maximum 2 fils
-	   
-	   if (a.getArite() > 0)
-	   {
-		   f1 = a.getFils1();
-		   t1 = f1.getDecor().getType();
-	   }
-	   if (a.getArite() > 1)
-	   {
-		   f2 = a.getFils2();
-		   t2 = f2.getDecor().getType();
-	   }
-	   
+	   Arbre f1 = null,f2 = null; //On aura maximum 2 fils  
 	   
 	   switch (a.getNoeud())
 	   {
 	   //Type.Boolean -> Type.Boolean
 	   case Non:
-     		verifier_EXP(f1);
-	   	   if(t1.equals(Type.Boolean)) 
+		   f1 = a.getFils1();
+		   verifier_EXP(f1);
+		   t1 = f1.getDecor().getType();
+		   
+		   if(t1.equals(Type.Boolean)) 
 		   {
 			   a.setDecor(new Decor(Type.Boolean));
 			   break;
@@ -696,8 +687,15 @@ public class Verif {
 	   //Type.Boolean, Type.Boolean -> Type.Boolean   
 	   case Et:
 	   case Ou:
-     		verifier_EXP(f1);
-     		verifier_EXP(f2);
+		   f1 = a.getFils1();
+		   f2 = a.getFils2();
+		   
+      		verifier_EXP(f1);
+      		verifier_EXP(f2);
+      		
+ 		   t1 = f1.getDecor().getType();
+		   t2 = f2.getDecor().getType();
+ 		   
 		   if (t1.equals(t2) && t1.equals(Type.Boolean) )
 		   {
 			   a.setDecor(new Decor(Type.Boolean));
@@ -716,8 +714,15 @@ public class Verif {
 	   case NonEgal:
 	   case InfEgal:
 	   case SupEgal:  
-     		verifier_EXP(f1);
-     		verifier_EXP(f2);
+		   f1 = a.getFils1();
+		   f2 = a.getFils2();
+		   
+      		verifier_EXP(f1);
+      		verifier_EXP(f2);
+      		
+ 		   t1 = f1.getDecor().getType();
+		   t2 = f2.getDecor().getType();
+		   
 		   if ( (t1.getNature().equals(NatureType.Interval) || t1.equals(Type.Real)) && (t2.getNature().equals(NatureType.Interval) || t2.equals(Type.Real))) 		   
 		   {
 			    Arbre cast;
@@ -743,7 +748,11 @@ public class Verif {
   	   //Type.Real     -> Type.Real 
 	   case PlusUnaire:
 	   case MoinsUnaire:
+ 		   f1 = a.getFils1();
      		verifier_EXP(f1);
+     		
+ 		   t1 = f1.getDecor().getType();
+ 		   
 		   if ( t1.getNature().equals(NatureType.Interval) ) a.setDecor(new Decor(Type.Integer));
 		   else if (t1.equals(Type.Real))        a.setDecor(new Decor(Type.Real));
 		   else ErreurContext.ErreurOperateurUnaireIntervalOuReel.leverErreurContext(t1.getNature().toString()+"/"+t1.toString(), a.getNumLigne());
@@ -757,8 +766,15 @@ public class Verif {
 	   case Plus:
 	   case Moins:
 	   case Mult:
+		   f1 = a.getFils1();
+		   f2 = a.getFils2();
+		   
       		verifier_EXP(f1);
       		verifier_EXP(f2);
+      		
+ 		   t1 = f1.getDecor().getType();
+		   t2 = f2.getDecor().getType();
+		   
 		   if ( (t1.getNature().equals(NatureType.Interval) || t1.equals(Type.Real)) && (t2.getNature().equals(NatureType.Interval) || t2.equals(Type.Real))) 		   
 		   {
 		  	    if (t1.getNature().equals(t2.getNature()) && t1.getNature().equals(NatureType.Interval)) 
@@ -791,8 +807,14 @@ public class Verif {
 	   //Type.Interval, Type.Interval -> Type.Integer
 	   case Quotient:
 	   case Reste:
-     		verifier_EXP(f1);
-     		verifier_EXP(f2);
+		   f1 = a.getFils1();
+		   f2 = a.getFils2();
+		   
+      		verifier_EXP(f1);
+      		verifier_EXP(f2);
+      		
+ 		   t1 = f1.getDecor().getType();
+		   t2 = f2.getDecor().getType();
      		
      		if (t1.getNature().equals(t2.getNature()) && t1.getNature().equals(NatureType.Interval) )
      		{
@@ -807,8 +829,15 @@ public class Verif {
 	   //Type.Real,     Type.Interval -> Type.Real
 	   //Type.Real,     Type.Real     -> Type.Real	   
 	   case DivReel:
-       		verifier_EXP(f1);
-       		verifier_EXP(f2);
+		   f1 = a.getFils1();
+		   f2 = a.getFils2();
+		   
+      		verifier_EXP(f1);
+      		verifier_EXP(f2);
+      		
+ 		   t1 = f1.getDecor().getType();
+		   t2 = f2.getDecor().getType();
+		   
 		   if ( (t1.getNature().equals(NatureType.Interval) || t1.equals(Type.Real)) && (t2.getNature().equals(NatureType.Interval) || t2.equals(Type.Real))) 		   
 		   {
 			    Arbre cast;
@@ -833,8 +862,14 @@ public class Verif {
 		   
 	   //Array(Type.Interval, <type>), Type.Interval -> <type>	   
        case Index:
-       	   verifier_PLACE(f1);
-           verifier_EXP(f2);        
+		   f1 = a.getFils1();
+		   f2 = a.getFils2();
+		   
+      		verifier_PLACE(f1);
+      		verifier_EXP(f2);
+      		
+ 		   t1 = f1.getDecor().getType();
+		   t2 = f2.getDecor().getType();
            
            if(!(t1.getNature().equals(NatureType.Array))) ErreurContext.ErreurIndexationTableau.leverErreurContext(t1.getNature().toString(), a.getNumLigne());
        		//On ne peut indexer qu'un tableau
