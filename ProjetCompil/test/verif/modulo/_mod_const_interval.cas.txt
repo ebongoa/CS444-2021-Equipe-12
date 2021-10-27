@@ -1,5 +1,0 @@
-program
-   c : integer;
-begin
-   c := -10..10 mod -5..+5;
-end.
