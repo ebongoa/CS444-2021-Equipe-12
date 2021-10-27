@@ -1,0 +1,7 @@
+-- EXP_CSTE -> IDENT
+
+program
+i : 0 .. integer ; --Erreur Contextuelle indentificateur de type cste attendu
+begin
+	null;
+end

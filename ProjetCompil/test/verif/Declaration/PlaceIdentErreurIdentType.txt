@@ -1,0 +1,7 @@
+-- PLACE -> IDENT
+
+program
+i : integer ;
+begin
+	integer = 1; -- Erreur Contexuelle identificateur de variable attendu
+end

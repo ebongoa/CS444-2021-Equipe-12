@@ -1,0 +1,10 @@
+-- Not
+program
+
+b : boolean;
+bb : boolean;
+
+begin
+	b = true;
+	bb = not b; --Ok b et bb sont de types booleens
+end

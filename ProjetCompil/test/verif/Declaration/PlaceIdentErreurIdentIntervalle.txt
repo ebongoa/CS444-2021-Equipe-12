@@ -1,0 +1,7 @@
+-- PLACE -> IDENT
+
+program
+i : integer ;
+begin
+	i[0] = 1; -- Erreur Contexuelle tableau attendu
+end

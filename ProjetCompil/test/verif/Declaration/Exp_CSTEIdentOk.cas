@@ -1,0 +1,8 @@
+-- EXP_CSTE-> IDENT
+
+program
+i :  0 .. max_int; --Ok
+j : - max_int .. 0; --Ok
+begin
+	null;
+end

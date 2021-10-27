@@ -1,0 +1,7 @@
+-- EXP-> IDENT
+
+program
+i : integer;
+begin
+	i = max_int - 1 ; --ok
+end
