@@ -1,0 +1,17 @@
+program
+   a: array [0..10] of array [0..10] of 0..100;
+   i,j: integer;
+begin
+   for i := 10 downto 0 do
+   	for j := 10 downto 0 do
+   	    write("Loading...");
+   	end;
+   end;
+   
+   for i := 10 downto 0 do
+   	for j := 10 downto 0 do
+   	    read(a[5][5]);
+   	end;
+   end;
+end.
+

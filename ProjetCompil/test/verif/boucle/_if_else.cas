@@ -1,0 +1,11 @@
+program
+   a: boolean;
+begin
+   if a then
+      null;
+   else
+      null;
+   end;
+end.
+
+

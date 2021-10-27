@@ -1,0 +1,7 @@
+program
+   a: array [1..5] of 1..5;
+   b: integer;
+begin
+   b := a[1];
+end.
+

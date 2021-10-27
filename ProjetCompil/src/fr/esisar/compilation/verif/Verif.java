@@ -227,12 +227,14 @@ public class Verif {
         {  
         	Arbre f1 = a.getFils1();
         	Arbre f2 = a.getFils2();
+
+        	int borne_inf = verifier_EXP_CONST(f1);
+        	int borne_sup = verifier_EXP_CONST(f2);
+
         	Type t1 = f1.getDecor().getType();
         	Type t2 = f2.getDecor().getType();
         	
-        	int borne_inf = verifier_EXP_CONST(f1);
-        	int borne_sup = verifier_EXP_CONST(f2);
-        
+        	
         	//Verifier que les noeuds sont de type interval
         	if(!(t1.equals(Type.Integer))) 
         	{
@@ -362,9 +364,10 @@ public class Verif {
                 		{
                			
                 			//De même Type
-                			if (! t1.getElement().equals(t2.getElement()))
-                			{    
-                				ErreurContext.ErreurAffect.leverErreurContext("Les indices devraient être de même type.Obtenu : "+ t1.getElement().toString() +" à "+t2.getElement().toString(), a.getNumLigne());
+                			if (! (t1.equals(t2)))
+                			{   
+                				System.out.println(t1.toString()+";"+t2.toString());
+                				ErreurContext.ErreurAffect.leverErreurContext("Les indices devraient être de même type.Obtenu : "+ t1.getElement().toString() +" et "+t2.getElement().toString(), a.getNumLigne());
                 			}             			
                 		}
                 		else
@@ -406,7 +409,7 @@ public class Verif {
                 	}
                 	else
                 	{
-                		ErreurContext.ErreurAffect.leverErreurContext("Cast impossible de "+ t1.toString() +" à "+t2.toString(), a.getNumLigne());                         	                                        			
+                		ErreurContext.ErreurAffect.leverErreurContext("Cast impossible de "+ t2.toString() +" à "+t1.toString(), a.getNumLigne());                         	                                        			
                 	}
                 }
                 

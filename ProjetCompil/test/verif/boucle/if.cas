@@ -1,0 +1,8 @@
+program
+   a: integer;
+begin
+   if a then
+      null;
+   end;
+end.
+

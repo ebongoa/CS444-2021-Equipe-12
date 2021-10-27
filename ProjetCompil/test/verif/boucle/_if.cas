@@ -1,0 +1,8 @@
+program
+   a: boolean;
+begin
+   if true and true then
+      null;
+   end;
+end.
+
