@@ -1,0 +1,8 @@
+program
+    a,b: boolean;
+    c: real;
+begin
+   a := true;
+   b := false;
+   c := a and b;
+end.   

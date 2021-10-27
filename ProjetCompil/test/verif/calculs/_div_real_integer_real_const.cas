@@ -1,0 +1,9 @@
+program
+   a,b,c: real;
+   i,j: integer;
+begin
+   i:= 1;
+   j:= 2;
+   c:= 1/2.0;
+end.
+

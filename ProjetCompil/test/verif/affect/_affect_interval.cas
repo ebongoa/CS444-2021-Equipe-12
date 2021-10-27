@@ -1,0 +1,6 @@
+program
+   k: 5..1;
+begin
+   null;
+end.
+

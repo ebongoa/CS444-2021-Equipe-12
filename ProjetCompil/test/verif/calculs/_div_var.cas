@@ -1,0 +1,8 @@
+program
+   a,b,c: integer;
+begin
+   a := 5;
+   b := 5;
+   c := a div b;
+end.
+

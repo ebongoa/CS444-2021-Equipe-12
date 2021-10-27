@@ -1,0 +1,6 @@
+program
+    a,b: real;
+begin
+   a := 1.0;
+   b := +boolean;
+end.   

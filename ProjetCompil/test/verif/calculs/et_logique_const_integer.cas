@@ -1,0 +1,7 @@
+program
+    a,b,c: boolean;
+begin
+   a := true;
+   b := false;
+   c := true and 1;
+end.   
