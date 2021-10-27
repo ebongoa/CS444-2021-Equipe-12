@@ -1,0 +1,7 @@
+program
+   a,b,c: integer;
+begin
+   a := 5;
+   b := 4;
+   c := a mod b;
+end.
