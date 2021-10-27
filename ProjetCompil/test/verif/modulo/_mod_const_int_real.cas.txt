@@ -1,5 +1,0 @@
-program
-   c: integer;
-begin
-   c := 5 mod 2.5;
-end.
