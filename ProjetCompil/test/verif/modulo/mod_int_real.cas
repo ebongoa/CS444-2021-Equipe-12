@@ -1,0 +1,8 @@
+program
+   a,c: integer;
+   b: real;
+begin
+   a := 5;
+   b := 2.5;
+   c := a mod b;
+end.
