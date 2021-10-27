@@ -355,31 +355,38 @@ public class Verif {
                    
                 //. <place> et <expression> de type Array, les types des indices étant identiques (plus précisement, de type Type.Interval, avec les mêmes 
                 // bornes), et les types des éléments compatibles pour l'affectation.
-                if (t1.getNature().equals(NatureType.Array))
+                if (t1.getNature().equals(NatureType.Array) )
                 {
-                	//On test les bornes
-                	if (t1.getIndice().getBorneInf() == t2.getIndice().getBorneInf())
+                	if (t2.getNature().equals(NatureType.Array))
                 	{
-                		if (t1.getIndice().getBorneSup() == t2.getIndice().getBorneSup())
-                		{
-               			
-                			//De même Type
-                			if (! (t1.equals(t2)))
-                			{   
-                				System.out.println(t1.toString()+";"+t2.toString());
-                				ErreurContext.ErreurAffect.leverErreurContext("Les indices devraient être de même type.Obtenu : "+ t1.getElement().toString() +" et "+t2.getElement().toString(), a.getNumLigne());
-                			}             			
-                		}
-                		else
-                		{
-                    		ErreurContext.ErreurAffect.leverErreurContext("Bornes sup différentes : "+ t1.getIndice().getBorneSup() +" et "+t2.getIndice().getBorneSup(), a.getNumLigne());     
-                			//Pas les même bornes sup
-                		}
+                		//On test les bornes
+                    	if (t1.getIndice().getBorneInf() == t2.getIndice().getBorneInf())
+                    	{
+                    		if (t1.getIndice().getBorneSup() == t2.getIndice().getBorneSup())
+                    		{
+                   			
+                    			//De même Type
+                    			if (! (t1.getElement().equals(t2.getElement())))
+                    			{   
+                    				ErreurContext.ErreurAffect.leverErreurContext("Les éléments devraient être de même type.Obtenu : "+ t1.getElement().toString() +" et "+t2.getElement().toString(), a.getNumLigne());
+                    			}             			
+                    		}
+                    		else
+                    		{
+                        		ErreurContext.ErreurAffect.leverErreurContext("Bornes sup différentes : "+ t1.getIndice().getBorneSup() +" et "+t2.getIndice().getBorneSup(), a.getNumLigne());     
+                    			//Pas les même bornes sup
+                    		}
+                    	}
+                    	else
+                    	{
+                    		ErreurContext.ErreurAffect.leverErreurContext("Bornes inf différentes : "+ t1.getIndice().getBorneInf() +" et "+t2.getIndice().getBorneInf(), a.getNumLigne());     
+                    		//Pas les même bornes inf
+                    	}
                 	}
                 	else
                 	{
-                		ErreurContext.ErreurAffect.leverErreurContext("Bornes inf différentes : "+ t1.getIndice().getBorneInf() +" et "+t2.getIndice().getBorneInf(), a.getNumLigne());     
-                		//Pas les même bornes inf
+                		ErreurContext.ErreurAffect.leverErreurContext("L'expression doit être de type Array.Obtenu : "+ t2.getNature(), a.getNumLigne());     
+
                 	}
                 }
                 

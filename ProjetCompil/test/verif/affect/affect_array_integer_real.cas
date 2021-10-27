@@ -1,6 +1,6 @@
 program
    a,b: array[1..10] of integer;
-   c: array[1..10] of integer;
+   c: array[1..10] of real;
 begin
    a := b;
    b := c;

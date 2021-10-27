@@ -1,0 +1,7 @@
+program
+   a,b: array[1..10] of -10..10;
+   c: array[1..9] of -10..5;
+begin
+   b := c;
+end.
+

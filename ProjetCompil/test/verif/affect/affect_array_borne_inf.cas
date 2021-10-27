@@ -1,8 +1,7 @@
 program
    a,b: array[1..10] of integer;
-   c: array[1..10] of integer;
+   c: array[2..10] of integer;
 begin
-   a := b;
    b := c;
 end.
 
