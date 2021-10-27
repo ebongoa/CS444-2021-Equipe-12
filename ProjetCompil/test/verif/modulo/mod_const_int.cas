@@ -1,0 +1,5 @@
+program
+   c: integer;
+begin
+   c := 5 mod 3;
+end.
