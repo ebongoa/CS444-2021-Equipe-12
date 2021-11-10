@@ -1,0 +1,9 @@
+program
+   a: real;
+   b: array[1..10] of integer;
+   c: integer;  
+begin
+   a := 2.5;
+   c := 2;
+   b[a] := c; -- Erreur contextuelle 
+end.
