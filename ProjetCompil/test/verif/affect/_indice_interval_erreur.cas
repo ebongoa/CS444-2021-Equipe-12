@@ -1,0 +1,6 @@
+program
+   b: array[1..10] of integer;
+   c: integer;
+begin
+   b[0] := c; -- Erreur contextuelle car 0 n'est pas dans 1..10
+end.
