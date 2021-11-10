@@ -1,0 +1,8 @@
+program
+   b: boolean;
+begin
+   b := true;
+   while b do
+      null;
+   end;
+end.
