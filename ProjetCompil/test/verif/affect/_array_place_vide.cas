@@ -1,0 +1,8 @@
+program
+   a: integer;
+   c: integer;
+begin
+   a := 2;
+   c := 2;
+   b[a] := c; -- Erreur contextuelle
+end.
