@@ -1,0 +1,7 @@
+program
+   a: integer;
+begin
+    a := 2;
+   write(a);
+end.
+
