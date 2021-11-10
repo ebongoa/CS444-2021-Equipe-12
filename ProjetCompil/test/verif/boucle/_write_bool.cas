@@ -1,0 +1,6 @@
+program
+   a: boolean;
+begin
+    a := false;
+   write(a);
+end.
