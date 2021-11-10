@@ -1,0 +1,6 @@
+program
+   a: real;
+begin
+    a := 2.5;
+   write(a);
+end.
