@@ -1,0 +1,279 @@
+     Définition de la Machine Abstraite et de son langage d'assemblage
+
+
+Les types des valeurs manipulées sont les entiers, les flottants, les adresses.
+
+La "mémoire physique" (sous ce terme sont englobés registres, caches, RAM...)
+de la machine est logiquement partagée en 3 zones :
+
+   - La zone registres. Elle est constituée des registres banalisés R0 .. R15.
+     Ils peuvent contenir des valeurs de tout type, et peuvent etre lus
+     ou modifiés.
+   - La zone code. Elle contient les instructions du programme.
+     A cette zone est associé un registre spécialisé, PC (compteur ordinal),
+     qui contient les adresses successives des instructions à exécuter.
+     PC ne peut etre ni lu ni modifié explicitement. PC+1 (resp. PC-1) est
+     l'adresse de l'instruction suivant (resp. précédant) celle d'adresse PC.
+   - La zone pile, qui comprend N mots (N n'est pas fixé a priori).
+     Ils peuvent contenir des valeurs de tout type, et peuvent etre lus ou
+     modifiés. A chaque mot est associée une adresse.
+     A cette zone sont associés trois registres spécialisés, qui ne peuvent
+     contenir que des adresses.
+        GB (base globale) : contient à tout instant l'adresse précédant celle
+                            du premier mot de la pile.
+        LB (base locale).
+        SP (pointeur de pile).
+     Les adresses des mots de la pile sont comprises entre GB+1 et GB+N.
+
+Les éléments de mémorisation (registres banalisés et mots mémoires) sont
+"typés" dynamiquement. Initialement, tout est "indéfini" ; lors d'une
+modification d'un élément, le type de données est aussi mémorise. Lors d'une
+opération, il y a vérification de compatibilité de type.
+
+Avant l'exécution de la première instruction :
+   - Le contenu de la pile ainsi que des registres R0 .. Rn est indéfini.
+   - GB = LB = SP sont initialisés à la même valeur (par le chargeur).
+   - PC est initialisé (par le chargeur) à l'adresse de la première instruction
+     à exécuter dans la zone code.
+
+On dispose de 4 modes d'adressage :
+     * registre direct : Rm (m dans 0 .. n)
+     * registre indirect avec déplacement : d(XX), ou d est entier et XX = Rm
+       (qui doit contenir une adresse), GB ou LB.
+       d(XX) désigne l'adresse (contenu de XX)+d.
+     * registre indirect avec déplacement et index : d(XX, Rm), où d est entier,
+       XX = GB, LB ou Rp (qui doit contenir une adresse), et
+       Rm doit contenir un entier.
+       d(XX,Rm) désigne l'adresse (contenu de XX)+(contenu de Rm)+d.
+       Pour les deux modes d'adressage indirect, le déplacement d est un
+       entier en notation Cas, éventuellement précédé d'un signe + ou -.
+     * immédiat : #d, ou d est entier ou réel, en notation Cas,
+       éventuellement précédé d'un signe + ou -.
+
+Les instructions (dénotées InstructionMA dans la grammaire ci-dessous) sont de
+plusieurs catégories :
+   - transfert de données
+   - opérations arithmétiques
+   - contrôle
+   - entrées-sorties
+   - divers
+Les instructions ont 0, 1 ou 2 opérandes (source puis destination).
+Avant l'exécution de chaque instruction, PC est incrémente de 1.
+
+
+
+Dans ce qui suit :
+  +--------------------------------------------------------------------+
+  | dadr  ==       d(XX)   d(XX, Rm)           (désignation d'adresse) |
+  | dval  ==  Rm   d(XX)   d(XX, Rm)   #d      (désignation de valeur) |
+  +--------------------------------------------------------------------+
+  Les notations d(XX) et d(XX, Rm) ne sont autorisées pour des dval
+  que si l'adresse désignée est une adresse d'un mot de la pile.
+  +----------------------------------------------------------------------+
+  | C[XX]    ==  contenu du registre XX (XX = Rm, SP, LB, GB)            |
+  | C[@]     ==  contenu du mot d'adresse @ dans la pile                 |
+  |              (@ doit être dans C[GB]+1 .. C[GB]+N)                   |
+  +----------------------------------------------------------------------+
+  +---------------------------------+ +---------------------------------+
+  |         ADRESSES                | |          VALEURS                |
+  | A[d(XX)]    = C[XX] + d         | | V[XX]       = C[XX]             |
+  | A[d(XX,Rm)] = C[XX] + C[Rm] + d | | V[dadr]     = C[A[dadr]]        |
+  +---------------------------------+ | V[#d]       = d                 |
+                                      +---------------------------------+
+  V[dadr] n'a de sens que si A[dadr] est dans l'intervalle C[GB]+1 .. C[GB]+N,
+  c'est-à-dire si l'adresse associée à dadr est l'adresse d'un mot de la pile.
+
+  L <- Val est une affectation : la valeur Val est rangée dans L.
+  L est soit un registre, soit l'adresse d'un mot de la pile.
+  Dans ce dernier cas, Val est rangée dans le mot d'adresse L.
+
+Les codes condition cc sont :
+   EQ (égal)                     NE (différent)
+   GT (strictement supérieur)    LT (strictement inférieur)
+   GE (supérieur ou égal)        LE (inférieur ou égal)
+   OV (débordement)
+Ils sont positionnés à vrai ou faux par certaines instructions.
+
+Les codes de comparaison EQ, NE, GT, LT, GE, LE sont toujours positionnés
+simultanément, et leurs valeurs satisfont toujours les axiomes :
+  NE == non EQ
+  LT == NE et non GT    GT == NE et non LT
+  LE == LT ou EQ        GE == GT ou EQ
+La valeur initiale des codes condition est indéterminée, mais elle satisfait
+les axiomes.
+
+Pour indiquer qu'une instruction positionne les codes condition,
+on écrit "CC :" suivi de CP et/ou OV (CP pour ComParaison).
+En général, la valeur des codes de comparaison est relative à la comparaison 
+à #0 (pour les entiers) ou #0.0 (pour les flottants), du résultat de
+l'opération pour les instructions arithmétiques, ou de la valeur de la source
+pour les autres.
+Lorsqu'une instruction positionne OV à vrai, son effet est indéterminé.
+
+- transfert de données
+   LOAD dval, Rm   : Rm <- V[dval]                        CC : OV faux, CP
+   STORE Rm, dadr  : A[dadr] <- V[Rm]                     CC : OV faux, CP
+   LEA dadr, Rm    : Rm <- A[dadr]
+   PEA dadr        : SP <- V[SP] + 1 ; V[SP] <- A[dadr]
+   PUSH Rm         : SP <- V[SP] + 1 ; V[SP] <- V[Rm]     CC : OV faux, CP
+   POP Rm          : Rm <- V[V[SP]] ;  SP <- V[SP] - 1    CC : OV faux, CP
+
+- opérations arithmétiques (soit entre entiers, soit entre flottants)
+   ADD dval, Rm    : Rm <- V[Rm] + V[dval]             CC : CP, OV
+   SUB dval, Rm    : Rm <- V[Rm] - V[dval]             CC : CP, OV
+   OPP dval, Rm    : Rm <- - V[dval]                   CC : OV faux, CP
+   MUL dval, Rm    : Rm <- V[Rm] * V[dval]             CC : CP, OV
+   CMP dval, Rm    : mise a jour des codes condition   CC : OV faux, CP
+                     selon V[Rm] - V[dval] (ex. GT := V[Rm] - V[dval] > 0)
+
+- opérations arithmétiques spécifiques aux entiers
+   DIV dval, Rm    : Rm <- V[Rm] div V[dval]    CC : CP, OV vrai ssi V[dval] = 0
+   MOD dval, Rm    : Rm <- V[Rm] mod V[dval]    CC : CP, OV vrai ssi V[dval] = 0
+   FLOAT dval, Rm  : conversion entier->reel    CC : OV vrai ssi V[dval] non
+                     Rm <- IntToFloat(V[dval])       codable sur un flottant
+   Scc Rm          : si (cc = vrai) alors Rm <- 1 sinon Rm <- 0
+
+- opérations arithmétiques spécifiques aux flottants
+   DIV dval, Rm    : Rm <- V[Rm] / V[dval]      CC : CP, OV vrai ssi débordement
+   INT dval, Rm    : conversion reel->entier    CC : OV vrai ssi V[dval] non
+                                                     codable sur un entier
+                     Rm <- Signe(V[dval]) * PartieEntière(ValAbsolue(V[dval]))
+
+- contrôle
+   BRA etiq        : branchement inconditionnel
+                          PC <- (@ de l'instruction qui suit etiq)
+   Bcc etiq        : branchement conditionnel
+                     si (cc = vrai) alors
+                        PC <- (@ de l'instruction qui suit etiq)
+   BSR etiq        : SP <- V[SP] + 2 ; V[SP]-1 <- V[PC] ; V[SP] <- V[LB] ;
+                     LB <- V[SP] ; PC <- (@ de l'instruction qui suit etiq)
+   RTS             : PC <- C[V[LB]-1] ; SP <- V[LB]-2 ; LB <- C[V[LB]] ;
+
+- entrées-sorties
+   RINT            : R1 <- entier lu         CC : CP, OV vrai ssi débordement
+                                                         ou erreur de syntaxe
+   RFLOAT          : R1 <- flottant lu       CC : CP, OV (cf RINT)
+   WINT            : écriture de l'entier V[R1]
+   WFLOAT          : écriture du flottant V[R1]
+   WSTR "..."      : écriture de la chaîne (meme notation qu'en langage Cas)
+   WNL             : écriture newline
+
+- divers
+   ADDSP #d        : SP <- V[SP] + d
+                     d doit être un entier naturel, avec ou sans le signe +.
+   SUBSP #d        : SP <- V[SP] - d
+                     d doit être un entier naturel, avec ou sans le signe +.
+   TSTO #d         : test débordement pile.                    CC : OV
+                     si V[SP] + d > V[GB] + N alors OV := vrai
+                     d doit être un entier naturel, avec ou sans le signe '+'.
+   HALT            : arrêt du programme
+
+
+Temps d'exécution des instructions (en nombre de cycles internes) :
+
+LOAD     2                         INT      4
+STORE    2                         BRA      5
+LEA      0                         Bcc      5 (cc vrai) 4 (cc faux)
+PEA      4                         BSR      9
+PUSH     4                         RTS      8
+POP      2                         RINT    16
+ADD      2                         RFLOAT  16
+SUB      2                         WINT    16
+OPP      2                         WFLOAT  16
+MUL     20                         WSTR    16
+CMP      2                         WNL     14
+DIV     79 (entiers)               ADDSP    4
+DIV     40 (reels)                 SUBSP    4
+MOD     79                         TSTO     4
+FLOAT    4                         HALT     1
+Scc      3 (cc vrai) 2 (cc faux)
+
+
+
+Il faut ajouter le cas écheant le temps d'accès aux opérandes :
+
+Modes d'adressage  Temps
+       Rm            0
+     d(XX)           4
+     d(XX,Rm)        5
+       #d            2
+     "..."           2 * longueur de la chaîne
+
+Notes sur le langage d'assemblage :
+  - l'espace et la tabulation sont des séparateurs.
+  - on peut insérer des lignes blanches où on veut.
+  - les commentaires sont constitués du caractère ';' et du reste de la ligne
+    (caractères imprimables et tabulations).
+  - une étiquette est positionnée en faisant suivre son nom de ':'.
+  - on place une instruction par ligne, éventuellement suivie de commentaires.
+Les codes opération et les noms des registres peuvent être en majuscules ou 
+minuscules.
+Il est d'usage d'indenter les instructions par rapport aux étiquettes.
+
+La syntaxe est la suivante (notation Ayacc) :
+
+  Programme   :
+              |  Programme Ligne
+              ;
+  Ligne       : ListeEtiq Instruction '\n'
+              ;
+  ListeEtiq   :
+              | ListeEtiq etiq ':'
+              ;
+  Instruction :
+              | InstructionMA       -- cf instructions ci-dessus
+              ;
+
+La lexicographie des étiquettes et des commentaires est la suivante (notation 
+Aflex)
+  LETTRE         [a-zA-Z]
+  CHIFFRE        [0-9]
+  ETIQUETTE      {LETTRE}({LETTRE}|{CHIFFRE}|_|".")*
+  COMM_CAR       [\t\040-\176] -- caracteres imprimables et tabulation
+  COMMENTAIRE    ";"{COMM_CAR}*
+
+Exemples d'etiquettes:   Ceci_Est_1_etiquette.0   En.Voici_42._autres_
+
+On ne distingue pas majuscules et minuscules. Une étiquette ne doit pas avoir
+un nom de code-opération ou de registre.
+
+Exemple : la factorielle itérative
+
+; ======================================================================
+     ADDSP #2
+; -------------------------- Writeln ligne 5 ---------------------------
+     WSTR "Entrer un entier : "
+     RINT
+     STORE R1, 1(GB)
+; ------------------------ Affectation, ligne 9 ------------------------
+     LOAD #1, R0
+     STORE R0, 2(GB)
+; --------------------- Boucle tant que, ligne 10 ----------------------
+     BRA etiq.2
+etiq.1 :
+; ----------------------- Affectation, ligne 11 ------------------------
+     LOAD 2(GB), R0
+     MUL 1(GB), R0
+     BOV erreur_debordement
+     STORE R0, 2(GB)
+; ----------------------- Affectation, ligne 12 ------------------------
+     LOAD 1(GB), R0
+     SUB #1, R0
+     STORE R0, 1(GB)
+etiq.2 :
+     LOAD 1(GB), R0
+     CMP #1, R0
+     BGE etiq.1
+; -------------------------- Writeln ligne 15 --------------------------
+     WSTR "factorielle = "
+     LOAD 2(GB), R1
+     WINT
+; -------------------------- New_Line ligne 16 -------------------------
+     WNL
+     HALT
+; ------------------------ Erreurs a l'execution -----------------------
+erreur_debordement :
+     WSTR "Erreur a l'execution : debordement arithmetique"
+     WNL
+     HALT
+; ======================================================================
