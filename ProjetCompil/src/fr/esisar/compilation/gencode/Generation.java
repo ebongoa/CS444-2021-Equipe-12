@@ -207,14 +207,14 @@ class Generation {
 		   }
 		   break;
 	   case Pour :
-		   /* Etiq etiq_Cond = Nouvelle_Etiq("Cond");
+		   Etiq etiq_Cond = Nouvelle_Etiq("Cond");
 		   Etiq etiq_Debut = Nouvelle_Etiq("Debut");
 		   Inst inst = Inst.creation1(Operation.BRA, new OperandeEtiq(etiq_Cond));
 		   Prog.ajouter(inst);
 		   Prog.ajouter(etiq_Debut);
 		   Coder_Inst(a.getFils2());
 		   Prog.ajouter(etiq_Cond);
-		   Coder_Cond(a.getFils1(), true, new OperandeEtiq(etiq_Debut)); */
+		   Coder_Cond(a.getFils1(), true, new OperandeEtiq(etiq_Debut));
 		   break;
 	   case TantQue :
 		   Etiq etiq_Cond = Nouvelle_Etiq("Cond");
