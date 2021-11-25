@@ -4,93 +4,101 @@ import fr.esisar.compilation.global.src.*;
 import fr.esisar.compilation.global.src3.*;
 
 /**
- * Génération de code pour un programme JCas à partir d'un arbre décoré.
+ * GÃ©nÃ©ration de code pour un programme JCas Ã  partir d'un arbre dÃ©corÃ©.
  */
 
 class Generation {
    
    /**
-    * Méthode principale de génération de code.
-    * Génère du code pour l'arbre décoré a.
+    * MÃ©thode principale de gÃ©nÃ©ration de code.
+    * GÃ©nÃ¨re du code pour l'arbre dÃ©corÃ© a.
     */
    static Prog coder(Arbre a) {
-      Prog.ajouterGrosComment("Programme généré par JCasc");
+      Prog.ajouterGrosComment("Programme gÃ©nÃ©rÃ© par JCasc");
 
       // -----------
       // A COMPLETER
       // -----------
-
-      coder_LISTEDECL(a.getFils1());
-      coder_LISTEINST(a.getFils2());
-
+      
+      
       // Fin du programme
       // L'instruction "HALT"
       Inst inst = Inst.creation0(Operation.HALT);
-      // On ajoute l'instruction à la fin du programme
+      // On ajoute l'instruction Ã  la fin du programme
       Prog.ajouter(inst);
 
-      // On retourne le programme assembleur généré
+      // On retourne le programme assembleur gÃ©nÃ©rÃ©
       return Prog.instance(); 
    }
-
-
-   private static void coder_LISTEDECL(Arbre a) {
-	   
+   
+   static Etiq Nouvelle_Etiq(String chaine) {
+	   return new Etiq(chaine);
    }
 
-
-	private static void coder_LISTEINST(Arbre a) {
-		switch (a.getNoeud()) {
-			case Vide :
-				break;
-			case ListeInst :
-				coder_LISTEINST(a.getFils1());
-				coder_INST(a.getFils2());
-				break;
-		
-			default:
-				break;
-		}
+   static void coder_Cond(Arbre c, boolean saut, Etiq etiq) {
+	   Noeud noeud = c.getNoeud();
+	   
+	   switch(noeud) {
+	   case Ident :
+		   if(c.getChaine().equals(String.valueOf(saut))) {
+			   Inst inst = Inst.creation1(Operation.BRA, new OperandeEtiq(etiq));
+			   Prog.ajouter(inst);
+		   }
+		   else if(c.getChaine().equals(String.valueOf(!saut))) {
+			   null; // il n'y a rien à faire
+		   }
+		   else {
+			   if(saut) {
+				   Inst inst1 = Inst.creation2(Operation.LOAD, new OperandeChaine(c.getChaine()),Operande.R0);
+				   Prog.ajouter(inst1);
+				   Inst inst2 = Inst.creation2(Operation.CMP, new OperandeEntier(0), Operande.R0);
+				   Prog.ajouter(inst2);
+				   Inst inst3 = Inst.creation1(Operation.BNE, new OperandeEtiq(etiq));
+				   Prog.ajouter(inst3);
+			   }
+			   else {
+				   Inst inst1 = Inst.creation2(Operation.LOAD, new OperandeChaine(c.getChaine()),Operande.R0);
+				   Prog.ajouter(inst1);
+				   Inst inst2 = Inst.creation2(Operation.CMP, new OperandeEntier(0), Operande.R0);
+				   Prog.ajouter(inst2);
+				   Inst inst3 = Inst.creation1(Operation.BEQ, new OperandeEtiq(etiq));
+				   Prog.ajouter(inst3);
+			   }
+		   }
+		   break;
+	   case Et :
+		   if(saut) {
+			   Etiq etiq_fin = Nouvelle_Etiq(etiq.toString()+"_fin");
+			   Coder_Cond(c.getFils1(), false, etiq_fin);
+			   Coder_Cond(c.getFils2(), true, etiq);
+			   Prog.ajouter(etiq_fin);
+		   }
+		   else {
+			   Coder_Cond(c.getFils1(), false, etiq);
+			   Coder_Cond(c.getFils2(), false, etiq);
+		   }
+		   break;
+	   case Ou :
+		   if(saut) {
+			   Coder_Cond(c.getFils1(), true, etiq);
+			   Coder_Cond(c.getFils2(), true, etiq);
+		   }
+		   else {
+			   Etiq etiq_fin = Nouvelle_Etiq(etiq.toString()+"_fin");
+			   Coder_Cond(c.getFils1(), true, etiq_fin);
+			   Coder_Cond(c.getFils2(), false, etiq);
+			   Prog.ajouter(etiq_fin);
+		   }
+		   break;
+	   case Non :
+		   Coder_Cond(c.getFils1(), !saut, etiq);
+		   break;
+	   // Opérateurs de comparaison =, <, >, !=, ≤, et ≥
+	   case Inf :
 	   }
 
-
-   private static void coder_INST(Arbre a) {
-	   switch (a.getNoeud()) {
-		   case Ecriture :
-				coder_LISTE_EXP(a.getFils1());
-				break;
-	
-			default:
-				break;
-		}
-	}
-
-
-	private static void coder_LISTE_EXP(Arbre a) {
-		switch (a.getNoeud()) {
-			case Vide :
-				break;
-			case ListeExp:
-				coder_LISTE_EXP(a.getFils1());
-				coder_EXP(a.getFils2());
-				break;
-			default:
-				break;
-		}
-		
-	}
-	
-	private static void coder_EXP(Arbre a) {
-		switch (a.getNoeud()) {
-			case Chaine:
-				String val = new String(a.getChaine());
-				Inst instWSTR = Inst.creation1(Operation.WSTR, Operande.creationOpChaine(val));
-			    Prog.ajouter(instWSTR);
-				break;
-			default:
-				break;
-		}
-	}
+   }
+   
 }
 
 
