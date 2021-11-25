@@ -94,10 +94,94 @@ class Generation {
 		   Coder_Cond(c.getFils1(), !saut, etiq);
 		   break;
 	   // Opérateurs de comparaison =, <, >, !=, ≤, et ≥
+	   case Egal :
+		   Coder_Expr(c.getFils1(), Registre.R1);
+		   Coder_Expr(c.getFils2(), Registre.R2);
+		   Inst inst1 = Inst.creation2(Operation.CMP, Operande.R2, Operande.R1);
+		   Prog.ajouter(inst1);
+		   if(saut) {
+			   Inst inst2 = Inst.creation1(Operation.BEQ, new OperandeEtiq(etiq));
+			   Prog.ajouter(inst2);
+		   }
+		   else {
+			   Inst inst2 = Inst.creation1(Operation.BNE, new OperandeEtiq(etiq));
+			   Prog.ajouter(inst2);
+		   }
+		   break;
 	   case Inf :
+		   Coder_Expr(c.getFils1(), Registre.R1);
+		   Coder_Expr(c.getFils2(), Registre.R2);
+		   Inst inst1 = Inst.creation2(Operation.CMP, Operande.R2, Operande.R1);
+		   Prog.ajouter(inst1);
+		   if(saut) {
+			   Inst inst2 = Inst.creation1(Operation.BLT, new OperandeEtiq(etiq));
+			   Prog.ajouter(inst2);
+		   }
+		   else {
+			   Inst inst2 = Inst.creation1(Operation.BGE, new OperandeEtiq(etiq));
+			   Prog.ajouter(inst2);
+		   }
+		   break;
+	   case Sup :
+		   Coder_Expr(c.getFils1(), Registre.R1);
+		   Coder_Expr(c.getFils2(), Registre.R2);
+		   Inst inst1 = Inst.creation2(Operation.CMP, Operande.R2, Operande.R1);
+		   Prog.ajouter(inst1);
+		   if(saut) {
+			   Inst inst2 = Inst.creation1(Operation.BGT, new OperandeEtiq(etiq));
+			   Prog.ajouter(inst2);
+		   }
+		   else {
+			   Inst inst2 = Inst.creation1(Operation.BLE, new OperandeEtiq(etiq));
+			   Prog.ajouter(inst2);
+		   }
+		   break;
+	   case NonEgal :
+		   Coder_Expr(c.getFils1(), Registre.R1);
+		   Coder_Expr(c.getFils2(), Registre.R2);
+		   Inst inst1 = Inst.creation2(Operation.CMP, Operande.R2, Operande.R1);
+		   Prog.ajouter(inst1);
+		   if(saut) {
+			   Inst inst2 = Inst.creation1(Operation.BNE, new OperandeEtiq(etiq));
+			   Prog.ajouter(inst2);
+		   }
+		   else {
+			   Inst inst2 = Inst.creation1(Operation.BEQ, new OperandeEtiq(etiq));
+			   Prog.ajouter(inst2);
+		   }
+		   break;
+	   case InfEgal : 
+		   Coder_Expr(c.getFils1(), Registre.R1);
+		   Coder_Expr(c.getFils2(), Registre.R2);
+		   Inst inst1 = Inst.creation2(Operation.CMP, Operande.R2, Operande.R1);
+		   Prog.ajouter(inst1);
+		   if(saut) {
+			   Inst inst2 = Inst.creation1(Operation.BLE, new OperandeEtiq(etiq));
+			   Prog.ajouter(inst2);
+		   }
+		   else {
+			   Inst inst2 = Inst.creation1(Operation.BGT, new OperandeEtiq(etiq));
+			   Prog.ajouter(inst2);
+		   }
+		   break;
+	   case SupEgal :
+		   Coder_Expr(c.getFils1(), Registre.R1);
+		   Coder_Expr(c.getFils2(), Registre.R2);
+		   Inst inst1 = Inst.creation2(Operation.CMP, Operande.R2, Operande.R1);
+		   Prog.ajouter(inst1);
+		   if(saut) {
+			   Inst inst2 = Inst.creation1(Operation.BGE, new OperandeEtiq(etiq));
+			   Prog.ajouter(inst2);
+		   }
+		   else {
+			   Inst inst2 = Inst.creation1(Operation.BLT, new OperandeEtiq(etiq));
+			   Prog.ajouter(inst2);
+		   }
+		   break;
 	   }
 
    }
+   
    
 }
 
