@@ -32,7 +32,7 @@ class Generation {
    }
    
    static Etiq Nouvelle_Etiq(String chaine) {
-	   return new Etiq(chaine);
+	   return Etiq.nouvelle(chaine);
    }
 
    static void coder_Cond(Arbre c, boolean saut, Etiq etiq) {
@@ -178,10 +178,59 @@ class Generation {
 			   Prog.ajouter(inst2);
 		   }
 		   break;
+	   case default :
+		   break;
 	   }
 
    }
    
+   static void Coder_Inst(Arbre a) {
+	   Noeud noeud = a.getNoeud();
+	   
+	   switch(noeud) {
+	   case Si :
+		   Etiq etiq_Fin = Nouvelle_Etiq("Si_Fin");
+		   if(a.getFils3().getNoeud().equals(Noeud.Vide)) {
+			   Coder_Cond(a.getFils1(), false, etiq_Fin);
+			   Coder_Inst(a.getFils2());
+			   Prog.ajouter(etiq_Fin);
+		   }
+		   else {
+			   Etiq etiq_Sinon = Nouvelle_Etiq("Sinon");
+			   Coder_Cond(a.getFils1(), false, etiq_Sinon);
+			   Coder_Inst(a.getFils2());
+			   Inst inst = Inst.creation1(Operation.BRA, new OperandeEtiq(etiq_Fin));
+			   Prog.ajouter(inst);
+			   Prog.ajouter(etiq_Sinon);
+			   Coder_Inst(a.getFils3());
+			   Prog.ajouter(etiq_Fin);
+		   }
+		   break;
+	   case Pour :
+		   /* Etiq etiq_Cond = Nouvelle_Etiq("Cond");
+		   Etiq etiq_Debut = Nouvelle_Etiq("Debut");
+		   Inst inst = Inst.creation1(Operation.BRA, new OperandeEtiq(etiq_Cond));
+		   Prog.ajouter(inst);
+		   Prog.ajouter(etiq_Debut);
+		   Coder_Inst(a.getFils2());
+		   Prog.ajouter(etiq_Cond);
+		   Coder_Cond(a.getFils1(), true, new OperandeEtiq(etiq_Debut)); */
+		   break;
+	   case TantQue :
+		   Etiq etiq_Cond = Nouvelle_Etiq("Cond");
+		   Etiq etiq_Debut = Nouvelle_Etiq("Debut");
+		   Inst inst = Inst.creation1(Operation.BRA, new OperandeEtiq(etiq_Cond));
+		   Prog.ajouter(inst);
+		   Prog.ajouter(etiq_Debut);
+		   Coder_Inst(a.getFils2());
+		   Prog.ajouter(etiq_Cond);
+		   Coder_Cond(a.getFils1(), true, new OperandeEtiq(etiq_Debut));
+		   break;
+	   case default :
+		   break;
+	   }
+	   
+   }
    
 }
 
