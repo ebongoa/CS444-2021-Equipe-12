@@ -346,57 +346,7 @@ class Generation {
 		   if (!used[ri])
 		   {
 			   used[ri] = true;
-			   switch(ri)
-			   {
-			   	   case 0:
-			   			to_return = Operande.R0;
-			   			break;
-			   	   case 1:
-			   			to_return = Operande.R1;
-			   			break;	
-			   	   case 2:
-			   			to_return = Operande.R2;
-			   			break;
-			   	   case 3:
-			   			to_return = Operande.R3;
-			   			break;	   			   			
-			   	   case 4:
-			   			to_return = Operande.R4;
-			   			break;
-			   	   case 5:
-			   			to_return = Operande.R5;
-			   			break;	
-			   	   case 6:
-			   			to_return = Operande.R6;
-			   			break;
-			   	   case 7:
-			   			to_return = Operande.R7;
-			   			break;			   
-	   	   			case 8:
-	   	   				to_return = Operande.R8;
-	   	   				break;
-	   	   			case 9:
-	   	   				to_return = Operande.R9;
-	   	   				break;	
-	   	   			case 10:
-	   	   				to_return = Operande.R10;
-	   	   				break;
-	   	   			case 11:
-	   	   				to_return = Operande.R11;
-	   	   				break;	   			   			
-	   	   			case 12:
-	   	   				to_return = Operande.R12;
-	   	   				break;
-	   	   			case 13:
-	   	   				to_return = Operande.R13;
-	   	   				break;	
-	   	   			case 14:
-	   	   				to_return = Operande.R14;
-	   	   				break;
-	   	   			case 15:
-	   	   				to_return = Operande.R15;
-	   	   				break;	
-		   		}
+			   to_return = Operande.opDirect(Registre.valueOf("R" + ri));
 	   		}
 	   	 
 		   else
@@ -408,7 +358,10 @@ class Generation {
 
    static private void free_Reg(Operande ri) throws Exception
    {
+	   if (!(ri.getNature().equals(NatureOperande.OpDirect))) throw new Exception("free_Reg called on a non-register operande!");
+	   
 	   int i = -1;
+	   
 	   switch(ri.getRegistre())
 	   {   	   
 	   	   case R0:
@@ -458,10 +411,12 @@ class Generation {
 	   			break;
 	   	   case R15:
 	   			i = 15;
-	   			break;	
+	   			break;
+	   		default:
+	   			//LB ou RB
+	   			break;
 	   }
-	   if (i == -1) throw new Exception("free_Reg called on a non-register operande!");
-	   else used[i] = false;
+	   if (i != -1) used[i] = false;
    }
 
 }
