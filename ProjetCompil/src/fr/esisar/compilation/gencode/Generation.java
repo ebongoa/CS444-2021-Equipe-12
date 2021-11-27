@@ -13,14 +13,17 @@ class Generation {
    /**
     * MÃ©thode principale de gÃ©nÃ©ration de code.
     * GÃ©nÃ¨re du code pour l'arbre dÃ©corÃ© a.
+ * @throws Exception 
     */
-   static Prog coder(Arbre a) {
+   static Prog coder(Arbre a) throws Exception {
       Prog.ajouterGrosComment("Programme gÃ©nÃ©rÃ© par JCasc");
 
       // -----------
       // A COMPLETER
       // -----------
-      
+      coder_Liste_Decl(a.getFils1());
+      coder_Liste_Inst(a.getFils2());
+
       
       // Fin du programme
       // L'instruction "HALT"
@@ -36,17 +39,80 @@ class Generation {
 	   return Etiq.nouvelle(chaine);
    }
 
+   static void coder_Liste_Decl(Arbre a) throws Exception
+   {
+	   Noeud noeud = a.getNoeud();
+	   
+	   if(noeud != Noeud.Vide) {
+		   // (List_Decl Decl) | Decl
+		   Arbre f1 = a.getFils1();
+		   Arbre f2 = a.getFils2();
+			
+		   noeud = f1.getNoeud();	
+			// List_Decl | vide
+			switch(noeud) {
+				
+				case ListeDecl:
+					coder_Liste_Decl(f1);
+					break;
+					
+				case Vide :
+					break;
+			
+			default:
+				throw new Exception("Décor incohérent ligne : " + f1.getNumLigne());
+				
+			}
+			noeud = f2.getNoeud();
+			//Decl , rien d'autre (même pas vide)
+			if (noeud.equals( Noeud.Decl))
+			{
+				//Placer en mémoire
+			}
+			else
+			{
+				throw new Exception("Décor incohérent ligne : " + f1.getNumLigne());
+			}
+		}
+	   
+   }
    
    static void coder_Expr(Arbre a, Operande r)
    {
-	   //@TODO
+	    Noeud noeud = a.getNoeud();
+  
+		switch (noeud) {
+		case Chaine:
+			String val = new String(a.getChaine());
+			Inst instWSTR = Inst.creation1(Operation.WSTR, Operande.creationOpChaine(val));
+		    Prog.ajouter(instWSTR);
+			break;
+		default:
+			break;
+	}
    }
-   
    
    static void coder_Expr(Arbre a, Registre r)
    {
 	   //@Placeholder
    }
+     
+   static void coder_Liste_Expr(Arbre a) {
+		Noeud noeud = a.getNoeud();
+	
+		switch (noeud) {
+			case Vide :
+				break;
+			case ListeExp:
+				coder_Liste_Expr(a.getFils1());
+				coder_Expr(a.getFils2(),(Operande)null);
+				break;
+			default:
+				break;
+		}
+		
+	}
+
    
    static void coder_Cond(Arbre c, boolean saut, Etiq etiq) throws Exception {
 	   Noeud noeud = c.getNoeud();
@@ -59,10 +125,7 @@ class Generation {
 			   inst = Inst.creation1(Operation.BRA, Operande.creationOpEtiq(etiq));
 			   Prog.ajouter(inst);
 		   }
-		   else if(c.getChaine().equals(String.valueOf(!saut))) {
-			   return; // il n'y a rien à faire
-		   }
-		   else {
+		   else if (!(c.getChaine().equals(String.valueOf(!saut)))){
 			   if(saut) {
 				   inst1 = Inst.creation2(Operation.LOAD, Operande.creationOpChaine(c.getChaine()),allouer_Reg());
 				   Prog.ajouter(inst1);
@@ -196,12 +259,12 @@ class Generation {
 	   default:
 		   break;
 	   }
-	   
 	   free_Reg(reg1);
 	   free_Reg(reg2);
    }
    
-   static void Coder_Inst(Arbre a) {
+   
+   static void coder_Inst(Arbre a) throws Exception {
 	   Noeud noeud = a.getNoeud();
 	   Inst inst,inst1 ;
 	   Etiq etiq_Debut,etiq_Fin,etiq_Cond,etiq_Sinon;
@@ -210,17 +273,17 @@ class Generation {
 		   etiq_Fin = Nouvelle_Etiq("Si_Fin");
 		   if(a.getFils3().getNoeud().equals(Noeud.Vide)) {
 			   coder_Cond(a.getFils1(), false, etiq_Fin);
-			   Coder_Inst(a.getFils2());
+			   coder_Inst(a.getFils2());
 			   Prog.ajouter(etiq_Fin);
 		   }
 		   else {
 			   etiq_Sinon = Nouvelle_Etiq("Sinon");
 			   coder_Cond(a.getFils1(), false, etiq_Sinon);
-			   Coder_Inst(a.getFils2());
+			   coder_Inst(a.getFils2());
 			   inst = Inst.creation1(Operation.BRA, Operande.creationOpEtiq(etiq_Fin));
 			   Prog.ajouter(inst);
 			   Prog.ajouter(etiq_Sinon);
-			   Coder_Inst(a.getFils3());
+			   coder_Inst(a.getFils3());
 			   Prog.ajouter(etiq_Fin);
 		   }
 		   break;
@@ -230,9 +293,9 @@ class Generation {
 		   inst = Inst.creation1(Operation.BRA, Operande.creationOpEtiq(etiq_Cond));
 		   Prog.ajouter(inst);
 		   Prog.ajouter(etiq_Debut);
-		   Coder_Inst(a.getFils2());
+		   coder_Inst(a.getFils2());
 		   Prog.ajouter(etiq_Cond);
-		   coder_Cond(a.getFils1(), true, Operande.creationOpEtiq(etiq_Debut));
+		   coder_Cond(a.getFils1(), true, etiq_Debut);
 		   break;
 	   case TantQue :
 		   etiq_Cond = Nouvelle_Etiq("Cond");
@@ -240,15 +303,38 @@ class Generation {
 		   inst = Inst.creation1(Operation.BRA, Operande.creationOpEtiq(etiq_Cond));
 		   Prog.ajouter(inst);
 		   Prog.ajouter(etiq_Debut);
-		   Coder_Inst(a.getFils2());
+		   coder_Inst(a.getFils2());
 		   Prog.ajouter(etiq_Cond);
-		   coder_Cond(a.getFils1(), true, Operande.creationOpEtiq(etiq_Debut));
+		   coder_Cond(a.getFils1(), true, etiq_Debut);
 		   break;
+		   
+	   case Ecriture :
+			coder_Liste_Expr(a.getFils1());
+			break;
+			
 	   default :
 		   break;
 	   }
 	   
    }
+   
+   static void coder_Liste_Inst(Arbre a) throws Exception {
+		Noeud noeud = a.getNoeud();
+		switch (noeud) {
+			case Vide :
+				break;
+			case ListeInst :
+				coder_Liste_Inst(a.getFils1());
+				coder_Inst(a.getFils2());
+				break;
+		
+			default:
+				break;
+		}
+	}
+
+
+   
    
    
    static private Operande allouer_Reg() throws Exception
