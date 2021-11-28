@@ -10,6 +10,8 @@ import fr.esisar.compilation.global.src3.*;
 class Generation {
 	static private boolean used[] = new boolean[16];
 	static private int pointeur_pile = 0;
+	static private Etiq end = Etiq.lEtiq("end");
+	static private Etiq hlt = Etiq.lEtiq("hlt");
    
    /**
     * MÃ©thode principale de gÃ©nÃ©ration de code.
@@ -23,24 +25,41 @@ class Generation {
       // A COMPLETER
       // -----------
       
+      // Etiquettes de structure
+     
       // program :
-      Prog.ajouterComment("program");
+      Prog.ajouterGrosComment("program                    ");
       coder_Liste_Decl(a.getFils1());
-      if (pointeur_pile > 0 ) Prog.ajouter(Inst.creation1(Operation.ADDSP,Operande.creationOpEntier(pointeur_pile)));
+      if (pointeur_pile > 0 ) 
+      {
+    	  verifier_Pile_OV(pointeur_pile);
+    	  Prog.ajouter(Inst.creation1(Operation.ADDSP,Operande.creationOpEntier(pointeur_pile)));
+      }
       
       
       // begin :
-      Prog.ajouterComment("begin");
+      Prog.ajouterGrosComment("begin                     ");
       coder_Liste_Inst(a.getFils2());
-
-      
+     
       // Fin du programme
+      Prog.ajouterGrosComment("end                       ");
+      
+      Prog.ajouter(end);    
+      if (pointeur_pile > 0 ) Prog.ajouter(Inst.creation1(Operation.SUBSP,Operande.creationOpEntier(pointeur_pile)));
+   
       // L'instruction "HALT"
-      Prog.ajouter(Etiq.nouvelle("end"),"Fin du programme");
+      Prog.ajouter(hlt);
       Inst inst = Inst.creation0(Operation.HALT);
       // On ajoute l'instruction Ã  la fin du programme
       Prog.ajouter(inst);
 
+      // En cas d'erreur 
+      Prog.ajouterComment("Erreurs a l'execution");      
+      coder_Erreur(Prog.L_Etiq_Debordement_Arith,"Erreur a l'execution : debordement arithmetique");
+      coder_Erreur(Prog.L_Etiq_Pile_Pleine,"Erreur a l'execution : debordement de la pile");
+      coder_Erreur(Prog.L_Etiq_Debordement_Intervalle,"Erreur a l'execution : debordement d'intervalle");
+      coder_Erreur(Prog.L_Etiq_Debordement_Indice,"Erreur a l'execution : debordement d'indice dans un tableau");
+      
       // On retourne le programme assembleur gÃ©nÃ©rÃ©
       return Prog.instance(); 
    }
@@ -49,6 +68,18 @@ class Generation {
 	   return Etiq.nouvelle(chaine);
    }
 
+   // ############################ Erreurs ################################
+   
+   private static void coder_Erreur(Etiq etiq , String comm)
+   {	      
+	      Prog.ajouter(etiq);
+	      Prog.ajouter(Inst.creation1(Operation.WSTR,Operande.creationOpChaine(comm)));
+	      Prog.ajouter(Inst.creation0(Operation.WNL));
+	      Prog.ajouter(Inst.creation1(Operation.BRA, Operande.creationOpEtiq(hlt)));
+   }
+   
+   // ############################ Declarations ################################
+   
    static void coder_Liste_Decl(Arbre a) throws Exception
    {
 	   Noeud noeud = a.getNoeud();
@@ -386,7 +417,7 @@ class Generation {
 
 			
 			Arbre f2 = a.getFils2();
-			// Strong | Interval | Real
+			// String | Interval | Real
 			switch (f2.getDecor().getType().getNature()) 
 			{
 			
@@ -549,6 +580,57 @@ class Generation {
 	   }
 	   */											
 	}   
+   
+   // A placer après chaque ajout en pile
+   static private void verifier_Pile_OV(int offset) 
+   {
+	Prog.ajouter(Inst.creation1(Operation.TSTO, Operande.creationOpEntier(offset)));
+	Prog.ajouter(Inst.creation1(Operation.BOV, Operande.creationOpEtiq(Prog.L_Etiq_Pile_Pleine)));
+   }
+   
+   // A placer après chaque operateur arithmetique risquant de faire un overflow
+   static private void verifier_Arith_OV(Arbre a)
+	{
+	    // L'overflow sera causé par l'appel à une instruction arithmetique , on met juste un BOV après chacun
+		Prog.ajouter(Inst.creation1(Operation.BOV, Operande.creationOpEtiq(Prog.L_Etiq_Debordement_Arith)));
+	}
+   
+   static private void verifier_Interval_OV(Operande operande, Type bornes)
+	{
+		Operande etiq = Operande.creationOpEtiq(Prog.L_Etiq_Debordement_Intervalle);
+		int inf = bornes.getBorneInf(),sup = bornes.getBorneSup();	
+		
+		if (inf != -java.lang.Integer.MAX_VALUE)
+		{
+			Prog.ajouter(Inst.creation2(Operation.CMP, Operande.creationOpEntier(inf), operande));
+			Prog.ajouter(Inst.creation1(Operation.BLT, etiq));
+		}
+
+		if (sup != java.lang.Integer.MAX_VALUE)
+		{
+			Prog.ajouter(Inst.creation2(Operation.CMP, Operande.creationOpEntier(sup), operande));
+			Prog.ajouter(Inst.creation1(Operation.BLT, etiq));
+		}
+	}
+	
+   static private void verifier_Tableau_OV(Operande operande, Type bornes)
+	{
+		Operande etiq = Operande.creationOpEtiq(Prog.L_Etiq_Debordement_Indice);
+		int inf = bornes.getBorneInf(),sup = bornes.getBorneSup();	
+		
+		if (inf != -java.lang.Integer.MAX_VALUE)
+		{
+			Prog.ajouter(Inst.creation2(Operation.CMP, Operande.creationOpEntier(inf), operande));
+			Prog.ajouter(Inst.creation1(Operation.BLT, etiq));
+		}
+
+		if (sup != java.lang.Integer.MAX_VALUE)
+		{
+			Prog.ajouter(Inst.creation2(Operation.CMP, Operande.creationOpEntier(sup), operande));
+			Prog.ajouter(Inst.creation1(Operation.BLT, etiq));
+		}
+		
+	}
    
 }
 
