@@ -26,7 +26,7 @@ class Generation {
       // program :
       Prog.ajouterComment("program");
       coder_Liste_Decl(a.getFils1());
-      Prog.ajouter(Inst.creation1(Operation.ADDSP,Operande.creationOpEntier(pointeur_pile)));
+      if (pointeur_pile > 0 ) Prog.ajouter(Inst.creation1(Operation.ADDSP,Operande.creationOpEntier(pointeur_pile)));
       
       
       // begin :
@@ -36,6 +36,7 @@ class Generation {
       
       // Fin du programme
       // L'instruction "HALT"
+      Prog.ajouter(Etiq.nouvelle("end"),"Fin du programme");
       Inst inst = Inst.creation0(Operation.HALT);
       // On ajoute l'instruction Ã  la fin du programme
       Prog.ajouter(inst);
@@ -86,27 +87,26 @@ class Generation {
 	   
    }
    
-   static void coder_Expr(Arbre a, Operande r)
-   {
-	   NatureType type = a.getDecor().getType().getNature();
-	    Noeud noeud = a.getNoeud();
-  
-		switch (noeud) {
-		case Chaine:
-			String val = new String(a.getChaine());
-			Inst instWSTR = Inst.creation1(Operation.WSTR, Operande.creationOpChaine(val));
-		    Prog.ajouter(instWSTR);
-			break;
-		default:
-			break;
-	}
-   }
+
+   // ############################ Expressions ################################
    
    static void coder_Expr(Arbre a, Registre r)
    {
 	   //@Placeholder
    }
      
+   
+   static void coder_Expr(Arbre a, Operande r)
+   {
+	    NatureType type = a.getDecor().getType().getNature();
+  
+		switch (type) 
+		{
+		default:
+			break;
+		}
+   }
+   
    static void coder_Liste_Expr(Arbre a) {
 		Noeud noeud = a.getNoeud();
 	
@@ -123,6 +123,8 @@ class Generation {
 		
 	}
 
+   // ############################ Arithmetique ################################
+   // ############################ Booleens ################################
    
    static void coder_Cond(Arbre c, boolean saut, Etiq etiq) throws Exception {
 	   Noeud noeud = c.getNoeud();
@@ -274,11 +276,19 @@ class Generation {
    }
    
    
+   // ############################ Instructions ################################
+   
    static void coder_Inst(Arbre a) throws Exception {
 	   Noeud noeud = a.getNoeud();
 	   Inst inst,inst1 ;
 	   Etiq etiq_Debut,etiq_Fin,etiq_Cond,etiq_Sinon;
+
+	   
 	   switch(noeud) {
+		case Affect:
+			//coder_Affect(a);
+			break;
+	   
 	   case Si :
 		   etiq_Fin = Nouvelle_Etiq("Si_Fin");
 		   if(a.getFils3().getNoeud().equals(Noeud.Vide)) {
@@ -318,8 +328,20 @@ class Generation {
 		   coder_Cond(a.getFils1(), true, etiq_Debut);
 		   break;
 		   
-	   case Ecriture :
-			coder_Liste_Expr(a.getFils1());
+		case Lecture:
+			coder_IO(a,true);
+			break;
+		   
+	   case Ecriture :	
+		    coder_IO(a,false);
+			break;
+			
+	   case Ligne:
+		    // WNL             : ecriture newline
+			Prog.ajouter(Inst.creation0(Operation.WNL));
+			break;
+			
+	   case Nop:
 			break;
 			
 	   default :
@@ -343,6 +365,64 @@ class Generation {
 		}
 	}
 
+   // True/False -> Lecture/Ecriture
+   static private void coder_IO(Arbre a,boolean io) throws Exception
+   {	 
+	if (io)
+	{
+		//coder_Lecture
+	}
+	else 
+	{ 
+		switch (a.getNoeud()) 
+		{
+		case Ecriture:
+			coder_IO(a.getFils1(),false);
+			break;
+	
+		// (Liste_Exp , Exp) | (Vide,Exp)
+		case ListeExp:
+			coder_IO(a.getFils1(),false);
+
+			
+			Arbre f2 = a.getFils2();
+			// Strong | Interval | Real
+			switch (f2.getDecor().getType().getNature()) 
+			{
+			
+			    // WSTR "..."      : ecriture de la chaine (meme notation qu'en langage Cas)
+				case String:
+					Prog.ajouter(Inst.creation1(Operation.WSTR, Operande.creationOpChaine(f2.getChaine())));
+					break;
+
+				// WINT            : ecriture de l'entier V[R1]
+				case Interval:
+					// Mise dans R1 (f2)
+					Prog.ajouter(Inst.creation0(Operation.WINT));
+					break;
+
+				// WFLOAT          : ecriture du flottant V[R1]
+				case Real:
+					// Mise dans R1 (f2)
+					Prog.ajouter(Inst.creation0(Operation.WFLOAT));
+					break;
+
+				default:
+					throw new Exception("Decor incoherent ligne : " + f2.getNumLigne());
+			}
+			break;
+			
+		case Vide:
+			break;
+		
+		default:
+			throw new Exception("Decor incoherent ligne : " + a.getNumLigne());
+		}
+	}
+   }
+   
+   
+   // ############################ Memoire ################################
     
    
    static private Operande allouer_Reg() throws Exception
@@ -427,7 +507,7 @@ class Generation {
 	   if (i != -1) used[i] = false;
    }
    
-   static void allouer_Pile(Arbre lident) throws Exception
+   static private void allouer_Pile(Arbre lident) throws Exception
    {
 	   Defn def = lident.getFils2().getDecor().getDefn();
 	   NatureType nature = def.getType().getNature();
