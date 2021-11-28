@@ -8,7 +8,11 @@ import fr.esisar.compilation.global.src3.*;
  */
 
 class Generation {
+	// les états 
 	static private boolean used[] = new boolean[16];
+	// les operateurs contenus
+	static private Operande mmap[] = new Operande[16];
+	
 	static private int pointeur_pile = 0;
 	static private Etiq end = Etiq.lEtiq("end");
 	static private Etiq hlt = Etiq.lEtiq("hlt");
@@ -32,7 +36,7 @@ class Generation {
       coder_Liste_Decl(a.getFils1());
       if (pointeur_pile > 0 ) 
       {
-    	  verifier_Pile_OV(pointeur_pile);
+    	  verifier_Pile_OV();
     	  Prog.ajouter(Inst.creation1(Operation.ADDSP,Operande.creationOpEntier(pointeur_pile)));
       }
       
@@ -169,7 +173,11 @@ class Generation {
 	   Noeud noeud = c.getNoeud();
 	   Inst inst ,inst1,inst2 , inst3 ;
 	   Etiq etiq_fin ;
-	   Operande reg1 = allouer_Reg() ,reg2 = allouer_Reg();
+	   
+	   //Allocation des registres
+	   int[] regs = allouer(2);
+	   Operande reg1 = int_to_Op(regs[0]) ,reg2 = int_to_Op(regs[1]);
+	   
 	   switch(noeud) {
 	   case Ident :
 		   if(c.getChaine().equals(String.valueOf(saut))) {
@@ -178,17 +186,17 @@ class Generation {
 		   }
 		   else if (!(c.getChaine().equals(String.valueOf(!saut)))){
 			   if(saut) {
-				   inst1 = Inst.creation2(Operation.LOAD, Operande.creationOpChaine(c.getChaine()),allouer_Reg());
+				   inst1 = Inst.creation2(Operation.LOAD, Operande.creationOpChaine(c.getChaine()),reg1);
 				   Prog.ajouter(inst1);
-				   inst2 = Inst.creation2(Operation.CMP, Operande.creationOpEntier(0), allouer_Reg());
+				   inst2 = Inst.creation2(Operation.CMP, Operande.creationOpEntier(0), reg2);
 				   Prog.ajouter(inst2);
 				   inst3 = Inst.creation1(Operation.BNE, Operande.creationOpEtiq(etiq));
 				   Prog.ajouter(inst3);
 			   }
 			   else {
-				   inst1 = Inst.creation2(Operation.LOAD, Operande.creationOpChaine(c.getChaine()),allouer_Reg());
+				   inst1 = Inst.creation2(Operation.LOAD, Operande.creationOpChaine(c.getChaine()),reg2);
 				   Prog.ajouter(inst1);
-				   inst2 = Inst.creation2(Operation.CMP, Operande.creationOpEntier(0), allouer_Reg());
+				   inst2 = Inst.creation2(Operation.CMP, Operande.creationOpEntier(0), reg2);
 				   Prog.ajouter(inst2);
 				   inst3 = Inst.creation1(Operation.BEQ, Operande.creationOpEtiq(etiq));
 				   Prog.ajouter(inst3);
@@ -310,8 +318,8 @@ class Generation {
 	   default:
 		   break;
 	   }
-	   free_Reg(reg1);
-	   free_Reg(reg2);
+	   //Restauration des registres
+	   desallouer(regs);
    }
    
    // ############################ Bool ################################
@@ -377,23 +385,23 @@ class Generation {
 		   throw new Exception("Decor incoherent ligne : " + a.getNumLigne());
 	   else
 	   {
-	   // Allocation des registres
-	   Operande reg1 = allouer_Reg(), reg2 = allouer_Reg(); 
+		   int regs[] = allouer(2); 
+		   // Allocation des registres
+		   Operande reg1 = int_to_Op(regs[0]), reg2 = int_to_Op(regs[1]); 
 	   
-	   // Evaluation des expressions
-	   coder_Expr(a.getFils1(), reg1);
-	   	/// Verification ici ou dans coder_Expr ?
-	   coder_Expr(a.getFils2(), reg2);
-	   	/// Verification ici ou dans coder_Expr ?
+		   // Evaluation des expressions
+		   coder_Expr(a.getFils1(), reg1);
+		   /// Verification ici ou dans coder_Expr ?
+		   coder_Expr(a.getFils2(), reg2);
+		   /// Verification ici ou dans coder_Expr ?
 	   
-	   // Comparaison (i.e update des flags)
-	   Prog.ajouter(Inst.creation2(Operation.CMP, reg2, reg1));
+		   // Comparaison (i.e update des flags)
+		   Prog.ajouter(Inst.creation2(Operation.CMP, reg2, reg1));
 	   
-	   // Liberation des registres
-	   free_Reg(reg2);
-	   free_Reg(reg1);
+		   // Liberation des registres
+		   desallouer(regs);
    
-	   return to_return;
+		   return to_return;
 	   }
    }
    
@@ -608,86 +616,206 @@ class Generation {
    
    
    // ############################ Memoire ################################
-   static private Operande allouer_Reg() throws Exception
+   
+   
+   // >>>     Des/Allocation
+   // Top level : demande l'allocation de nb var. Retourne un tableau d'indice (au modulo pres) des registres allouees
+   static private int[] allouer(int nb) throws Exception
    {
-	   Operande to_return = null;
-	   int ri = 0;
-	   while (to_return == null && ri < 16)
+	   int to_return[] = new int[nb] , tmp;
+	   for (int i = 0 ; i < nb ; i++)
+	   {
+		   try
+		   {
+			   tmp = allouer_Reg();
+		   }
+		   //Il n'y a plus de registres disponibles , on doit en save
+		   /// Pour le moment on va encoder cette information simplement en ajoutant un offset -> int_to_Reg pour éviter les ennuis !
+		   catch (Exception e)
+		   {
+			   tmp = 16+i;
+			   push(Registre.valueOf("R" + i));
+		   }	   
+		   
+		   to_return[i] = tmp;
+	   }
+	   
+	   return to_return;   
+   }
+   
+   // Top level : fonction contraire de allouer. Utilise l'indice pour determiner si il faut restaurer ou non le registre.
+   static private void desallouer(int[] ris) throws Exception
+   {
+	   int tmp;
+	   for (int i = ris.length-1 ; i >= 0 ; i--)
+	   {
+		   tmp = ris[i];
+		   // Ce registre a ete sauver il faut donc le restaurer
+		   if (tmp > 15)
+		   {
+			   pop(tmp%16);
+		   }
+		   else
+		   {
+			   free_Reg(tmp);
+		   }
+	   }
+   }
+   
+
+   static private int allouer_Reg() throws Exception
+   {
+	   int to_return = -1;
+	   int ri = 15;
+	   while (ri >= 0)
 	   {
 		   if (!used[ri])
 		   {
 			   used[ri] = true;
-			   to_return = Operande.opDirect(Registre.valueOf("R" + ri));
+			   return ri;
 	   		}
 	   	 
 		   else
-			   ri++;
+			   ri--;
 	   }
-	   if (to_return == null) throw new Exception("Out of register!");
-	   else return to_return;
+	   throw new Exception("Out of register!");
    }
 
    static private void free_Reg(Operande ri) throws Exception
    {
 	   if (!(ri.getNature().equals(NatureOperande.OpDirect))) throw new Exception("free_Reg called on a non-register operande!");
 	   
-	   int i = -1;
+	   int i = reg_to_Int(ri.getRegistre());
 	   
-	   switch(ri.getRegistre())
+	   if (i != -1) used[i] = false;
+   }
+   
+   static private void free_Reg(int ri)
+   {
+	   if (ri != -1) used[(ri%16)] = false;
+   }
+   
+   // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+   
+   // >>>    Conversion
+   static private Registre int_to_Reg(int ri)
+   {
+	   int ri_mod = ri%16;
+	   return Registre.valueOf("R"+ri_mod);
+   }
+   
+   // Prends l'indice d'un registre (au modulo pres) et retourne l'opDirect associe.
+   // int_to_Reg se charge du modulo
+   static private Operande int_to_Op(int ri)
+   {
+	   return Operande.opDirect(int_to_Reg(ri));
+   }
+   
+   static private int reg_to_Int(Registre reg) throws Exception
+   {
+	   int to_return;
+	   switch(reg)
 	   {   	   
 	   	   case R0:
-	   			i = 0;
+	   		    to_return = 0;
 	   			break;
 	   	   case R1:
-	   			i = 1;
+	   		    to_return = 1;
 	   			break;	
 	   	   case R2:
-	   			i = 2;
+	   		    to_return = 2;
 	   			break;
 	   	   case R3:
-	   			i = 3;
+	   		    to_return = 3;
 	   			break;	   			   			
 	   	   case R4:
-	   			i = 4;	   			
+	   		    to_return = 4;	   			
 	   			break;
 	   	   case R5:
-	   			i = 5;
+	   		   	to_return = 5;
 	   			break;	
 	   	   case R6:
-	   			i = 6;
+	   		   	to_return = 6;
 	   			break;
 	   	   case R7:
-	   			i = 7;
+	   		   	to_return = 7;
 	   			break;			   
 	   	   case R8:
-	   			i = 8;
+	   		   	to_return = 8;
 	   			break;
 	   	   case R9:
-	   			i = 9;
+	   		   	to_return = 9;
 	   			break;	
 	   	   case R10:
-	   			i = 10;
+	   		   	to_return = 10;
 	   			break;
 	   	   case R11:
-	   			i = 11;
+	   		   	to_return = 11;
 	   			break;	   			   			
 	   	   case R12:
-	   			i = 12;
+	   		   	to_return = 12;
 	   			break;
 	   	   case R13:
-	   			i = 13;
+	   		   	to_return = 13;
 	   			break;	
 	   	   case R14:
-	   			i = 14;
+	   		   	to_return = 14;
 	   			break;
 	   	   case R15:
-	   			i = 15;
+	   		   	to_return = 15;
 	   			break;
 	   		default:
 	   			//LB ou GB
-	   			break;
+	   			throw new Exception("Pas d'équivalent numérique à LB/RB");
 	   }
-	   if (i != -1) used[i] = false;
+	   return to_return;
+   }
+   
+   
+   // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+   
+   
+   
+   // >>>    Pile
+   static private void push(int ri) throws Exception
+   {
+	   if (used[ri])
+	   {
+		   Prog.ajouter(Inst.creation1(Operation.PUSH, Operande.opDirect(Registre.valueOf("R"+ri))));
+		   
+		   pointeur_pile++;
+		   
+		   verifier_Pile_OV();
+		   
+		   free_Reg(ri);
+	   }
+   }
+   
+   // Un alias pour utiliser directemet l'indice
+   static private void push(Registre ri) throws Exception
+   {
+	   int i = reg_to_Int(ri);
+	   push(i);
+   }
+   
+   static private void pop(int ri) throws Exception
+   {
+	   if (pointeur_pile > 0)
+	   {
+		   Prog.ajouter(Inst.creation1(Operation.POP, Operande.opDirect(Registre.valueOf("R"+ri))));
+		   
+		   pointeur_pile--;
+		   
+		   used[ri] = true;
+	   }
+   }
+   
+   // Un alias pour utiliser directemet l'indice
+   static private void pop(Registre ri) throws Exception
+   {
+	   int i = reg_to_Int(ri);
+	   pop(i);
    }
    
    static private void allouer_Pile(Arbre lident) throws Exception
@@ -732,13 +860,16 @@ class Generation {
 	   }
 	   */											
 	}   
+  
+   // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+   
    
    // ############################ Debordements ################################
    
    // A placer après chaque ajout en pile
-   static private void verifier_Pile_OV(int offset) 
+   static private void verifier_Pile_OV() 
    {
-	Prog.ajouter(Inst.creation1(Operation.TSTO, Operande.creationOpEntier(offset)));
+	Prog.ajouter(Inst.creation1(Operation.TSTO, Operande.creationOpEntier(pointeur_pile)));
 	Prog.ajouter(Inst.creation1(Operation.BOV, Operande.creationOpEtiq(Prog.L_Etiq_Pile_Pleine)));
    }
    
