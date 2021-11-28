@@ -119,6 +119,8 @@ class Generation {
    }
    
 
+   
+   
    // ############################ Expressions ################################
    
    static void coder_Expr(Arbre a, Registre r)
@@ -126,19 +128,28 @@ class Generation {
 	   //@Placeholder
    }
      
-   
-   static void coder_Expr(Arbre a, Operande r)
+   // Une expression est similaire à une instruction , cependant une expression retourne un type 
+   static void coder_Expr(Arbre a, Operande r) throws Exception
    {
-	    NatureType type = a.getDecor().getType().getNature();
+	    NatureType nature = a.getDecor().getType().getNature();
   
-		switch (type) 
+		switch(nature) 
 		{
-		default:
-			break;
+			case String:
+				break;
+			case Boolean:				
+				break;
+			case Real:
+			case Interval:				
+				break;
+			case Array:				
+				break;
+			default:
+				throw new Exception("Decor incoherent ligne : " + a.getNumLigne());
 		}
    }
    
-   static void coder_Liste_Expr(Arbre a) {
+   static void coder_Liste_Expr(Arbre a) throws Exception {
 		Noeud noeud = a.getNoeud();
 	
 		switch (noeud) {
@@ -153,9 +164,6 @@ class Generation {
 		}
 		
 	}
-
-   // ############################ Arithmetique ################################
-   // ############################ Booleens ################################
    
    static void coder_Cond(Arbre c, boolean saut, Etiq etiq) throws Exception {
 	   Noeud noeud = c.getNoeud();
@@ -306,6 +314,125 @@ class Generation {
 	   free_Reg(reg2);
    }
    
+   // ############################ Bool ################################
+
+   // Opérateurs de comparaison =, <, >, !=, ≤, et ≥
+   // Prends un noeud en entree et retourne l'Operation correspondante. si revert = true alors retourne l'Operation contraire
+   static private Operation op_Comparaison(Noeud n,boolean revert) throws Exception 
+   {
+	   Operation to_return;
+		   switch(n) 
+		   {			
+	   			case Egal:
+	   				to_return = Operation.BEQ;
+	   			case Inf:
+	   				to_return = Operation.BLT;
+	   			case Sup:
+	   				to_return = Operation.BGT;
+	   			case NonEgal:
+	   				to_return = Operation.BNE;
+	   			case InfEgal:
+	   				to_return = Operation.BLE;
+	   			case SupEgal:
+	   				to_return = Operation.BGE;
+
+	   			default:
+	   				to_return = null;
+		  }
+	  return (revert) ? op_Comparaison(to_return) : to_return;
+  }
+   
+   //Un alias pour revert = false
+   static private Operation op_Comparaison(Noeud n) throws Exception
+   { return op_Comparaison(n,false);}
+ 
+   //Un alias pour revert = true , prend une Operation en entree
+   static private Operation op_Comparaison(Operation op) throws Exception
+   {
+	   switch (op)
+	   {
+	   		case BEQ:
+	   			return Operation.BNE;
+	   		case BLT:
+	   			return Operation.BGE;
+	   		case BGT:
+	   			return Operation.BLE;
+	   		case BNE:
+	   			return Operation.BEQ;
+	   		case BLE:
+	   			return Operation.BGT;
+	   		case BGE:
+	   			return Operation.BLT;
+			default:
+   				return null;
+		   
+	   }
+   }
+   
+   //Evalue les expressions fils , ajouter un CMP et renvoie quel branchement utiliser
+   static private Operation coder_Operation_Comparaison(Arbre a) throws Exception
+   {
+	   Operation to_return = op_Comparaison(a.getNoeud());
+	   if (to_return == null)
+		   throw new Exception("Decor incoherent ligne : " + a.getNumLigne());
+	   else
+	   {
+	   // Allocation des registres
+	   Operande reg1 = allouer_Reg(), reg2 = allouer_Reg(); 
+	   
+	   // Evaluation des expressions
+	   coder_Expr(a.getFils1(), reg1);
+	   	/// Verification ici ou dans coder_Expr ?
+	   coder_Expr(a.getFils2(), reg2);
+	   	/// Verification ici ou dans coder_Expr ?
+	   
+	   // Comparaison (i.e update des flags)
+	   Prog.ajouter(Inst.creation2(Operation.CMP, reg2, reg1));
+	   
+	   // Liberation des registres
+	   free_Reg(reg2);
+	   free_Reg(reg1);
+   
+	   return to_return;
+	   }
+   }
+   
+   // ############################ Arith ################################
+   
+	static Operation operation_Arithmetique(Arbre a) throws Exception 
+	{
+		// + | - | * | div | / | % 
+		switch (a.getNoeud()) {
+			case Plus:
+				return Operation.ADD;
+			case Moins:
+				return Operation.SUB;
+			case Mult:
+				return Operation.MUL;
+			case DivReel:
+			case Quotient:
+				return Operation.DIV;
+			case Reste:
+				return Operation.MOD;
+			default:
+				throw new Exception("Decor incoherent ligne : " + a.getNumLigne());
+		}
+	}
+	
+	static Operande operande_Arithmetique(Arbre a) throws Exception 
+	{	
+		// Interval | Real
+		switch (a.getDecor().getType().getNature()) 
+		{
+			case Interval:
+				return Operande.creationOpEntier(a.getEntier());
+			case Real:
+				return Operande.creationOpReel(a.getReel());
+			default:
+				throw new Exception("Decor incoherent ligne : " + a.getNumLigne());
+		}
+	}
+   
    
    // ############################ Instructions ################################
    
@@ -401,7 +528,30 @@ class Generation {
    {	 
 	if (io)
 	{
-		//coder_Lecture
+		Arbre f1 = a.getFils1();
+	
+		switch(f1.getDecor().getType().getNature()) 
+		{
+		
+			// RINT            : R1 <- entier lu         CC : CP, OV vrai ssi débordement ou erreur de syntaxe
+			case Interval:
+				// On lit
+				Prog.ajouter(Inst.creation0(Operation.RINT));
+				// On vérifie
+				verifier_Interval_OV(Operande.R1,f1.getDecor().getType());
+				// On stocke
+				// Mise dans R1 (f1)
+				break;
+		
+			// RFLOAT          : R1 <- flottant lu       CC : CP, OV (cf RINT)
+			case Real:
+				Prog.ajouter(Inst.creation0(Operation.RFLOAT));
+				// Mise dans R1 (f1)
+				break;
+			
+		default:
+			throw new Exception("Decor incoherent ligne : " + a.getNumLigne());
+		}
 	}
 	else 
 	{ 
@@ -456,6 +606,8 @@ class Generation {
    // ############################ Memoire ################################
     
    
+   
+   // ############################ Memoire ################################
    static private Operande allouer_Reg() throws Exception
    {
 	   Operande to_return = null;
@@ -532,7 +684,7 @@ class Generation {
 	   			i = 15;
 	   			break;
 	   		default:
-	   			//LB ou RB
+	   			//LB ou GB
 	   			break;
 	   }
 	   if (i != -1) used[i] = false;
@@ -580,6 +732,8 @@ class Generation {
 	   }
 	   */											
 	}   
+   
+   // ############################ Debordements ################################
    
    // A placer après chaque ajout en pile
    static private void verifier_Pile_OV(int offset) 
