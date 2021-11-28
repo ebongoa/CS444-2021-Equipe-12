@@ -1,0 +1,6 @@
+program
+-- aucune declaration
+begin
+   write("\lo");
+end.
+

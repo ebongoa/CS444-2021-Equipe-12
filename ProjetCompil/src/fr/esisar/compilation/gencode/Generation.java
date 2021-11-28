@@ -8,7 +8,8 @@ import fr.esisar.compilation.global.src3.*;
  */
 
 class Generation {
-	static boolean used[] = new boolean[16];
+	static private boolean used[] = new boolean[16];
+	static private int pointeur_pile = 0;
    
    /**
     * MÃ©thode principale de gÃ©nÃ©ration de code.
@@ -21,7 +22,15 @@ class Generation {
       // -----------
       // A COMPLETER
       // -----------
+      
+      // program :
+      Prog.ajouterComment("program");
       coder_Liste_Decl(a.getFils1());
+      Prog.ajouter(Inst.creation1(Operation.ADDSP,Operande.creationOpEntier(pointeur_pile)));
+      
+      
+      // begin :
+      Prog.ajouterComment("begin");
       coder_Liste_Inst(a.getFils2());
 
       
@@ -67,7 +76,7 @@ class Generation {
 			//Decl , rien d'autre (même pas vide)
 			if (noeud.equals( Noeud.Decl))
 			{
-				//Placer en mémoire
+				allouer_Pile(f2.getFils1());
 			}
 			else
 			{
@@ -79,6 +88,7 @@ class Generation {
    
    static void coder_Expr(Arbre a, Operande r)
    {
+	   NatureType type = a.getDecor().getType().getNature();
 	    Noeud noeud = a.getNoeud();
   
 		switch (noeud) {
@@ -333,9 +343,7 @@ class Generation {
 		}
 	}
 
-
-   
-   
+    
    
    static private Operande allouer_Reg() throws Exception
    {
@@ -418,7 +426,50 @@ class Generation {
 	   }
 	   if (i != -1) used[i] = false;
    }
+   
+   static void allouer_Pile(Arbre lident) throws Exception
+   {
+	   Defn def = lident.getFils2().getDecor().getDefn();
+	   NatureType nature = def.getType().getNature();
 
+	   switch (nature)
+	   {
+	   		case Interval:
+	   		case Boolean:
+	   		case Real:
+	   			def.setOperande(Operande.creationOpIndirect(pointeur_pile, Registre.GB));
+	   			pointeur_pile++;
+	   			break;
+	   			
+	   		case Array:
+	   			Type tab = def.getType().getIndice();
+	   			int inf = tab.getBorneInf();
+	   			int sup = tab.getBorneSup();
+	   			
+	   			if (inf < sup)
+	   			{
+	   				def.setOperande(Operande.creationOpIndirect(pointeur_pile, Registre.GB));
+	   				pointeur_pile += (1+sup-inf);
+	   			}
+	   			else
+	   			{
+	   				System.out.println("/!\\ Tableau de taille nulle ligne : " + lident.getNumLigne());
+	   			}
+	   			break;
+	   		
+	   		default:
+	   			throw new Exception("Decor incoherent ligne : " +lident.getNumLigne());
+	   }
+	   
+	   // A priori code Liste_Decl appel Decl par Decl
+	   /*
+	   if( lident.getFils1().getNoeud() == Noeud.ListeIdent) 
+	   {
+		   allouer_Pile(lident.getFils1());
+	   }
+	   */											
+	}   
+   
 }
 
 

@@ -1,0 +1,8 @@
+program
+   a: boolean;    	        -- 1 mot
+   b: real;		        -- 1 mot
+   c: array[1..10] of integer; -- 10 mots
+begin
+   write("\lo");
+end.
+
