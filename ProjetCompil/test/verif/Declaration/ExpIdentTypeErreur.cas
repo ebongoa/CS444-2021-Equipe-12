@@ -1,7 +1,0 @@
--- EXP-> IDENT
-
-program
-i : integer;
-begin
-	i = integer; --erreur contextuelle integer n'est pas un identificateur de cste ou de variable
-end

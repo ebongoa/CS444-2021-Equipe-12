@@ -1,7 +1,0 @@
--- TYPE->IDENT
-
-program
-i : x ; --erreur contextuelle x n'est un identificateur de type
-begin
-	null;
-end

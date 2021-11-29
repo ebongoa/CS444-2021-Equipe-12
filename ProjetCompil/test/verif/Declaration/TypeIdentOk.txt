@@ -1,7 +1,0 @@
--- TYPE->IDENT
-
-program
-i : integer; --OK
-begin
-	null;
-end

@@ -1,7 +1,0 @@
--- TYPE->IDENT
-
-program
-i : 0 .. x; --erreur contextuelle, identificateur de type attendu ligne 2
-begin
-	null;
-end
