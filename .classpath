@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="src" path="ProjetCompil/src"/>
+	<classpathentry kind="lib" path="ProjetCompil/lib/jacocoagent.jar"/>
+	<classpathentry kind="lib" path="ProjetCompil/lib/jacocoant.jar"/>
+	<classpathentry kind="lib" path="ProjetCompil/lib/jacococli.jar"/>
+	<classpathentry kind="lib" path="ProjetCompil/lib/java-cup-11a-runtime.jar"/>
+	<classpathentry kind="lib" path="ProjetCompil/lib/java-cup-11a.jar"/>
+	<classpathentry kind="lib" path="ProjetCompil/lib/JFlex.jar"/>
+	<classpathentry kind="lib" path="ProjetCompil/tp-compilation.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
