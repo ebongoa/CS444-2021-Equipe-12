@@ -1,0 +1,7 @@
+-- EXP-> IDENT
+
+program
+i : integer;
+begin
+	i := j; --erreur contextuelle l indentificateur de variable j n a pas ete declare
+end.

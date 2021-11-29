@@ -1,0 +1,11 @@
+-- Not
+program
+
+b : boolean;
+bb : boolean;
+i : integer;
+
+begin
+	b := true;
+	bb := not 1; --Erreur contextuelle , expression de type booleene attendue
+end.

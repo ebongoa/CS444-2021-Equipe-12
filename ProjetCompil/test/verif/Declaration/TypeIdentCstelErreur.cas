@@ -1,0 +1,7 @@
+-- TYPE->IDENT
+
+program
+i : true  ; --erreur contextuelle, true n'est pas un identificateur de type ;identificateur de type attendu ligne 2
+begin
+	null;
+end.

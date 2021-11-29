@@ -1,0 +1,7 @@
+-- PLACE -> IDENT
+
+program
+i : integer ;
+begin
+	i := 1; --OK
+end.
