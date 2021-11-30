@@ -1,0 +1,7 @@
+program
+   -- aucune déclaration
+begin
+   if 2>1 then
+      null;
+   end;
+end.  

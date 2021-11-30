@@ -3,5 +3,5 @@
 program
 i : integer;
 begin
-	i = max_int - 1 ; --ok
-end
+	i := max_int - 1 ; --ok
+end.

@@ -1,0 +1,7 @@
+program
+   -- aucune déclaration
+begin
+   while 2 > 0 do
+      null;
+   end;
+end.

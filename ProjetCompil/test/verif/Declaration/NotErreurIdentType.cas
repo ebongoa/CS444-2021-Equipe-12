@@ -7,5 +7,5 @@ i : integer;
 
 begin
 	b := true;
-	bb := not "."; --Erreur contextuelle , expression de type booleene attendue
+	bb := not real; --Erreur contextuelle , expression de type booleenne attendue
 end.

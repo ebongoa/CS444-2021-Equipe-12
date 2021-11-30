@@ -1,7 +1,0 @@
--- PLACE -> IDENT
-
-program
-i : integer ;
-begin
-	true = 1; -- Erreur Contexuelle identificateur de variable attendu
-end

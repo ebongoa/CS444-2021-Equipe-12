@@ -3,5 +3,5 @@
 program
 i : integer ;
 begin
-	i = 1; --OK
-end
+	i := 1; --OK
+end.

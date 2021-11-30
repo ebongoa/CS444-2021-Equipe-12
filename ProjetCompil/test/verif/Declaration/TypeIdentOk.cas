@@ -4,4 +4,4 @@ program
 i : integer; --OK
 begin
 	null;
-end
+end.
