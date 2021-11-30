@@ -264,7 +264,7 @@ class Generation {
 	    **************************************************************************/
 	   int[] regs = allouer(1);
 	   
-	   Operande ident = a.getFils1().getDecor().getDefn().getOperande();
+	  // Operande ident = a.getFils1().getDecor().getDefn().getOperande();
 	   Operande expr = int_to_Op(regs[0]);
 	   // b + c
 	   coder_Expr(a.getFils2(), expr);
@@ -274,7 +274,7 @@ class Generation {
 	   {	   		
 	   		case Real:
 	   		case Boolean:
-				Prog.ajouter(Inst.creation2(Operation.STORE, expr, ident));
+		//		Prog.ajouter(Inst.creation2(Operation.STORE, expr, ident));
 	   			break;
 	   		case Interval:
 	   			//verifier_Interval_OV(expr, bornes_de_lident);
