@@ -251,6 +251,42 @@ class Generation {
 	   desallouer(regs);
    }
    
+   static private void coder_Affect(Arbre a) throws Exception
+   {
+	   // a = b + c
+	   // il faut d'abord evaluer b+c (dans un registre de travail)
+	   // puis l'injecter dans a grace a son addresse (OpIndirect que l'on trouve dans sa declaration
+	   
+	   
+	   /**************************************************************************
+	    * PLACE 		-> IDENT | IDENT est un identificateur de variable  
+						|  Noeud.Index(PLACE, EXP)     
+	    **************************************************************************/
+	   int[] regs = allouer(1);
+	   
+	   Operande ident = a.getFils1().getDecor().getDefn().getOperande();
+	   Operande expr = int_to_Op(regs[0]);
+	   // b + c
+	   coder_Expr(a.getFils2(), expr);
+	   
+	   NatureType nature = a.getFils1().getDecor().getType().getNature();	   
+	   switch(nature)
+	   {	   		
+	   		case Real:
+	   		case Boolean:
+				Prog.ajouter(Inst.creation2(Operation.STORE, expr, ident));
+	   			break;
+	   		case Interval:
+	   			//verifier_Interval_OV(expr, bornes_de_lident);
+	   			break;
+	   		case Array:
+	   			//Un peu plus de travail ici
+	   			break;   
+	   		default:
+	   			throw new Exception("Decor incohérent ligne : "+a.getNumLigne());
+	   }
+	   desallouer(regs);
+   }
    // ############################ Bool ################################
 
    // Opérateurs de comparaison =, <, >, !=, ≤, et ≥
@@ -457,7 +493,7 @@ class Generation {
 	   
 	   switch(noeud) {
 		case Affect:
-			//coder_Affect(a);
+			coder_Affect(a);
 			break;
 	   
 	   case Si :
