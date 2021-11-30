@@ -335,8 +335,84 @@ class Generation {
    }
    
    // ############################ Arith ################################
+  
+   /*
    
-	static Operation operation_Arithmetique(Arbre a) throws Exception 
+   MoinsUnaire(1),
+   Conversion(1, 1),
+   PlusUnaire(1),
+   
+   Moins(2, 1),
+   Plus(2, 1),
+   DivReel(2, 1),
+   Reste(2, 1),
+   Mult(2, 1),
+   Quotient(2, 1),
+   */
+   //On suppose que l'appelant à déjà alloué rdest
+   static private void evaluer_Expr_Arith(Arbre a, Operande rdest) throws Exception
+   {
+	   //en fonction de l'arite il nous faudra allouer (ou non) un nouveau registre
+	   Operande opande;
+	   Operation option;
+	   
+	   switch (a.getArite())
+	   {
+	   
+	    //case 0: ?
+		//	break;
+	   	case 1:
+	   		//On evalue dans le sens naturel , gauche -> droite
+	   		evaluer_Expr_Arith(a.getFils1(), rdest);
+			//rdest a été modifié
+	   		opande = rdest;
+	   		
+			switch (a.getNoeud()) 
+			{
+				case MoinsUnaire:
+					option = Operation.OPP; // -rdest
+					break;
+				case Conversion:			
+					option = Operation.FLOAT;// cast
+					break;
+				case PlusUnaire:
+					option = Operation.LOAD;// +rdest
+					break;
+				default:
+					throw new Exception("Decor incoherent ligne : " + a.getNumLigne());
+			}
+			
+			Prog.ajouter(Inst.creation2(option, opande, rdest));
+			break;
+		
+	   	case 2:
+				//On s'alloue un registre
+				int[] regs = allouer(1);
+				//On défini l'operation
+				option = operation_Arithmetique(a);
+				//
+				opande = int_to_Op(regs[0]);
+
+				//On evalue a gauche ...
+				evaluer_Expr_Arith(a.getFils1(), rdest);
+				// ... puis a droite
+				evaluer_Expr_Arith(a.getFils2(), opande);
+				
+				// Et on ajoute !
+				Prog.ajouter(Inst.creation2(option, opande, rdest));
+
+				//On libere/restaure le registre
+				desallouer(regs);
+				verifier_Arith_OV(a);
+			
+			break;
+	   	default:
+	   		throw new Exception("Decor incoherent ligne : " + a.getNumLigne());
+	 }
+   }
+   
+   
+	static private Operation operation_Arithmetique(Arbre a) throws Exception 
 	{
 		// + | - | * | div | / | % 
 		switch (a.getNoeud()) {
@@ -452,11 +528,11 @@ class Generation {
 				break;
 			case ListeInst :
 				coder_Liste_Inst(a.getFils1());
-				coder_Inst(a.getFils2());
+				coder_Inst(a.getFils2()); 										// Faut ptet le sortir en fait
 				break;
 		
 			default:
-				break;
+	   			throw new Exception("Decor incoherent ligne : " +a.getNumLigne());
 		}
 	}
 
@@ -502,7 +578,7 @@ class Generation {
 		case ListeExp:
 			coder_IO(a.getFils1(),false);
 
-			
+			boolean to_restore;
 			Arbre f2 = a.getFils2();
 			// String | Interval | Real
 			switch (f2.getDecor().getType().getNature()) 
@@ -515,14 +591,34 @@ class Generation {
 
 				// WINT            : ecriture de l'entier V[R1]
 				case Interval:
-					// Mise dans R1 (f2)
+					to_restore = used[1];
+					//On libère R1 de force
+					if (to_restore)
+					{
+						push(1);
+					}
+					evaluer_Expr_Arith(f2,Operande.R1);
 					Prog.ajouter(Inst.creation0(Operation.WINT));
+					if (to_restore)
+					{
+						pop(1);					
+					}
 					break;
 
 				// WFLOAT          : ecriture du flottant V[R1]
 				case Real:
-					// Mise dans R1 (f2)
+					to_restore = used[1];
+					//On libère R1 de force
+					if (to_restore)
+					{
+						push(1);
+					}
+					evaluer_Expr_Arith(f2,Operande.R1);
 					Prog.ajouter(Inst.creation0(Operation.WFLOAT));
+					if (to_restore)
+					{
+						pop(1);					
+					}
 					break;
 
 				default:
@@ -545,8 +641,7 @@ class Generation {
    
    
    // ############################ Memoire ################################
-   
-   
+
    // >>>     Des/Allocation
    // Top level : demande l'allocation de nb var. Retourne un tableau d'indice (au modulo pres) des registres allouees
    static private int[] allouer(int nb) throws Exception
@@ -594,7 +689,6 @@ class Generation {
 
    static private int allouer_Reg() throws Exception
    {
-	   int to_return = -1;
 	   int ri = 15;
 	   while (ri >= 0)
 	   {
@@ -846,7 +940,27 @@ class Generation {
 		
 	}
    
+
+
+
+
+   private static Operande operande_Ident (Arbre a) throws Exception
+   {
+	   Defn def = a.getDecor().getDefn();
+	   Operande to_return;
+	   switch (a.getChaine()) 
+	   {
+			case "true":
+				to_return = def.getNature().equals(NatureDefn.ConstBoolean) ? Operande.creationOpEntier(1) : null;
+			case "false":
+				to_return = def.getNature().equals(NatureDefn.ConstBoolean) ? Operande.creationOpEntier(0) : null;
+			case "max_int":
+				to_return = def.getNature().equals(NatureDefn.ConstInteger) ? Operande.creationOpEntier(def.getValeurInteger()) : null;	
+			default:
+				to_return = def.getOperande();
+	   }
+	   if (to_return == null) throw new Exception("NatureDefn incohérent ligne : "+a.getNumLigne());
+	   else return to_return;
 }
 
-
-
+}
