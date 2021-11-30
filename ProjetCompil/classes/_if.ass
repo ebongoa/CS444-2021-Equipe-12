@@ -1,0 +1,37 @@
+; ----------------------------------------------------------------------
+; ----------                    Programme gÃ©nÃ©rÃ© par JCasc-----------
+; ----------------------------------------------------------------------
+; ----------------------------------------------------------------------
+; -----------                     program                    -----------
+; ----------------------------------------------------------------------
+   TSTO #1 
+   BOV etiq_pile_pleine 
+   ADDSP #1 
+; ----------------------------------------------------------------------
+; -----------                      begin                     -----------
+; ----------------------------------------------------------------------
+si_fin.1: 
+; ----------------------------------------------------------------------
+; -----------                      end                       -----------
+; ----------------------------------------------------------------------
+end: 
+   SUBSP #1 
+hlt: 
+   HALT 
+; ------------------------Erreurs a l'execution-------------------------
+etiq_debordement_arith: 
+   WSTR "Erreur a l'execution : debordement arithmetique" 
+   WNL 
+   BRA hlt 
+etiq_pile_pleine: 
+   WSTR "Erreur a l'execution : debordement de la pile" 
+   WNL 
+   BRA hlt 
+etiq_debordement_intervalle: 
+   WSTR "Erreur a l'execution : debordement d'intervalle" 
+   WNL 
+   BRA hlt 
+etiq_debordement_indice: 
+   WSTR "Erreur a l'execution : debordement d'indice dans un tableau" 
+   WNL 
+   BRA hlt 
