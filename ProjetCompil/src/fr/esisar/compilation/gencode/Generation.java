@@ -127,11 +127,7 @@ class Generation {
    
    // ############################ Expressions ################################
    
-   static void coder_Expr(Arbre a, Registre r)
-   {
-	   //@Placeholder
-   }
-     
+    
    // Une expression est similaire à une instruction , cependant une expression retourne un type 
    static void coder_Expr(Arbre a, Operande r) throws Exception
    {
@@ -173,7 +169,8 @@ class Generation {
 	   Noeud noeud = c.getNoeud();
 	   Inst inst ,inst1,inst2 , inst3 ;
 	   Etiq etiq_fin ;
-	   
+	   Operande op_Etiq = Operande.creationOpEtiq(etiq);
+	   Operation option; //utiliser pour les cas de comparaison
 	   //Allocation des registres
 	   int[] regs = allouer(2);
 	   Operande reg1 = int_to_Op(regs[0]) ,reg2 = int_to_Op(regs[1]);
@@ -232,87 +229,19 @@ class Generation {
 		   break;
 	   // Opérateurs de comparaison =, <, >, !=, ≤, et ≥
 	   case Egal :
-		   coder_Expr(c.getFils1(), reg1);
-		   coder_Expr(c.getFils2(), reg2);
-		   inst1 = Inst.creation2(Operation.CMP, reg2, reg1);
-		   Prog.ajouter(inst1);
-		   if(saut) {
-			   inst2 = Inst.creation1(Operation.BEQ, Operande.creationOpEtiq(etiq));
-			   Prog.ajouter(inst2);
-		   }
-		   else {
-			   inst2 = Inst.creation1(Operation.BNE, Operande.creationOpEtiq(etiq));
-			   Prog.ajouter(inst2);
-		   }
-		   break;
 	   case Inf :
-		   coder_Expr(c.getFils1(), reg1);
-		   coder_Expr(c.getFils2(), reg2);
-		   inst1 = Inst.creation2(Operation.CMP, reg2, reg1);
-		   Prog.ajouter(inst1);
-		   if(saut) {
-			   inst2 = Inst.creation1(Operation.BLT, Operande.creationOpEtiq(etiq));
-			   Prog.ajouter(inst2);
-		   }
-		   else {
-			   inst2 = Inst.creation1(Operation.BGE, Operande.creationOpEtiq(etiq));
-			   Prog.ajouter(inst2);
-		   }
-		   break;
 	   case Sup :
-		   coder_Expr(c.getFils1(), reg1);
-		   coder_Expr(c.getFils2(), reg2);
-		   inst1 = Inst.creation2(Operation.CMP, reg2, reg1);
-		   Prog.ajouter(inst1);
-		   if(saut) {
-			   inst2 = Inst.creation1(Operation.BGT, Operande.creationOpEtiq(etiq));
-			   Prog.ajouter(inst2);
-		   }
-		   else {
-			   inst2 = Inst.creation1(Operation.BLE, Operande.creationOpEtiq(etiq));
-			   Prog.ajouter(inst2);
-		   }
-		   break;
 	   case NonEgal :
-		   coder_Expr(c.getFils1(), reg1);
-		   coder_Expr(c.getFils2(), reg2);
-		   inst1 = Inst.creation2(Operation.CMP, reg2, reg1);
-		   Prog.ajouter(inst1);
-		   if(saut) {
-			   inst2 = Inst.creation1(Operation.BNE, Operande.creationOpEtiq(etiq));
-			   Prog.ajouter(inst2);
-		   }
-		   else {
-			   inst2 = Inst.creation1(Operation.BEQ, Operande.creationOpEtiq(etiq));
-			   Prog.ajouter(inst2);
-		   }
-		   break;
 	   case InfEgal : 
-		   coder_Expr(c.getFils1(), reg1);
-		   coder_Expr(c.getFils2(), reg2);
-		   inst1 = Inst.creation2(Operation.CMP, reg2, reg1);
-		   Prog.ajouter(inst1);
-		   if(saut) {
-			   inst2 = Inst.creation1(Operation.BLE, Operande.creationOpEtiq(etiq));
-			   Prog.ajouter(inst2);
-		   }
-		   else {
-			   inst2 = Inst.creation1(Operation.BGT, Operande.creationOpEtiq(etiq));
-			   Prog.ajouter(inst2);
-		   }
-		   break;
 	   case SupEgal :
-		   coder_Expr(c.getFils1(), reg1);
-		   coder_Expr(c.getFils2(), reg2);
-		   inst1 = Inst.creation2(Operation.CMP, reg2, reg1);
-		   Prog.ajouter(inst1);
-		   if(saut) {
-			   inst2 = Inst.creation1(Operation.BGE, Operande.creationOpEtiq(etiq));
-			   Prog.ajouter(inst2);
-		   }
-		   else {
-			   inst2 = Inst.creation1(Operation.BLT, Operande.creationOpEtiq(etiq));
-			   Prog.ajouter(inst2);
+		   option = coder_Operation_Comparaison(c);
+		   if(saut) 
+		   {
+			   Prog.ajouter(Inst.creation1(option, op_Etiq));
+		   } 
+		   else 
+		   {
+			   Prog.ajouter(Inst.creation1(op_Comparaison(option), op_Etiq));
 		   }
 		   break;
 	   default:
