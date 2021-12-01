@@ -6,12 +6,12 @@
 	<property name="output.dir" value="output"/>
 	<property name="input.dir" value="input"/>
 	<property name="html.dir" value="html"/>
-
+	<property name="doc.dir" value="documentation"/>
 
 
 	<taskdef classname="java_cup.anttask.CUPTask" name="cup" classpath="${lib.dir}/java-cup-11a.jar" />
 	<taskdef classname="JFlex.anttask.JFlexTask" name="jflex" classpath="${lib.dir}/JFlex.jar" />
-
+	
 	<target name="jflex">
 		<mkdir dir="${output.dir}"/>
 		<jflex file="${input.dir}/lexical.flex" destdir="${output.dir}" />
@@ -95,6 +95,18 @@
 				 <pathelement location="${lib.dir}/java-cup-11a.jar"/>
 			</classpath>
 		</javadoc>
+	</target>
+	
+	<!-- Generate javadocs for current project into ${doc.dir} -->
+	<target name="doc" depends="compile" description="generate documentation">
+		<delete dir="${doc.dir}" />
+		<mkdir dir="${doc.dir}" />
+		    <javadoc destdir="${doc.dir}">
+		        <fileset dir="${src.dir}/fr/esisar/compilation/gencode" />
+		    	<fileset dir="${src.dir}/fr/esisar/compilation/global" />
+		    	<fileset dir="${src.dir}/fr/esisar/compilation/verif" />
+		    	<fileset dir="${src.dir}/fr/esisar/compilation/syntaxe" />
+		    </javadoc>
 	</target>
 	
 	<target name="clean">
