@@ -1,1 +1,1 @@
-packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html"},{"l":"fr.esisar.compilation.gencode"},{"l":"fr.esisar.compilation.global.src"},{"l":"fr.esisar.compilation.global.src3"},{"l":"fr.esisar.compilation.syntaxe"},{"l":"fr.esisar.compilation.verif"}];updateSearchResults();
+packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html"},{"l":"fr.esisar.compilation.gencode"}];updateSearchResults();

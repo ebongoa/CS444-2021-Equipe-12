@@ -147,6 +147,57 @@ class Generation {
 			default:
 				throw new Exception("Decor incoherent ligne : " + a.getNumLigne());
 		}
+		
+		Noeud noeud = a.getNoeud();
+		
+		// a est une feuille de l'arbre, arité 0
+		switch(noeud) {
+		case Chaine:
+			Prog.ajouter(Inst.creation2(Operation.LOAD, Operande.creationOpChaine(a.getChaine()), r));
+			break;
+		case Reel:
+			Prog.ajouter(Inst.creation2(Operation.LOAD, Operande.creationOpReel(a.getReel()), r));
+			break;
+		case Entier:
+			Prog.ajouter(Inst.creation2(Operation.LOAD, Operande.creationOpEntier(a.getEntier()), r));
+			break;
+		case Ident:
+			Prog.ajouter(Inst.creation2(Operation.LOAD, Operande.GB, r));
+			break;
+		default:
+			break;
+		}
+		boolean Reste_Registres = false;
+		// on recherche si il existe des registres non utilisés
+		for(int i=0; i<used.length; i++) {
+			if(!used[i]) {
+				Reste_Registres = true;
+				break;
+			}
+		}
+		
+		// a est d'arité 2
+		if(a.getArite()==2) {
+			
+			if(Reste_Registres) {
+				coder_Expr(a.getFils1(), r);
+				int d = allouer_Reg();
+				Operande rd = int_to_Op(d);
+				coder_Expr(a.getFils2(), rd);
+				Prog.ajouter(Inst.creation2(operation_Arithmetique(a), rd, r));
+				free_Reg(d);
+			}
+			else {
+				// lorsqu'on a plus de registres on alloue une varable temporaire
+				coder_Expr(a.getFils2(), r);
+				int[] temp = allouer(1);
+				Prog.ajouter(Inst.creation2(Operation.STORE, r, int_to_Op(temp[0])));
+				coder_Expr(a.getFils1(), r);
+				Prog.ajouter(Inst.creation2(operation_Arithmetique(a), int_to_Op(temp[0]), r));
+				free_Reg(temp[0]);
+			}
+			
+		}
    }
    
    static void coder_Liste_Expr(Arbre a) throws Exception {
