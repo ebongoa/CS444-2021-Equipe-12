@@ -321,13 +321,41 @@ class Generation {
 	   			if (nature.equals(NatureType.Interval)) verifier_Interval_OV(expr,type); 
 	   			Prog.ajouter(Inst.creation2(Operation.STORE, expr, ident));
 	   			break;
-	   		case Array:
-	   			//Un peu plus de travail ici
+	   		case Array:   			
+	   			int taille = 1;
+   				Type indices;
+   				int delta;
+
+   				//Pour gérer les tableaux de tableaux
+	   			while(type.getNature() == NatureType.Array) 
+	   			{
+	   				indices = type.getIndice();
+	   				delta = indices.getBorneSup()-indices.getBorneInf();
+	   				
+	   				// A[i][j] 
+	   				if( delta > 0 )
+	   				{
+	   					taille *= delta+1;	
+	   				} 
+	   				else //C'est un typle tableau avec aucun éléments
+	   				{
+	   					taille = 0;
+	   				}
+	   					
+	   				//Si c'est un tableau de tableau on va reboucler
+	   				type = type.getElement();
+	   			}
+	   			//																									//A faire  On recopie le tableau
 	   			break;   
 	   		default:
 	   			throw new Exception("NatureType incohérent ligne : "+a.getNumLigne());
 	   }
 	   desallouer(regs);
+   }
+   
+   static private void recopier_tableau()
+   {
+	   																												//A faire  On recopie le tableau
    }
    // ############################ Bool ################################
 
@@ -932,19 +960,34 @@ class Generation {
 	   			break;
 	   			
 	   		case Array:
-	   			Type tab = def.getType().getIndice();
-	   			int inf = tab.getBorneInf();
-	   			int sup = tab.getBorneSup();
+	   			Type tab = def.getType();
+	   			Type indices;
+	   			int inf;
+	   			int sup;
 	   			
-	   			if (inf < sup)
-	   			{
-	   				def.setOperande(Operande.creationOpIndirect(pointeur_pile, Registre.GB));
-	   				pointeur_pile += (1+sup-inf);
+	   			//Pour gérer les tableaux de tableaux ..
+	   			while(tab.getNature() == NatureType.Array) {
+	   				indices = tab.getIndice();
+	   				inf = indices.getBorneInf();
+	   				sup = indices.getBorneSup();
+	   				
+		   			if (inf < sup)
+		   			{
+		   				def.setOperande(Operande.creationOpIndirect(pointeur_pile, Registre.GB));
+		   				pointeur_pile += (1+sup-inf);
+		   			}
+		   			else
+		   			{
+		   				System.out.println("/!\\ Tableau de taille nulle ligne : " + lident.getNumLigne());
+		   			}
+		   			
+		   			//Soit on a un tableau de tableau et donc on a un Array sinon autre chose.
+		   			tab = tab.getElement();
 	   			}
-	   			else
-	   			{
-	   				System.out.println("/!\\ Tableau de taille nulle ligne : " + lident.getNumLigne());
-	   			}
+	   			
+
+	   			
+
 	   			break;
 	   		
 	   		default:
