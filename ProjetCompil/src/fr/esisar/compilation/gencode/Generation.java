@@ -10,8 +10,6 @@ import fr.esisar.compilation.global.src3.*;
 class Generation {
 	// les états 
 	static private boolean used[] = new boolean[16];
-	// les operateurs contenus
-	static private Operande mmap[] = new Operande[16];
 	
 	static private int pointeur_pile = 0;
 	static private Etiq end = Etiq.lEtiq("end");
@@ -150,7 +148,7 @@ class Generation {
 		
 		Noeud noeud = a.getNoeud();
 		
-		// a est une feuille de l'arbre, arit� 0
+		// a est une feuille de l'arbre, arit� 0
 		switch(noeud) {
 		case Chaine:
 			Prog.ajouter(Inst.creation2(Operation.LOAD, Operande.creationOpChaine(a.getChaine()), r));
@@ -162,41 +160,21 @@ class Generation {
 			Prog.ajouter(Inst.creation2(Operation.LOAD, Operande.creationOpEntier(a.getEntier()), r));
 			break;
 		case Ident:
-			Prog.ajouter(Inst.creation2(Operation.LOAD, Operande.GB, r));
+			Prog.ajouter(Inst.creation2(Operation.LOAD, operande_Ident(a), r));								// A refaire 
 			break;
 		default:
 			break;
 		}
-		boolean Reste_Registres = false;
-		// on recherche si il existe des registres non utilis�s
-		for(int i=0; i<used.length; i++) {
-			if(!used[i]) {
-				Reste_Registres = true;
-				break;
-			}
-		}
-		
-		// a est d'arit� 2
+		// a est d'arit� 2
 		if(a.getArite()==2) {
-			
-			if(Reste_Registres) {
-				coder_Expr(a.getFils1(), r);
-				int d = allouer_Reg();
-				Operande rd = int_to_Op(d);
-				coder_Expr(a.getFils2(), rd);
-				Prog.ajouter(Inst.creation2(operation_Arithmetique(a), rd, r));
-				free_Reg(d);
-			}
-			else {
-				// lorsqu'on a plus de registres on alloue une varable temporaire
-				coder_Expr(a.getFils2(), r);
-				int[] temp = allouer(1);
-				Prog.ajouter(Inst.creation2(Operation.STORE, r, int_to_Op(temp[0])));
-				coder_Expr(a.getFils1(), r);
-				Prog.ajouter(Inst.creation2(operation_Arithmetique(a), int_to_Op(temp[0]), r));
-				free_Reg(temp[0]);
-			}
-			
+			int[] regs = allouer(1);
+			Operande rd = int_to_Op(regs[0]);
+
+			coder_Expr(a.getFils1(), r);
+			coder_Expr(a.getFils2(), rd);
+			Prog.ajouter(Inst.creation2(operation_Arithmetique(a), rd, r));
+			desallouer(regs);
+			verifier_Arith_OV();
 		}
    }
    
@@ -306,35 +284,48 @@ class Generation {
    {
 	   // a = b + c
 	   // il faut d'abord evaluer b+c (dans un registre de travail)
-	   // puis l'injecter dans a grace a son addresse (OpIndirect que l'on trouve dans sa declaration
+	   // puis l'injecter dans a grace a son addresse (OpIndirect)
 	   
-	   
+	   int[] regs = allouer(2);
 	   /**************************************************************************
 	    * PLACE 		-> IDENT | IDENT est un identificateur de variable  
 						|  Noeud.Index(PLACE, EXP)     
 	    **************************************************************************/
-	   int[] regs = allouer(1);
 	   
-	  // Operande ident = a.getFils1().getDecor().getDefn().getOperande();
-	   Operande expr = int_to_Op(regs[0]);
+	   Arbre f1 = a.getFils1();
+	   Operande ident = int_to_Op(regs[0]);
+	   switch (f1.getNoeud())
+	   {
+	   		case Ident:
+	   			Operande addr = operande_Ident(f1);
+	   			Prog.ajouter(Inst.creation2(Operation.LEA, addr, ident));
+	   			break;
+	   		case Index:
+	   																						// A faire
+	   			break;
+	   		default:
+	   			throw new Exception("Décor incohérent ligne : "+a.getNumLigne());
+	   }
+	   
 	   // b + c
+	   Operande expr = int_to_Op(regs[1]);
 	   coder_Expr(a.getFils2(), expr);
 	   
-	   NatureType nature = a.getFils1().getDecor().getType().getNature();	   
+	   Type type = f1.getDecor().getType();
+	   NatureType nature = type.getNature();	   
 	   switch(nature)
 	   {	   		
 	   		case Real:
 	   		case Boolean:
-		//		Prog.ajouter(Inst.creation2(Operation.STORE, expr, ident));
-	   			break;
 	   		case Interval:
-	   			//verifier_Interval_OV(expr, bornes_de_lident);
+	   			if (nature.equals(NatureType.Interval)) verifier_Interval_OV(expr,type); 
+	   			Prog.ajouter(Inst.creation2(Operation.STORE, expr, ident));
 	   			break;
 	   		case Array:
 	   			//Un peu plus de travail ici
 	   			break;   
 	   		default:
-	   			throw new Exception("Decor incohérent ligne : "+a.getNumLigne());
+	   			throw new Exception("NatureType incohérent ligne : "+a.getNumLigne());
 	   }
 	   desallouer(regs);
    }
@@ -490,7 +481,7 @@ class Generation {
 
 				//On libere/restaure le registre
 				desallouer(regs);
-				verifier_Arith_OV(a);
+				verifier_Arith_OV();
 			
 			break;
 	   	default:
@@ -721,16 +712,11 @@ class Generation {
 		}
 	}
    }
-   
-   
-   // ############################ Memoire ################################
-    
-   
-   
    // ############################ Memoire ################################
 
    // >>>     Des/Allocation
    // Top level : demande l'allocation de nb var. Retourne un tableau d'indice (au modulo pres) des registres allouees
+   // R1 ne sera jamais allouee pour ne pas causer de conflit avec les instruction d'IO
    static private int[] allouer(int nb) throws Exception
    {
 	   int to_return[] = new int[nb] , tmp;
@@ -774,12 +760,13 @@ class Generation {
    }
    
 
+   // NE PAS UTILISER
    static private int allouer_Reg() throws Exception
    {
 	   int ri = 15;
 	   while (ri >= 0)
 	   {
-		   if (!used[ri])
+		   if (!used[ri] && ri != 1)
 		   {
 			   used[ri] = true;
 			   return ri;
@@ -791,6 +778,7 @@ class Generation {
 	   throw new Exception("Out of register!");
    }
 
+   // NE PAS UTILISER
    static private void free_Reg(Operande ri) throws Exception
    {
 	   if (!(ri.getNature().equals(NatureOperande.OpDirect))) throw new Exception("free_Reg called on a non-register operande!");
@@ -800,6 +788,7 @@ class Generation {
 	   if (i != -1) used[i] = false;
    }
    
+   // NE PAS UTILISER
    static private void free_Reg(int ri)
    {
 	   if (ri != -1) used[(ri%16)] = false;
@@ -984,7 +973,7 @@ class Generation {
    }
    
    // A placer après chaque operateur arithmetique risquant de faire un overflow
-   static private void verifier_Arith_OV(Arbre a)
+   static private void verifier_Arith_OV()
 	{
 	    // L'overflow sera causé par l'appel à une instruction arithmetique , on met juste un BOV après chacun
 		Prog.ajouter(Inst.creation1(Operation.BOV, Operande.creationOpEtiq(Prog.L_Etiq_Debordement_Arith)));
@@ -1039,10 +1028,13 @@ class Generation {
 	   {
 			case "true":
 				to_return = def.getNature().equals(NatureDefn.ConstBoolean) ? Operande.creationOpEntier(1) : null;
+				break;
 			case "false":
 				to_return = def.getNature().equals(NatureDefn.ConstBoolean) ? Operande.creationOpEntier(0) : null;
+				break;
 			case "max_int":
 				to_return = def.getNature().equals(NatureDefn.ConstInteger) ? Operande.creationOpEntier(def.getValeurInteger()) : null;	
+				break;
 			default:
 				to_return = def.getOperande();
 	   }
