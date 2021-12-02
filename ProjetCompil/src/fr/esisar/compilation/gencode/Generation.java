@@ -1,5 +1,7 @@
 package fr.esisar.compilation.gencode;
 
+import java.util.Arrays;
+
 import fr.esisar.compilation.global.src.*;
 import fr.esisar.compilation.global.src3.*;
 
@@ -370,10 +372,12 @@ class Generation {
 	   desallouer(regs);
    }
    
-   static private void recopier_tableau()
+   // on recopie un tableau d'objets dans un autre
+   static private Object[] recopier_tableau(Object[] tableau)
    {
-	   																												//A faire  On recopie le tableau
+	   		return Arrays.copyOf(tableau, tableau.length);																										//A faire  On recopie le tableau
    }
+   
    // ############################ Bool ################################
 	static void coder_Expr_Bool(Arbre a, Operande rdest) throws Exception 
 	{
