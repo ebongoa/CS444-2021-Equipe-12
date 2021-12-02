@@ -131,22 +131,42 @@ class Generation {
    static void coder_Expr(Arbre a, Operande r) throws Exception
    {
 	    NatureType nature = a.getDecor().getType().getNature();
-  
+		int[] regs = allouer(1);
+		Operande rd = int_to_Op(regs[0]);
+		
+
 		switch(nature) 
 		{
 			case String:
 				break;
-			case Boolean:				
+			case Boolean:	
+				coder_Expr_Bool(a,rd);
 				break;
 			case Real:
-			case Interval:				
+			case Interval:
+				evaluer_Expr_Arith(a,rd);
+				//verifier_Arith_OV(); // normalement deja appele par evaluer_Expr_Arith
 				break;
-			case Array:				
+			case Array:
+				Arbre f1 = a.getFils1();
+				switch (f1.getNoeud())
+				{
+					case Ident:
+				   		Operande addr = operande_Ident(f1);
+				   		Prog.ajouter(Inst.creation2(Operation.LEA, addr, rd));
+				   		break;
+				    case Index:
+				   																						// A faire
+				   		break;
+				   	default:
+				   		throw new Exception("Décor incohérent ligne : "+a.getNumLigne());
+				}
 				break;
 			default:
 				throw new Exception("Decor incoherent ligne : " + a.getNumLigne());
 		}
-		
+		desallouer(regs);
+		/*                                                              Un bout qu'a commence alberte 
 		Noeud noeud = a.getNoeud();
 		
 		// a est une feuille de l'arbre, arit� 0
@@ -161,22 +181,18 @@ class Generation {
 			Prog.ajouter(Inst.creation2(Operation.LOAD, Operande.creationOpEntier(a.getEntier()), r));
 			break;
 		case Ident:
-			Prog.ajouter(Inst.creation2(Operation.LOAD, operande_Ident(a), r));								// A refaire 
+			Prog.ajouter(Inst.creation2(Operation.LOAD, operande_Ident(a), r));	
 			break;
 		default:
 			break;
 		}
-		// a est d'arit� 2
-		if(a.getArite()==2) {
-			int[] regs = allouer(1);
-			Operande rd = int_to_Op(regs[0]);
+		
+		int[] regs = allouer(1);
+		Operande rd = int_to_Op(regs[0]);
+		evaluer_Expr_Arith(a,rd);
 
-			coder_Expr(a.getFils1(), r);
-			coder_Expr(a.getFils2(), rd);
-			Prog.ajouter(Inst.creation2(operation_Arithmetique(a), rd, r));
-			desallouer(regs);
-			verifier_Arith_OV();
-		}
+		desallouer(regs);
+		verifier_Arith_OV();*/
    }
    
    static void coder_Liste_Expr(Arbre a) throws Exception {
@@ -359,7 +375,37 @@ class Generation {
 	   																												//A faire  On recopie le tableau
    }
    // ############################ Bool ################################
-
+	static void coder_Expr_Bool(Arbre a, Operande rdest) throws Exception 
+	{
+		/* si vrai on injecte l'equivalent de true (1) sinon l'equivalent de false (0) dans rdest
+		 * traitement
+		 * comparaison
+		 * jump conditionnel
+		 * injecte true
+		 * jump
+		 * label : faux
+		 * injecte false
+		 * label : fin
+		 */
+		
+		Etiq faux = Etiq.lEtiq("cas_faux");
+		Etiq fin = Etiq.lEtiq("fin");
+		
+		// traitement + comparaison + jump conditionnel
+		coder_Cond(a, false, faux);	
+		// injecte true
+		Prog.ajouter(Inst.creation2(Operation.LOAD, Operande.creationOpEntier(1), rdest));
+		// jump
+		Prog.ajouter(Inst.creation1(Operation.BRA, Operande.creationOpEtiq(fin)));
+		// label : faux
+		Prog.ajouter(faux);
+		//  injecte false
+		Prog.ajouter(Inst.creation2(Operation.LOAD, Operande.creationOpEntier(0), rdest));
+		// label : fin
+		Prog.ajouter(fin);
+	}
+   
+   
    // Opérateurs de comparaison =, <, >, !=, ≤, et ≥
    // Prends un noeud en entree et retourne l'Operation correspondante. si revert = true alors retourne l'Operation contraire
    static private Operation op_Comparaison(Noeud n,boolean revert) throws Exception 
@@ -462,12 +508,23 @@ class Generation {
 	   //en fonction de l'arite il nous faudra allouer (ou non) un nouveau registre
 	   Operande opande;
 	   Operation option;
-	   
+	   int[] regs = null;
 	   switch (a.getArite())
 	   {
 	   
-	    //case 0: ?
-		//	break;
+	    case 0: 
+	    	option = Operation.LOAD;
+	    	if (a.getNoeud().equals(Noeud.Ident))
+	    	{
+	    		opande = operande_Ident(a);
+	    	}
+	    	else 
+	    	{
+	    		opande = operande_Arithmetique(a);
+	    	}
+			//factorise , apres le switch
+			//Prog.ajouter(Inst.creation2(option, opande, rdest));			
+	    	break;
 	   	case 1:
 	   		//On evalue dans le sens naturel , gauche -> droite
 	   		evaluer_Expr_Arith(a.getFils1(), rdest);
@@ -488,13 +545,12 @@ class Generation {
 				default:
 					throw new Exception("Decor incoherent ligne : " + a.getNumLigne());
 			}
-			
-			Prog.ajouter(Inst.creation2(option, opande, rdest));
+			//factorise , apres le switch
+			//Prog.ajouter(Inst.creation2(option, opande, rdest));
 			break;
 		
 	   	case 2:
-				//On s'alloue un registre
-				int[] regs = allouer(1);
+	   			regs = allouer(1);
 				//On défini l'operation
 				option = operation_Arithmetique(a);
 				//
@@ -506,16 +562,19 @@ class Generation {
 				evaluer_Expr_Arith(a.getFils2(), opande);
 				
 				// Et on ajoute !
-				Prog.ajouter(Inst.creation2(option, opande, rdest));
+				//factorise , apres le switch
+				//Prog.ajouter(Inst.creation2(option, opande, rdest));
 
-				//On libere/restaure le registre
-				desallouer(regs);
-				verifier_Arith_OV();
-			
+				verifier_Arith_OV();		
 			break;
 	   	default:
 	   		throw new Exception("Decor incoherent ligne : " + a.getNumLigne());
 	 }
+	   Prog.ajouter(Inst.creation2(option, opande, rdest));
+	   if(regs != null)
+			//On libere/restaure le registre
+			desallouer(regs);
+	  
    }
    
    
