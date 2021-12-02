@@ -1076,6 +1076,7 @@ class Generation {
 	   if( lident.getFils1().getNoeud() == Noeud.ListeIdent) 
 	   {
 		   allouer_Pile(lident.getFils1());
+		   //Pourquoi faire ça?
 	   }
 	   											
 	}   
