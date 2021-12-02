@@ -1,5 +1,10 @@
 program
+
+a : integer;
+
 begin
+
+	a:=1;
    write("lama");
 end.
 

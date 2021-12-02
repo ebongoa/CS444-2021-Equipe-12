@@ -1068,12 +1068,12 @@ class Generation {
 	   }
 	   
 	   // A priori code Liste_Decl appel Decl par Decl
-	   /*
+	   
 	   if( lident.getFils1().getNoeud() == Noeud.ListeIdent) 
 	   {
 		   allouer_Pile(lident.getFils1());
 	   }
-	   */											
+	   											
 	}   
   
    // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
