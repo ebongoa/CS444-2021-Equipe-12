@@ -10,6 +10,7 @@ import fr.esisar.compilation.global.src3.*;
 class Generation {
 	// les états 
 	static private boolean used[] = new boolean[16];
+	static private int last_saved = -1;
 	
 	static private int pointeur_pile = 0;
 	static private Etiq end = Etiq.lEtiq("end");
@@ -28,7 +29,7 @@ class Generation {
       // -----------
       
       // Etiquettes de structure
-     
+      
       // program :
       Prog.ajouterGrosComment("program                    ");
       coder_Liste_Decl(a.getFils1());
@@ -747,6 +748,7 @@ class Generation {
    // R1 ne sera jamais allouee pour ne pas causer de conflit avec les instruction d'IO
    static private int[] allouer(int nb) throws Exception
    {
+	   Prog.ajouterComment("Allocation : "+nb);
 	   int to_return[] = new int[nb] , tmp;
 	   for (int i = 0 ; i < nb ; i++)
 	   {
@@ -758,8 +760,12 @@ class Generation {
 		   /// Pour le moment on va encoder cette information simplement en ajoutant un offset -> int_to_Reg pour éviter les ennuis !
 		   catch (Exception e)
 		   {
-			   tmp = 16+i;
-			   push(Registre.valueOf("R" + i));
+			   last_saved++;
+               //On n'alloue jamais R1
+			   if (last_saved%16 == 1 ) last_saved++;
+
+			   tmp = last_saved;
+			   push(Registre.valueOf("R" + tmp%16));
 		   }	   
 		   
 		   to_return[i] = tmp;
@@ -771,6 +777,7 @@ class Generation {
    // Top level : fonction contraire de allouer. Utilise l'indice pour determiner si il faut restaurer ou non le registre.
    static private void desallouer(int[] ris) throws Exception
    {
+	   Prog.ajouterComment("Desallocation : "+ris.length);
 	   int tmp;
 	   for (int i = ris.length-1 ; i >= 0 ; i--)
 	   {
@@ -779,6 +786,13 @@ class Generation {
 		   if (tmp > 15)
 		   {
 			   pop(tmp%16);
+			   //Doit tout le temps etre vrai , le cas faux marquerait une desynchronisation ou une desallocation dans le mauvais ordre
+			   if (last_saved == tmp) 
+			   {
+				   last_saved--;
+				   //On n'alloue jamais R1
+				   if (last_saved%16 == 1 ) last_saved--;
+			   }
 		   }
 		   else
 		   {
