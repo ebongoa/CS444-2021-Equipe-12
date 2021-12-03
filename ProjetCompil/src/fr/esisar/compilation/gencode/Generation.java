@@ -96,7 +96,8 @@ class Generation {
 			
 		   noeud = f1.getNoeud();	
 			// List_Decl | vide
-			switch(noeud) {
+			switch(noeud) 
+			{
 				
 				case ListeDecl:
 					coder_Liste_Decl(f1);
@@ -621,7 +622,7 @@ class Generation {
    
    static void coder_Inst(Arbre a) throws Exception {
 	   Noeud noeud = a.getNoeud();
-	   Inst inst,inst1 ;
+	   Inst inst ;
 	   Etiq etiq_Debut,etiq_Fin,etiq_Cond,etiq_Sinon;
 
 	   
@@ -698,7 +699,7 @@ class Generation {
 				break;
 			case ListeInst :
 				coder_Liste_Inst(a.getFils1());
-				coder_Inst(a.getFils2()); 										// Faut ptet le sortir en fait
+				coder_Inst(a.getFils2());
 				break;
 		
 			default:
@@ -1070,13 +1071,10 @@ class Generation {
 	   		default:
 	   			throw new Exception("Decor incoherent ligne : " +lident.getNumLigne());
 	   }
-	   
-	   // A priori code Liste_Decl appel Decl par Decl
-	   
+	   	   
 	   if( lident.getFils1().getNoeud() == Noeud.ListeIdent) 
 	   {
 		   allouer_Pile(lident.getFils1());
-		   //Pourquoi faire ça?
 	   }
 	   											
 	}   

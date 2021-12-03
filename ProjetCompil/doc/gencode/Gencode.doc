@@ -1,0 +1,127 @@
+I - Structuration
+ 1 - le "main"
+ 2 - Declarations
+ 3 - Instructions
+ 4 - Expressions
+ 5 - Debordements
+ 6 - Memoire
+
+II - Algorithmes
+ 1 - Bool
+ 2 - Arithmetique
+ 3 - Tableaux
+
+
+I - Structuration
+
+	1/ Le "main"
+		Pour cette phase , le point d'entrée de notre programme est une instance statique de Generation et on fait appel à sa méthode coder.
+		Cette méthode va faire les appels aux fonctions génératrice de code de plus haut niveau de manière à obtenir une structure cohérente.
+		
+		Dans notre cas il y'a 4 grandes étapes:
+			- Generer la section JCas "program" , qui correspond aux déclarations.
+			- Generer la section JCas "begin" , qui correspond aux instructions.
+			- Génerer une section de post-traitement , nous ne compilerons que des programmes simples le post-traitement se limitera donc à libérer la pile alloué. 
+			- Génerer une section d'erreur , pour gérer les débordements.
+
+		Dans le code asm généré , les sections sont délimitées par les commentaires program/begin/end/Erreurs a l'execution.
+
+	2/ Declarations
+		Le langage JCas ne permet de déclarer des variables qu'au début , dans un segment de code spécifique , nous allons donc tout naturellement le traiter en premier.
+		Un arbre dont le noeud est Liste_Decl peut avoir pour fils (LISTE_DECL, DECL) ou (Noeud.Vide ).
+		
+		i) coder_Liste_Decl
+			Le choix d'une méthode qui s'appele récursivement semblait tout à fait adapté , cependant ce n'est pas cette méthode qui fait le vrai traitement.
+			En effet il y'a deux cas possible , le cas trivial où le fils 1 est un noeud vide , ou bien le cas moins trivial où le fils 1 est aussi une List_Decl et 
+			le fils 2 est la/les déclarations sur une ligne.
+			
+			Le cas trivial correspond à notre cas d'arrêt.
+			Le second cas lui va impliquer un appel récursif pour le traitement du fils 1 et l'appel à la méthode allouer_Pile pour le traitement du fils 2.
+			C'est concrètement allouer_Pile qui va déterminer la taille à allouer en fonction de la nature du noeud , et appeler la méthode SetOperande pour y inscrire l'@ du 				noeud en pile.La taille de la pile est contenue dans l'attribut pointeur_pile , c'est allouer_Pile qui est en charge de mettre cette valeur à jour cependant on ne met 				pas à jour SP.
+			
+			Dans le cas où une ligne déclare plusieurs variables , allouer_Pile le gère récursivement.
+			  
+		ii) Verification 
+			De retour dans le "main" , nous connaissons la taille alloué pour les déclarations car elle est dans pointeur_pile , nous allons donc faire appel a verifier_Pile_OV 
+			qui génère le code du test et du branchement (en cas d'OVerflow).
+			
+			Puis nous mettons à jour SP pour que le programme ai connaissance de l'allocation groupé.
+			Cette base fixe qui a été mise en pile sera libéré dans la section de post-traitement si il n'y a pas eu de débordement.
+
+	3/ Instructions
+		Un arbre dont le noeud est Liste_Inst peut avoir pour fils (LISTE_INST, INST) ou (Noeud.Vide ).
+	
+		De manière analogue a coder_Liste_Decl , coder_Liste_Inst va s'appeler récursivement tant qu'il tombe pas sur un noeud vide et va appeler coder_Inst pour effectuer le 			traitement.
+		Les différentes instructions que nous pouvions rencontrer sont :
+		- Affect	, coder_Affect
+		- Si		, codé en dur
+		- Pour		, codé en dur
+		- TantQue	, codé en dur
+		- Lecture	, coder_IO(true)
+		- Ecriture	, coder_IO(false)
+		- Ligne	, codé en dur
+		- Nop		, codé en dur
+		Sinon : Aucune erreur n'est levé.
+
+		A terme chacune de ses fonctions fait appel à coder_Expr pour evaluer les expressions.
+		
+	4/ Expressions
+		coder_Liste_Expr , analogue aux deux autre methodes de noms similaires. 		
+		Le traitement des expressions se fait différement selon le type qui a été attribué lors de l'étape 2 , on a donc 4 cas :
+		- String 	, aucun traitement
+		- Boolean 	, coder_Expr_Bool
+		- Interval ou Real , coder_Expr_Arith
+		- Array 	, codé en dur
+
+		Dans les cas coder_Expr_Bool et coder_Expr_Arithm l'idée a été de déterminer l'Operateur d'une part , d'évaluer le ou les opérandes (appel à coder_Expr_) et finalement 			injecter l'asm correspondant. 
+		Il y'a donc des sous methodes à coder_Expr_Arith/Bool pour obtenir les Operateurs et d'autres qui font des traitements spécifiques.
+
+	5/ Debordements
+		La gestion des débordements est assez sommaire , en effet on se contente d'afficher qu'il y'a eu un débordement et on arrête le programme
+		Il existe 4 méthodes qui génèrent le code asm qui ont une dénomination similaire verifier_X_OV où X peut valoir :
+		- Pile
+		- Arithmetique
+		- Interval
+		- Array
+	 
+	 6/ Memoire
+		Par mémoire , on entends gestion des registres et de la Pile.
+		i) Fonctionnement
+			- Nous avons pris le parti de gérer les registres par un tableau de boolean , car le nombre de registres ne va pas varier pendant l'execution et que nous avons 				uniquement besoin de retenir si ils sont déjà alloué ou non.
+			
+			- Avec ce tableau , nous avons aussi une variable last_saved qui contient indirectement l'indice du dernier registre que nous avons dû sauver pour pouvoir résoudre une 				allocation. (-1 => aucun registre n'est sauvé en pile)
+			
+			- R1 n'est jamais alloué , son usage est exclusivement reservé pour coder_IO (Write & Read utilisent ce registre spécifiquement)
+			
+			- Un encodage a été utilisé pour les indices des registres , en réalité il faut utiliser indice%16 pour addresser le tableau , si l'indice > 15 alors on sait que le 				registre a été sauvé en pile pour l'allocation , il faudra donc le restituer à la desallocation. Les fonctions int_to_Reg/int_to_Op sont des fonctions de conversion 				pour éviter d'avoir des erreurs dans le source Java et cacher ce détail.
+			
+			Ces point ayant été expliqué , il n'y a qu'une seule methode qui doit être appelé pour l'allocation de registre : allouer (et desallouer pour la desallocation).
+			allouer prends en entrée un nombre de registre a allouer , les alloue et retourne la liste des indices indirects associés aux registres allouéq.Cette liste est trié 				dans l'ordre d'allocation , la desallocation part donc de la fin de la liste vers le début.
+			
+			Dans un premier temps allocation va parcourir le tableau de boolean pour voir si un registre est libre (i.e tombe sur un false) , si oui il l'ajoute a la liste et 				l'inscrit comme alloué. Sinon il va incrémenter de manière intelligente last_saved (on evite les valeurs 1+15k) , push le registre associé a cet indice , ajouter cet 				indice a la liste.
+			
+			La recherche de registre libre part de 15 et descend vers 0 alors que pour définir quel registre sauver on part de 0 vers l'infini.
+			L'infini ? oui on a fait l'hypothèse qu'un traitement qui aurait besoin de plus de 15 registres serait nécessairement simplifiable. Meme si la reallocation va 				reboucler après avoir réallouer R15 en tout état de cause R0 ne sera pas utilisé dans le même contexte et donc aura le temps d'être restauré avant de retourner dans le 				contexte où il est utilisé.
+			
+		
+		ii) Usage
+			Au début d'une fonction qui a besoin de registre on appele allouer(nb_reg) et on stocke le int[] qu'il renvoie.
+			Avec les fonctions de conversion on récupère les opérandes associés aux indices (Operande.RX).
+			A la fin de la méthode on fait un appel à désallouer(int[]) ce qui va libérer le registre et si nécessaire restituer son précédent contenu .
+			
+			C'est donc au programmeur de s'assurer qu'il ne demande pas un registres indécent en une fois et de segmenter au maximum le traitement à faire en sous fonctions.
+		
+		Le fichier de test qui permet d'observer tous les aspects de ce fonctionnement est allouer.cas
+
+II - Algorithmes
+ 	1/ Bool
+ 		La volonté a été de programmer une lazy evaluation des booléens.
+ 	
+ 	2 - Arithmetique
+ 		Dans un premier temps nous avons evaluer à gauche tout le temps , une amélioration aurait été d'évaluer par la droite dans le cas où on a des registres qui ont été sauvé.
+ 		
+ 	3 - Tableaux	
+		Le calcul d'index n'a pas des été implementé.
+		
+		
+Auteur(s): Nicolas GROSJEAN
