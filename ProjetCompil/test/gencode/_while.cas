@@ -1,5 +1,5 @@
 program
-   -- aucune déclaration
+   -- aucune declaration
 begin
    while 2 > 0 do
       null;

@@ -1,0 +1,7 @@
+program
+	x : array[1..3] of array[1..5] of integer;
+	k : integer;
+begin
+	k := 10
+	x[1][2] := k;
+end.

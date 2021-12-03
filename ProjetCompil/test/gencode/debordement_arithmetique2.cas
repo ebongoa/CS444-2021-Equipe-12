@@ -1,0 +1,7 @@
+program
+ 	x,y : integer;
+begin
+ 	x := 2000000000;
+ 	y := 1000000000;
+	x := x+y; --debordement arithmetique addition
+end. 

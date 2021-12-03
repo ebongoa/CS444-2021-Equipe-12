@@ -1,0 +1,8 @@
+program
+	x : real;
+	y : real;
+begin
+	x := 10
+	y := 0;
+	x := x/y; --debordement arithmetique division par 0
+end.

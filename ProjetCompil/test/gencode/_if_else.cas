@@ -1,7 +1,7 @@
 program
    a: boolean;
 begin
-   if !true then
+   if not true then
       null;
    else
    	  null;

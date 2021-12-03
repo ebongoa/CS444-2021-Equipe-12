@@ -1,10 +1,6 @@
 program
-
-a : integer;
-
+	a,n : integer;
 begin
-
-	a:=1;
-   write("lama");
+	null;
 end.
 

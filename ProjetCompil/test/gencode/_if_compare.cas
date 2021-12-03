@@ -1,5 +1,5 @@
 program
-   -- aucune déclaration
+   -- aucune declaration
 begin
    if 2>1 then
       null;

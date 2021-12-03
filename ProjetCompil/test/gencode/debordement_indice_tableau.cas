@@ -1,0 +1,5 @@
+program
+	x : array[1..10] of integer;
+begin
+	x[11] := 5; --debordement indice du tableau
+end.

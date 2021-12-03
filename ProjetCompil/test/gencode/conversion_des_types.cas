@@ -1,0 +1,9 @@
+program
+	x :integer;
+	y : 9..15;
+	z : real;
+begin
+	x := 10;
+	y := x ;
+	z := y;
+end.
