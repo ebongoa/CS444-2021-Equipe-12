@@ -1,9 +1,11 @@
 program
    a: boolean;
 begin
-   if not true then
+   if a then
       null;
    else
-   	  null;
+      null;
    end;
 end.
+
+

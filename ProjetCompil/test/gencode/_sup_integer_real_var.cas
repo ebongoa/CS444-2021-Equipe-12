@@ -1,0 +1,10 @@
+program
+   a,b: real;
+   i,j: integer;
+   c : boolean;
+begin
+   i:= 1;
+   b:= 2.0;
+   c:= i > b;
+end.
+

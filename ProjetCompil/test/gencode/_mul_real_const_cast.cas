@@ -1,0 +1,7 @@
+program
+    a,b,c: real;
+begin
+   a := 1.0;
+   b := 2.0;
+   c := 1*2.0;
+end.

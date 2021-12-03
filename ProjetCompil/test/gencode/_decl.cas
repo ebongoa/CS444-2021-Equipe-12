@@ -3,6 +3,8 @@ program
    b: real;		        -- 1 mot
    c: array[1..10] of integer; -- 10 mots
 begin
+   a := true;
+   b := 10.0;
    write("\lo");
 end.
 

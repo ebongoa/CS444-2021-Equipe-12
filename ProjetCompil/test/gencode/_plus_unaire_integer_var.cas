@@ -1,0 +1,6 @@
+program
+    a,b: integer;
+begin
+   a := 1;
+   b := +a;
+end.   

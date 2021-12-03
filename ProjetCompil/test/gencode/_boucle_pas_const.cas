@@ -1,0 +1,7 @@
+program
+   i: integer;
+begin
+   for i := 3 downto 0 do
+      null;
+   end;
+end.

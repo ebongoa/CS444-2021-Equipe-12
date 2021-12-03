@@ -1,0 +1,6 @@
+program
+    a,b: boolean;
+begin
+   a := true;
+   b := not a;
+end.   

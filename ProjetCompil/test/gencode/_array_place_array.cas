@@ -1,0 +1,9 @@
+program
+   a: integer;
+   b: array[1..10] of integer;
+   c: integer;
+begin
+   a := 2;
+   c := 2;
+   b[a] := c;
+end.
